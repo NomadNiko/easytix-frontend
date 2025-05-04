@@ -148,6 +148,12 @@ function FormEditUser() {
       label: t(`admin-panel-users-edit:inputs.role.options.${RoleEnum.ADMIN}`),
     },
     {
+      value: RoleEnum.SERVICE_DESK.toString(),
+      label: t(
+        `admin-panel-users-edit:inputs.role.options.${RoleEnum.SERVICE_DESK}`
+      ),
+    },
+    {
       value: RoleEnum.USER.toString(),
       label: t(`admin-panel-users-edit:inputs.role.options.${RoleEnum.USER}`),
     },

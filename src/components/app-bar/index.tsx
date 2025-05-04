@@ -9,12 +9,13 @@ import AuthSection from "./auth-section";
 
 const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
   const [opened, setOpened] = useState(false);
+
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
         width: { base: 240, sm: 300 },
-        breakpoint: "sm",
+        breakpoint: "sm", // Using 'sm' to match our useResponsive hook's isMobile (48em/768px)
         collapsed: { desktop: true, mobile: !opened },
       }}
       padding="md"
@@ -24,25 +25,23 @@ const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
           <Group justify="space-between">
             {/* Left side: Burger (mobile), Logo, Navigation Links */}
             <Group>
-              {/* Mobile Burger */}
+              {/* Mobile Burger - hide on sm and above */}
               <Burger
                 opened={opened}
                 onClick={() => setOpened((o) => !o)}
-                hiddenFrom="md"
+                hiddenFrom="sm"
                 size="sm"
               />
-              {/* Desktop Logo */}
-              <Logo />
-              {/* Desktop Navigation - moved next to Logo */}
+              {/* Desktop Logo - hide on mobile */}
+              <Logo visibleFrom="sm" />
+              {/* Desktop Navigation - hide on mobile */}
               <DesktopNavigation onCloseMenu={() => setOpened(false)} />
             </Group>
-
-            {/* Mobile Logo - centered */}
-            <Logo isMobile />
-
+            {/* Mobile Logo - hide on desktop */}
+            <Logo isMobile hiddenFrom="sm" />
             {/* Right side: Theme Switch and Auth Section */}
             <Group>
-              {/* Theme Switch Button - moved next to Auth Section */}
+              {/* Theme Switch Button */}
               <SwitchThemeButton />
               {/* Authentication Section */}
               <AuthSection />

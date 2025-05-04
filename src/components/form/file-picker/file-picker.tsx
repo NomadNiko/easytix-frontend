@@ -1,18 +1,17 @@
+// ./easytix-frontend/src/components/form/file-picker/file-picker.tsx
 "use client";
-import { useFileUploadService } from "@/services/api/services/files";
+import { useFileGeneralUploadService } from "@/services/api/services/files-general";
 import { FileEntity } from "@/services/api/types/file-entity";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import {
   Box,
   Text,
   Paper,
-  Button,
-  Group,
   ActionIcon,
-  Image as MantineImage,
   useMantineTheme,
+  Group,
 } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
+import { Button } from "@mantine/core";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import {
@@ -22,8 +21,9 @@ import {
   FieldValues,
 } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { IconX, IconFile, IconDownload } from "@tabler/icons-react";
 
-type ImagePickerProps = {
+type FilePickerProps = {
   error?: string;
   onChange: (value: FileEntity | null) => void;
   onBlur: () => void;
@@ -31,44 +31,56 @@ type ImagePickerProps = {
   disabled?: boolean;
   testId?: string;
   label?: React.ReactNode;
+  maxSize?: number;
 };
 
-function ImagePicker(props: ImagePickerProps) {
+function FilePicker(props: FilePickerProps) {
   const { onChange } = props;
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  const fetchFileUpload = useFileUploadService();
+  const [fileName, setFileName] = useState<string | undefined>(undefined);
+  const fetchFileUpload = useFileGeneralUploadService();
   const theme = useMantineTheme();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
+      if (isLoading) return; // Prevent multiple uploads while loading
       setIsLoading(true);
-      const { status, data } = await fetchFileUpload(acceptedFiles[0]);
-      if (status === HTTP_CODES_ENUM.CREATED) {
-        onChange(data.file);
+      try {
+        const file = acceptedFiles[0];
+        setFileName(file.name); // Store original filename for display
+        const { status, data } = await fetchFileUpload(file);
+        if (status === HTTP_CODES_ENUM.CREATED) {
+          onChange(data.file);
+        }
+      } catch (error) {
+        console.error("File upload failed:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     },
-    [fetchFileUpload, onChange]
+    [fetchFileUpload, onChange, isLoading]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/jpeg": [],
-      "image/png": [],
-    },
     maxFiles: 1,
-    maxSize: 1024 * 1024 * 20, // 20MB
+    maxSize: props.maxSize || 20 * 1024 * 1024, // Default to 20MB if not specified
     disabled: isLoading || props.disabled,
   });
 
-  const removeImageHandle = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.stopPropagation();
-    onChange(null);
-  };
+  const removeFileHandle = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.stopPropagation();
+      onChange(null);
+      setFileName(undefined);
+    },
+    [onChange]
+  );
+
+  const handleButtonClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <Paper
@@ -103,10 +115,12 @@ function ImagePicker(props: ImagePickerProps) {
           }}
         >
           <Text size="xl" fw="bold" color="white" ta="center">
-            {t("common:formInputs.singleImageInput.dropzoneText")}
+            {t("common:formInputs.filePicker.dropzoneText") ||
+              "Drop file here..."}
           </Text>
         </Box>
       )}
+
       {props?.value && (
         <Box
           style={{
@@ -114,49 +128,53 @@ function ImagePicker(props: ImagePickerProps) {
             width: "100%",
             maxWidth: 300,
             marginBottom: theme.spacing.md,
+            padding: theme.spacing.md,
+            border: `1px solid ${theme.colors.gray[3]}`,
+            borderRadius: theme.radius.sm,
           }}
         >
-          <Box style={{ position: "relative", height: 250, width: "100%" }}>
-            <MantineImage
-              src={props.value.path}
-              alt={
-                t("common:formInputs.singleImageInput.imageAlt") ||
-                "Uploaded image"
-              }
-              fit="cover"
-              h={250}
-            />
-            <ActionIcon
-              color="red"
-              variant="filled"
-              onClick={removeImageHandle}
-              style={{
-                position: "absolute",
-                top: 5,
-                right: 5,
-                zIndex: 2,
-              }}
-            >
-              <IconX size={18} />
-            </ActionIcon>
-          </Box>
+          <Group justify="apart" align="center">
+            <Group>
+              <IconFile size={40} />
+              <Text size="md">{fileName || "File"}</Text>
+            </Group>
+            <Group>
+              <ActionIcon component="a" href={props.value.path} target="_blank">
+                <IconDownload size={18} />
+              </ActionIcon>
+              <ActionIcon color="red" onClick={removeFileHandle}>
+                <IconX size={18} />
+              </ActionIcon>
+            </Group>
+          </Group>
         </Box>
       )}
-      <Group mt={props.value ? 0 : theme.spacing.md}>
+
+      <Box mt={props.value ? 0 : theme.spacing.md} onClick={handleButtonClick}>
         <Button
+          component="label"
           loading={isLoading}
           data-testid={props.testId}
           size="compact-sm"
         >
           {isLoading
             ? t("common:loading")
-            : t("common:formInputs.singleImageInput.selectFile")}
+            : t("common:formInputs.filePicker.selectFile") || "Select File"}
           <input {...getInputProps()} />
         </Button>
-      </Group>
+      </Box>
+
       <Text mt="xs" size="sm" color="dimmed">
-        {t("common:formInputs.singleImageInput.dragAndDrop")}
+        {t("common:formInputs.filePicker.dragAndDrop") ||
+          "or drag and drop a file here"}
       </Text>
+      <Text mt="xs" size="xs" color="dimmed">
+        Max file size:{" "}
+        {props.maxSize
+          ? `${Math.round(props.maxSize / (1024 * 1024))}MB`
+          : "20MB"}
+      </Text>
+
       {props.error && (
         <Text color="red" size="sm" mt="xs">
           {props.error}
@@ -166,7 +184,7 @@ function ImagePicker(props: ImagePickerProps) {
   );
 }
 
-function FormImagePicker<
+function FormFilePicker<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
@@ -174,6 +192,7 @@ function FormImagePicker<
     disabled?: boolean;
     testId?: string;
     label?: React.ReactNode;
+    maxSize?: number;
   }
 ) {
   return (
@@ -181,7 +200,7 @@ function FormImagePicker<
       name={props.name}
       defaultValue={props.defaultValue}
       render={({ field, fieldState }) => (
-        <ImagePicker
+        <FilePicker
           onChange={field.onChange}
           onBlur={field.onBlur}
           value={field.value}
@@ -189,10 +208,11 @@ function FormImagePicker<
           disabled={props.disabled}
           testId={props.testId}
           label={props.label}
+          maxSize={props.maxSize}
         />
       )}
     />
   );
 }
 
-export default FormImagePicker;
+export default FormFilePicker;

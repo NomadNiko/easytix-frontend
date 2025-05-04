@@ -24,6 +24,11 @@
       "dropzoneText": "Drop the image here ...",
       "dragAndDrop": "Or drag 'n' drop some images here",
       "selectFile": "Select an image"
+    },
+    "filePicker": {
+      "dropzoneText": "Drop the file here ...",
+      "dragAndDrop": "Or drag 'n' drop a file here",
+      "selectFile": "Select a file"
     }
   },
   "leavePage": {

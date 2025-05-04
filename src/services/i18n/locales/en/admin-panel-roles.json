@@ -1,12 +1,7 @@
 {
   "role": {
     "1": "Admin",
-    "2": "User",
-    "3": "Role3",
-    "4": "Role4",
-    "5": "Role5",
-    "6": "Role6",
-    "7": "Role7",
-    "8": "Role8"
+    "2": "Service Desk",
+    "3": "User"
   }
 }

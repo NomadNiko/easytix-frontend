@@ -2,20 +2,23 @@
 import { Anchor, Text } from "@mantine/core";
 import { useTranslation } from "@/services/i18n/client";
 import { oxanium } from "@/config/fonts";
+
 interface LogoProps {
   isMobile?: boolean;
+  hiddenFrom?: string;
+  visibleFrom?: string;
 }
-const Logo = ({ isMobile = false }: LogoProps) => {
+
+const Logo = ({ isMobile = false, hiddenFrom, visibleFrom }: LogoProps) => {
   const { t } = useTranslation("common");
-  const display = isMobile
-    ? { base: "flex", md: "none" }
-    : { base: "none", md: "flex" };
+
   // Use Anchor directly instead of Box with component prop
   return (
     <Anchor
       href="/"
       underline="never"
-      display={display}
+      hiddenFrom={hiddenFrom}
+      visibleFrom={visibleFrom}
       style={{
         flexGrow: isMobile ? 1 : 0,
         fontFamily: `${oxanium.style.fontFamily}, system-ui, sans-serif`,
@@ -28,4 +31,5 @@ const Logo = ({ isMobile = false }: LogoProps) => {
     </Anchor>
   );
 };
+
 export default Logo;
