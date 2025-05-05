@@ -74,5 +74,43 @@
     "profile": {
       "success": "Profile has been updated successfully"
     }
+  },
+  "documents": {
+    "title": "My Documents",
+    "empty": "You haven't uploaded any documents yet",
+    "errors": {
+      "loading": "Failed to load documents. Please try again later."
+    },
+    "actions": {
+      "upload": "Upload Document",
+      "download": "Download",
+      "delete": "Delete"
+    },
+    "upload": {
+      "title": "Upload Document",
+      "nameLabel": "Document Name",
+      "namePlaceholder": "Enter document name",
+      "submit": "Upload"
+    },
+    "validation": {
+      "fileRequired": "Please select a file",
+      "nameRequired": "Document name is required"
+    },
+    "confirm": {
+      "delete": {
+        "title": "Delete Document",
+        "message": "Are you sure you want to delete this document? This action cannot be undone."
+      }
+    },
+    "alerts": {
+      "upload": {
+        "success": "Document uploaded successfully",
+        "error": "Failed to upload document"
+      },
+      "delete": {
+        "success": "Document deleted successfully",
+        "error": "Failed to delete document"
+      }
+    }
   }
 }

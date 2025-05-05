@@ -1,4 +1,4 @@
-// ./easytix-frontend/src/components/form/file-picker/file-picker.tsx
+// src/components/form/file-picker/file-picker.tsx
 "use client";
 import { useFileGeneralUploadService } from "@/services/api/services/files-general";
 import { FileEntity } from "@/services/api/types/file-entity";
@@ -49,12 +49,17 @@ function FilePicker(props: FilePickerProps) {
       try {
         const file = acceptedFiles[0];
         setFileName(file.name); // Store original filename for display
+
+        // Use direct file upload, no presigned URLs
         const { status, data } = await fetchFileUpload(file);
+
         if (status === HTTP_CODES_ENUM.CREATED) {
           onChange(data.file);
+        } else {
+          console.error("File upload failed with status:", status);
         }
       } catch (error) {
-        console.error("File upload failed:", error);
+        console.error("File upload failed with error:", error);
       } finally {
         setIsLoading(false);
       }
@@ -120,7 +125,6 @@ function FilePicker(props: FilePickerProps) {
           </Text>
         </Box>
       )}
-
       {props?.value && (
         <Box
           style={{
@@ -149,7 +153,6 @@ function FilePicker(props: FilePickerProps) {
           </Group>
         </Box>
       )}
-
       <Box mt={props.value ? 0 : theme.spacing.md} onClick={handleButtonClick}>
         <Button
           component="label"
@@ -163,7 +166,6 @@ function FilePicker(props: FilePickerProps) {
           <input {...getInputProps()} />
         </Button>
       </Box>
-
       <Text mt="xs" size="sm" color="dimmed">
         {t("common:formInputs.filePicker.dragAndDrop") ||
           "or drag and drop a file here"}
@@ -174,7 +176,6 @@ function FilePicker(props: FilePickerProps) {
           ? `${Math.round(props.maxSize / (1024 * 1024))}MB`
           : "20MB"}
       </Text>
-
       {props.error && (
         <Text color="red" size="sm" mt="xs">
           {props.error}

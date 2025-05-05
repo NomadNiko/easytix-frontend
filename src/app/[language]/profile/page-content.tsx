@@ -7,6 +7,7 @@ import { useTranslation } from "@/services/i18n/client";
 import RouteGuard from "@/services/auth/route-guard";
 import { useEffect } from "react";
 import useGlobalLoading from "@/services/loading/use-global-loading";
+import UserDocumentsSection from "@/components/user-documents/UserDocumentsSection";
 
 function Profile() {
   const { user } = useAuth();
@@ -47,6 +48,9 @@ function Profile() {
           </Box>
         </Stack>
       </Group>
+
+      {/* Add the User Documents Section */}
+      <UserDocumentsSection />
     </Container>
   );
 }
