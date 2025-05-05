@@ -106,7 +106,7 @@ export default function UploadDocumentButton() {
 
             <Group justify="flex-end" mt="xl">
               <Button variant="outline" onClick={closeModal} size="compact-sm">
-                {t("common:actions.cancel")}
+                {t("profile:actions.cancel")}
               </Button>
               <Button
                 type="submit"

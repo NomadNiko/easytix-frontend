@@ -34,10 +34,11 @@ export function UserDocumentItem({ document }: { document: UserDocument }) {
     }
   };
 
-  // Use direct S3 URL format - the path property already contains the S3 key
-  const BUCKET_NAME = "ixplor-bucket-test-01";
-  const REGION = "us-east-2";
-  const s3Url = `https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/${document.file.path}`;
+  // document.file.path should already contain the full or partial path
+  // Checking if it's already a full URL or just a path
+  const downloadUrl = document.file.path.startsWith("http")
+    ? document.file.path
+    : `https://ixplor-bucket-test-01.s3.us-east-2.amazonaws.com/${document.file.path}`;
 
   return (
     <Card shadow="xs" p="md" radius="md" withBorder mb="xs">
@@ -54,7 +55,7 @@ export function UserDocumentItem({ document }: { document: UserDocument }) {
         <Group>
           <ActionIcon
             component="a"
-            href={s3Url}
+            href={downloadUrl}
             target="_blank"
             title={t("profile:documents.actions.download")}
           >
