@@ -9,7 +9,6 @@ import {
   TextInput,
   Text,
   Divider,
-  Pagination,
   Switch,
   Center,
   Loader,
@@ -19,30 +18,41 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "@/services/i18n/client";
 import { IconSearch, IconInbox } from "@tabler/icons-react";
 import {
-  useNotificationsQuery,
+  useNotificationsInfiniteQuery,
   useMarkAllNotificationsAsReadMutation,
 } from "../queries/notifications-queries";
 import NotificationItem from "@/components/notifications/notification-item";
+import NotificationDetailModal from "@/components/notifications/notification-detail-modal";
 import RouteGuard from "@/services/auth/route-guard";
 import useGlobalLoading from "@/services/loading/use-global-loading";
+import { Notification } from "@/services/api/services/notifications";
 
 function NotificationsPageContent() {
   const { t } = useTranslation("notifications");
   const { setLoading } = useGlobalLoading();
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showOnlyUnread, setShowOnlyUnread] = useState(false);
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  const { data: notifications = [], isLoading } = useNotificationsQuery({
-    page,
-    limit,
+  const {
+    data: infiniteData,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useNotificationsInfiniteQuery({
+    limit: 10,
     search: debouncedSearch,
     isRead: showOnlyUnread ? false : undefined,
   });
 
   const markAllAsReadMutation = useMarkAllNotificationsAsReadMutation();
+
+  // Flatten all pages of notifications into a single array
+  const notifications = infiniteData?.pages.flatMap((page) => page.data) || [];
 
   // Handle debounced search
   useEffect(() => {
@@ -63,12 +73,19 @@ function NotificationsPageContent() {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
-    setPage(1); // Reset to first page on search
   };
 
   const toggleUnreadFilter = () => {
     setShowOnlyUnread(!showOnlyUnread);
-    setPage(1); // Reset to first page on filter change
+  };
+
+  const handleSelectNotification = (notification: Notification) => {
+    setSelectedNotification(notification);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
   };
 
   return (
@@ -123,16 +140,31 @@ function NotificationsPageContent() {
               <NotificationItem
                 key={notification.id}
                 notification={notification}
-                expanded={true}
+                onSelect={handleSelectNotification}
                 showActions={true}
               />
             ))}
-            <Center>
-              <Pagination total={10} value={page} onChange={setPage} mt="md" />
-            </Center>
+
+            {hasNextPage && (
+              <Center>
+                <Button
+                  onClick={() => fetchNextPage()}
+                  loading={isFetchingNextPage}
+                  variant="subtle"
+                >
+                  {t("notifications:loadMore")}
+                </Button>
+              </Center>
+            )}
           </Stack>
         )}
       </Stack>
+
+      <NotificationDetailModal
+        notification={selectedNotification}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
+      />
     </Container>
   );
 }

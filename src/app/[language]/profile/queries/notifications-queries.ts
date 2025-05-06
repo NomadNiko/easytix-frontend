@@ -1,5 +1,10 @@
 // src/app/[language]/profile/queries/notifications-queries.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { useSnackbar } from "@/components/mantine/feedback/notification-service";
 import { useTranslation } from "@/services/i18n/client";
 import { createQueryKeys } from "@/services/react-query/query-key-factory";
@@ -27,31 +32,41 @@ export const notificationsQueryKeys = createQueryKeys(["notifications"], {
   }),
 });
 
-export const useNotificationsQuery = (filters?: NotificationsQueryParams) => {
+export const useNotificationsInfiniteQuery = (
+  filters?: Omit<NotificationsQueryParams, "page">
+) => {
   const getNotificationsService = useGetNotificationsService();
+  const limit = filters?.limit || 10;
 
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: notificationsQueryKeys.list().sub.by({ filters }).key,
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ pageParam = 1, signal }) => {
       const { status, data } = await getNotificationsService(
         undefined,
-        filters,
+        { ...filters, page: pageParam, limit },
         { signal }
       );
 
       if (status === HTTP_CODES_ENUM.OK) {
-        return data;
+        return {
+          data,
+          page: pageParam,
+          hasMore: data.length === limit, // Determine if there are more items
+        };
       }
-
-      return [];
+      return { data: [], page: pageParam, hasMore: false };
     },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) return undefined;
+      return lastPage.page + 1;
+    },
+    initialPageParam: 1,
     staleTime: 30000, // 30 seconds
   });
 };
 
 export const useUnreadNotificationsCountQuery = () => {
   const getUnreadCountService = useGetUnreadCountService();
-
   return useQuery({
     queryKey: notificationsQueryKeys.unreadCount().key,
     queryFn: async ({ signal }) => {
@@ -60,11 +75,9 @@ export const useUnreadNotificationsCountQuery = () => {
         undefined,
         { signal }
       );
-
       if (status === HTTP_CODES_ENUM.OK) {
         return data;
       }
-
       return 0;
     },
     staleTime: 30000, // 30 seconds
@@ -74,15 +87,12 @@ export const useUnreadNotificationsCountQuery = () => {
 export const useMarkNotificationAsReadMutation = () => {
   const markAsReadService = useMarkNotificationAsReadService();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status, data } = await markAsReadService(undefined, { id });
-
       if (status !== HTTP_CODES_ENUM.OK) {
         throw new Error("Failed to mark notification as read");
       }
-
       return data;
     },
     onSuccess: () => {
@@ -105,7 +115,6 @@ export const useMarkAllNotificationsAsReadMutation = () => {
   return useMutation({
     mutationFn: async () => {
       const { status } = await markAllAsReadService();
-
       if (status !== HTTP_CODES_ENUM.NO_CONTENT) {
         throw new Error("Failed to mark all notifications as read");
       }
@@ -117,7 +126,6 @@ export const useMarkAllNotificationsAsReadMutation = () => {
       queryClient.invalidateQueries({
         queryKey: notificationsQueryKeys.unreadCount().key,
       });
-
       enqueueSnackbar(t("notifications:alerts.markAllAsRead.success"), {
         variant: "success",
       });
@@ -139,19 +147,18 @@ export const useDeleteNotificationMutation = () => {
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status } = await deleteNotificationService({ id });
-
       if (status !== HTTP_CODES_ENUM.NO_CONTENT) {
         throw new Error("Failed to delete notification");
       }
     },
     onSuccess: () => {
+      // Update both the list and the unread count
       queryClient.invalidateQueries({
         queryKey: notificationsQueryKeys.list().key,
       });
       queryClient.invalidateQueries({
         queryKey: notificationsQueryKeys.unreadCount().key,
       });
-
       enqueueSnackbar(t("notifications:alerts.delete.success"), {
         variant: "success",
       });

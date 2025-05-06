@@ -1,41 +1,29 @@
-// src/components/notifications/notification-item.tsx - fix for Link issues
-"use client";
-import { useState } from "react";
-import {
-  Box,
-  Group,
-  Text,
-  ActionIcon,
-  useMantineTheme,
-  Collapse,
-  Stack,
-} from "@mantine/core";
-import { IconTrash, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+// src/components/notifications/notification-item.tsx
+import { Box, Group, Text, ActionIcon, useMantineTheme } from "@mantine/core";
+import { IconTrash } from "@tabler/icons-react";
 import { formatDistance } from "date-fns";
+import { Notification } from "@/services/api/services/notifications";
 import {
-  Notification,
-  useMarkNotificationAsReadService,
-  useDeleteNotificationService,
-} from "@/services/api/services/notifications";
-import Link from "@/components/link";
+  useMarkNotificationAsReadMutation,
+  useDeleteNotificationMutation,
+} from "@/app/[language]/profile/queries/notifications-queries";
 
 interface NotificationItemProps {
   notification: Notification;
+  onSelect: (notification: Notification) => void;
   onClick?: () => void;
-  expanded?: boolean; // Whether to show expanded by default (used on notifications page)
-  showActions?: boolean; // Whether to show delete button
+  showActions?: boolean;
 }
 
 const NotificationItem = ({
   notification,
+  onSelect,
   onClick,
-  expanded = false,
   showActions = true,
 }: NotificationItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(expanded);
   const theme = useMantineTheme();
-  const markAsReadService = useMarkNotificationAsReadService();
-  const deleteNotificationService = useDeleteNotificationService();
+  const markAsReadMutation = useMarkNotificationAsReadMutation();
+  const deleteNotificationMutation = useDeleteNotificationMutation();
 
   // Format relative time (e.g., "2 hours ago")
   const relativeTime = formatDistance(
@@ -46,24 +34,15 @@ const NotificationItem = ({
 
   const handleClick = () => {
     if (!notification.isRead) {
-      markAsReadService(undefined, { id: notification.id });
+      markAsReadMutation.mutate({ id: notification.id });
     }
-
-    if (notification.link) {
-      if (onClick) onClick();
-    } else {
-      setIsExpanded(!isExpanded);
-    }
+    onSelect(notification);
+    if (onClick) onClick();
   };
 
   const handleDelete = (event: React.MouseEvent) => {
     event.stopPropagation();
-    deleteNotificationService({ id: notification.id });
-  };
-
-  const handleToggleExpand = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setIsExpanded(!isExpanded);
+    deleteNotificationMutation.mutate({ id: notification.id });
   };
 
   // Determine if message is long and should be truncated
@@ -72,8 +51,7 @@ const NotificationItem = ({
     ? `${notification.message.slice(0, 120)}...`
     : notification.message;
 
-  // Component to render
-  const NotificationContent = () => (
+  return (
     <Box
       style={{
         padding: theme.spacing.xs,
@@ -97,61 +75,26 @@ const NotificationItem = ({
           <Text fw={notification.isRead ? 400 : 700} size="sm" lineClamp={1}>
             {notification.title}
           </Text>
-
           <Text size="xs" color="dimmed">
             {relativeTime}
           </Text>
-
-          <Collapse in={isExpanded}>
-            <Text size="sm" mt="xs">
-              {notification.message}
-            </Text>
-          </Collapse>
-
-          {!isExpanded && (
-            <Text size="sm" lineClamp={2} mt="xs">
-              {truncatedMessage}
-            </Text>
-          )}
+          <Text size="sm" lineClamp={2} mt="xs">
+            {truncatedMessage}
+          </Text>
         </Box>
-
-        <Stack gap={4}>
-          {isLongMessage && (
-            <ActionIcon size="sm" onClick={handleToggleExpand} variant="subtle">
-              {isExpanded ? (
-                <IconChevronUp size={16} />
-              ) : (
-                <IconChevronDown size={16} />
-              )}
-            </ActionIcon>
-          )}
-
-          {showActions && (
-            <ActionIcon size="sm" color="red" onClick={handleDelete}>
-              <IconTrash size={16} />
-            </ActionIcon>
-          )}
-        </Stack>
+        {showActions && (
+          <ActionIcon
+            size="sm"
+            color="red"
+            onClick={handleDelete}
+            loading={deleteNotificationMutation.isPending}
+          >
+            <IconTrash size={16} />
+          </ActionIcon>
+        )}
       </Group>
     </Box>
   );
-
-  // Render with link if notification has a link
-  if (notification.link) {
-    // Return a div that wraps the Link wrapper + NotificationContent
-    return (
-      <div
-        onClick={handleClick}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <Link href={notification.link} />
-        <NotificationContent />
-      </div>
-    );
-  }
-
-  // Otherwise render as regular component
-  return <NotificationContent />;
 };
 
 export default NotificationItem;

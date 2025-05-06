@@ -7,6 +7,10 @@
   "empty": "Your notification inbox is empty",
   "search": "Search notifications...",
   "showOnlyUnread": "Show only unread",
+  "loadMore": "Load More",
+  "viewLink": "View Link",
+  "close": "Close",
+  "delete": "Delete",
   "alerts": {
     "markAllAsRead": {
       "success": "All notifications marked as read",
