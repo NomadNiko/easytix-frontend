@@ -1,0 +1,20 @@
+{
+  "title": "Notifications",
+  "recent": "Recent Notifications",
+  "markAllAsRead": "Mark All as Read",
+  "viewAll": "View All Notifications",
+  "noNotifications": "No notifications yet",
+  "empty": "Your notification inbox is empty",
+  "search": "Search notifications...",
+  "showOnlyUnread": "Show only unread",
+  "alerts": {
+    "markAllAsRead": {
+      "success": "All notifications marked as read",
+      "error": "Failed to mark all notifications as read"
+    },
+    "delete": {
+      "success": "Notification deleted",
+      "error": "Failed to delete notification"
+    }
+  }
+}

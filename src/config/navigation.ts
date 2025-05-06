@@ -9,7 +9,7 @@ export interface NavigationItem {
   children?: NavigationItem[]; // Submenu items
 }
 
-const createNavigationConfig = (): NavigationItem[] => [
+export const createNavigationConfig = (): NavigationItem[] => [
   {
     label: "common:navigation.home",
     path: "/",
@@ -17,6 +17,11 @@ const createNavigationConfig = (): NavigationItem[] => [
   {
     label: "common:navigation.users",
     path: "/admin-panel/users",
+    roles: [RoleEnum.ADMIN],
+  },
+  {
+    label: "common:navigation.notifications",
+    path: "/admin-panel/notifications",
     roles: [RoleEnum.ADMIN],
   },
 ];

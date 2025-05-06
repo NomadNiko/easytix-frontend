@@ -1,3 +1,4 @@
+// src/components/app-bar/index.tsx
 "use client";
 import { AppShell, Burger, Group, Container } from "@mantine/core";
 import { useState } from "react";
@@ -6,6 +7,7 @@ import Logo from "./logo";
 import DesktopNavigation from "./desktop-navigation";
 import MobileNavigation from "./mobile-navigation";
 import AuthSection from "./auth-section";
+import NotificationIcon from "./notification-icon";
 
 const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
   const [opened, setOpened] = useState(false);
@@ -37,10 +39,14 @@ const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
               {/* Desktop Navigation - hide on mobile */}
               <DesktopNavigation onCloseMenu={() => setOpened(false)} />
             </Group>
+
             {/* Mobile Logo - hide on desktop */}
             <Logo isMobile hiddenFrom="sm" />
-            {/* Right side: Theme Switch and Auth Section */}
+
+            {/* Right side: Notification Icon, Theme Switch and Auth Section */}
             <Group>
+              {/* Notification Icon */}
+              <NotificationIcon />
               {/* Theme Switch Button */}
               <SwitchThemeButton />
               {/* Authentication Section */}
@@ -49,10 +55,13 @@ const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
           </Group>
         </Container>
       </AppShell.Header>
+
       <AppShell.Navbar p="md">
         <MobileNavigation onCloseMenu={() => setOpened(false)} />
       </AppShell.Navbar>
+
       <AppShell.Main>{children}</AppShell.Main>
+
       {/* Overlay to allow clicking outside navbar to close it */}
       {opened && (
         <div

@@ -1,0 +1,40 @@
+{
+  "title": "Notification Management",
+  "tabs": {
+    "broadcast": "Broadcast to All Users",
+    "multiple": "Send to Specific Users"
+  },
+  "broadcast": {
+    "description": "Send a notification to all users in the system. Use this feature sparingly."
+  },
+  "multiple": {
+    "description": "Select specific users to receive this notification."
+  },
+  "fields": {
+    "title": "Title",
+    "message": "Message",
+    "link": "Link (Optional)",
+    "users": "Select Users"
+  },
+  "placeholders": {
+    "title": "Enter notification title",
+    "message": "Enter notification message",
+    "link": "Enter optional URL or path",
+    "users": "Search and select users"
+  },
+  "actions": {
+    "send": "Send Notification"
+  },
+  "validation": {
+    "titleRequired": "Title is required",
+    "messageRequired": "Message is required",
+    "usersRequired": "At least one user must be selected"
+  },
+  "noUsersFound": "No users found",
+  "alerts": {
+    "broadcastSuccess": "Notification broadcast to all users successfully",
+    "broadcastError": "Failed to broadcast notification to users",
+    "multipleSuccess": "Notification sent to selected users successfully",
+    "multipleError": "Failed to send notification to selected users"
+  }
+}
