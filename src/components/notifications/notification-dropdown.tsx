@@ -18,6 +18,7 @@ import {
 import NotificationItem from "./notification-item";
 import { IconInbox } from "@tabler/icons-react";
 import { Notification } from "@/services/api/services/notifications";
+import useAuth from "@/services/auth/use-auth";
 
 interface NotificationDropdownProps {
   closeMenu: () => void;
@@ -29,6 +30,9 @@ const NotificationDropdown = ({
   onSelectNotification,
 }: NotificationDropdownProps) => {
   const { t } = useTranslation("notifications");
+  const { user } = useAuth();
+
+  // Only fetch notifications when user is authenticated and the dropdown is open
   const { data: infiniteData, isLoading } = useNotificationsInfiniteQuery({
     limit: 5, // Only show 5 most recent notifications
   });
@@ -36,6 +40,11 @@ const NotificationDropdown = ({
   // Get the first page of notifications only for the dropdown
   const notifications = infiniteData?.pages[0]?.data || [];
   const markAllAsReadMutation = useMarkAllNotificationsAsReadMutation();
+
+  // Don't render if no user to ensure user-specific data
+  if (!user) {
+    return null;
+  }
 
   const handleMarkAllAsRead = () => {
     markAllAsReadMutation.mutate();

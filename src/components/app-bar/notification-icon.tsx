@@ -1,5 +1,5 @@
 // src/components/app-bar/notification-icon.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ActionIcon, Indicator, Menu } from "@mantine/core";
 import { IconBell } from "@tabler/icons-react";
 import { useUnreadNotificationsCountQuery } from "@/app/[language]/profile/queries/notifications-queries";
@@ -8,17 +8,37 @@ import NotificationDetailModal from "@/components/notifications/notification-det
 import useAuth from "@/services/auth/use-auth";
 import { useResponsive } from "@/services/responsive/use-responsive";
 import { Notification } from "@/services/api/services/notifications";
+import { useQueryClient } from "@tanstack/react-query";
+import { notificationsQueryKeys } from "@/app/[language]/profile/queries/notifications-queries";
 
 const NotificationIcon = () => {
   const [menuOpened, setMenuOpened] = useState(false);
   const [selectedNotification, setSelectedNotification] =
     useState<Notification | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
   const { user, isLoaded } = useAuth();
-  const { data: unreadCount = 0, isLoading } =
-    useUnreadNotificationsCountQuery();
+  const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
+
+  // Only enable the polling when the user is authenticated
+  const { data: unreadCount = 0, isLoading } = useUnreadNotificationsCountQuery(
+    isLoaded && !!user
+  );
+
+  // Clear notification cache when user changes or logs out
+  useEffect(() => {
+    return () => {
+      if (!user) {
+        // Clear notification cache when component unmounts or user logs out
+        queryClient.removeQueries({
+          queryKey: notificationsQueryKeys.list().key,
+        });
+        queryClient.removeQueries({
+          queryKey: notificationsQueryKeys.unreadCount().key,
+        });
+      }
+    };
+  }, [user, queryClient]);
 
   if (!isLoaded || !user) {
     return null; // Don't show to unauthenticated users
@@ -71,13 +91,14 @@ const NotificationIcon = () => {
           </Indicator>
         </Menu.Target>
         <Menu.Dropdown>
-          <NotificationDropdown
-            closeMenu={() => setMenuOpened(false)}
-            onSelectNotification={handleSelectNotification}
-          />
+          {menuOpened && ( // Only render dropdown content when the menu is open
+            <NotificationDropdown
+              closeMenu={() => setMenuOpened(false)}
+              onSelectNotification={handleSelectNotification}
+            />
+          )}
         </Menu.Dropdown>
       </Menu>
-
       {/* Moved outside of the dropdown to prevent unmounting */}
       <NotificationDetailModal
         notification={selectedNotification}

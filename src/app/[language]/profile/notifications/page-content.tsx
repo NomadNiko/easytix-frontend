@@ -26,10 +26,12 @@ import NotificationDetailModal from "@/components/notifications/notification-det
 import RouteGuard from "@/services/auth/route-guard";
 import useGlobalLoading from "@/services/loading/use-global-loading";
 import { Notification } from "@/services/api/services/notifications";
+import useAuth from "@/services/auth/use-auth";
 
 function NotificationsPageContent() {
   const { t } = useTranslation("notifications");
   const { setLoading } = useGlobalLoading();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showOnlyUnread, setShowOnlyUnread] = useState(false);
@@ -88,6 +90,15 @@ function NotificationsPageContent() {
     setIsDetailModalOpen(false);
   };
 
+  // Ensure we have a user before rendering
+  if (!user) {
+    return (
+      <Center p="xl">
+        <Loader size="md" />
+      </Center>
+    );
+  }
+
   return (
     <Container size="md">
       <Stack gap="md" py="lg">
@@ -104,7 +115,6 @@ function NotificationsPageContent() {
             </Button>
           )}
         </Group>
-
         <Group justify="space-between">
           <TextInput
             placeholder={t("notifications:search")}
@@ -118,9 +128,7 @@ function NotificationsPageContent() {
             <Switch checked={showOnlyUnread} onChange={toggleUnreadFilter} />
           </Group>
         </Group>
-
         <Divider />
-
         {isLoading ? (
           <Center p="xl">
             <Loader size="md" />
@@ -144,7 +152,6 @@ function NotificationsPageContent() {
                 showActions={true}
               />
             ))}
-
             {hasNextPage && (
               <Center>
                 <Button
@@ -159,7 +166,6 @@ function NotificationsPageContent() {
           </Stack>
         )}
       </Stack>
-
       <NotificationDetailModal
         notification={selectedNotification}
         isOpen={isDetailModalOpen}

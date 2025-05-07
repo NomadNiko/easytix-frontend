@@ -8,6 +8,7 @@ import {
 import { useSnackbar } from "@/components/mantine/feedback/notification-service";
 import { useTranslation } from "@/services/i18n/client";
 import { createQueryKeys } from "@/services/react-query/query-key-factory";
+import useAuth from "@/services/auth/use-auth";
 import {
   useGetNotificationsService,
   useGetUnreadCountService,
@@ -18,17 +19,31 @@ import {
 } from "@/services/api/services/notifications";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
+// Notification polling interval (20 seconds)
+const NOTIFICATION_POLL_INTERVAL = 20000;
+
 export const notificationsQueryKeys = createQueryKeys(["notifications"], {
   list: () => ({
     key: [],
     sub: {
-      by: ({ filters }: { filters?: NotificationsQueryParams }) => ({
-        key: [filters],
+      by: ({
+        filters,
+        userId,
+      }: {
+        filters?: NotificationsQueryParams;
+        userId?: string;
+      }) => ({
+        key: [filters, userId], // Include userId in the query key
       }),
     },
   }),
   unreadCount: () => ({
     key: ["unread-count"],
+    sub: {
+      by: ({ userId }: { userId?: string }) => ({
+        key: [userId], // Include userId in the query key
+      }),
+    },
   }),
 });
 
@@ -37,16 +52,17 @@ export const useNotificationsInfiniteQuery = (
 ) => {
   const getNotificationsService = useGetNotificationsService();
   const limit = filters?.limit || 10;
+  const { user } = useAuth();
+  const userId = user?.id;
 
   return useInfiniteQuery({
-    queryKey: notificationsQueryKeys.list().sub.by({ filters }).key,
+    queryKey: notificationsQueryKeys.list().sub.by({ filters, userId }).key,
     queryFn: async ({ pageParam = 1, signal }) => {
       const { status, data } = await getNotificationsService(
         undefined,
         { ...filters, page: pageParam, limit },
         { signal }
       );
-
       if (status === HTTP_CODES_ENUM.OK) {
         return {
           data,
@@ -62,13 +78,17 @@ export const useNotificationsInfiniteQuery = (
     },
     initialPageParam: 1,
     staleTime: 30000, // 30 seconds
+    enabled: !!userId, // Only run query if user is logged in
   });
 };
 
-export const useUnreadNotificationsCountQuery = () => {
+export const useUnreadNotificationsCountQuery = (enabled = true) => {
   const getUnreadCountService = useGetUnreadCountService();
+  const { user } = useAuth();
+  const userId = user?.id;
+
   return useQuery({
-    queryKey: notificationsQueryKeys.unreadCount().key,
+    queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
     queryFn: async ({ signal }) => {
       const { status, data } = await getUnreadCountService(
         undefined,
@@ -81,12 +101,17 @@ export const useUnreadNotificationsCountQuery = () => {
       return 0;
     },
     staleTime: 30000, // 30 seconds
+    refetchInterval: NOTIFICATION_POLL_INTERVAL, // Poll every 20 seconds
+    enabled: enabled && !!userId, // Only run query if user is logged in and the component is enabled
   });
 };
 
 export const useMarkNotificationAsReadMutation = () => {
   const markAsReadService = useMarkNotificationAsReadService();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const userId = user?.id;
+
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status, data } = await markAsReadService(undefined, { id });
@@ -97,10 +122,10 @@ export const useMarkNotificationAsReadMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.list().key,
+        queryKey: notificationsQueryKeys.list().sub.by({ userId }).key,
       });
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.unreadCount().key,
+        queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
       });
     },
   });
@@ -111,6 +136,8 @@ export const useMarkAllNotificationsAsReadMutation = () => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation("notifications");
+  const { user } = useAuth();
+  const userId = user?.id;
 
   return useMutation({
     mutationFn: async () => {
@@ -121,10 +148,10 @@ export const useMarkAllNotificationsAsReadMutation = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.list().key,
+        queryKey: notificationsQueryKeys.list().sub.by({ userId }).key,
       });
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.unreadCount().key,
+        queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
       });
       enqueueSnackbar(t("notifications:alerts.markAllAsRead.success"), {
         variant: "success",
@@ -143,6 +170,8 @@ export const useDeleteNotificationMutation = () => {
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation("notifications");
+  const { user } = useAuth();
+  const userId = user?.id;
 
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
@@ -154,10 +183,10 @@ export const useDeleteNotificationMutation = () => {
     onSuccess: () => {
       // Update both the list and the unread count
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.list().key,
+        queryKey: notificationsQueryKeys.list().sub.by({ userId }).key,
       });
       queryClient.invalidateQueries({
-        queryKey: notificationsQueryKeys.unreadCount().key,
+        queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
       });
       enqueueSnackbar(t("notifications:alerts.delete.success"), {
         variant: "success",

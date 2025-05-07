@@ -1,3 +1,4 @@
+// src/services/auth/auth-provider.tsx
 "use client";
 import { User } from "@/services/api/types/user";
 import {
@@ -20,11 +21,14 @@ import {
   getTokensInfo,
   setTokensInfo as setTokensInfoToStorage,
 } from "./auth-tokens-info";
+import { useQueryClient } from "@tanstack/react-query";
+import { notificationsQueryKeys } from "@/app/[language]/profile/queries/notifications-queries";
 
 function AuthProvider(props: PropsWithChildren<{}>) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const fetchBase = useFetch();
+  const queryClient = useQueryClient();
 
   const setTokensInfo = useCallback((tokensInfo: TokensInfo) => {
     setTokensInfoToStorage(tokensInfo);
@@ -33,15 +37,33 @@ function AuthProvider(props: PropsWithChildren<{}>) {
     }
   }, []);
 
+  // Clear notification cache on logout/user change
+  const clearUserSpecificCache = useCallback(() => {
+    // Remove all notification queries
+    queryClient.removeQueries({ queryKey: notificationsQueryKeys.list().key });
+    queryClient.removeQueries({
+      queryKey: notificationsQueryKeys.unreadCount().key,
+    });
+
+    // You can add more user-specific queries to clear here as needed
+  }, [queryClient]);
+
   const logOut = useCallback(async () => {
     const tokens = getTokensInfo();
+
+    // Clear user-specific query cache first
+    clearUserSpecificCache();
+
+    // Then perform logout
     if (tokens?.token) {
       await fetchBase(AUTH_LOGOUT_URL, {
         method: "POST",
       });
     }
+
+    // Clear tokens last
     setTokensInfo(null);
-  }, [setTokensInfo, fetchBase]);
+  }, [setTokensInfo, fetchBase, clearUserSpecificCache]);
 
   // Load user data once at initialization
   const loadData = useCallback(async () => {
@@ -56,13 +78,18 @@ function AuthProvider(props: PropsWithChildren<{}>) {
           return;
         }
         const data = await response.json();
+
+        // Clear previous user's cache before setting new user
+        clearUserSpecificCache();
+
+        // Set the new user
         setUser(data);
       }
     } finally {
       // Mark auth as loaded regardless of outcome
       setIsLoaded(true);
     }
-  }, [fetchBase, logOut]);
+  }, [fetchBase, logOut, clearUserSpecificCache]);
 
   useEffect(() => {
     loadData();
@@ -78,10 +105,16 @@ function AuthProvider(props: PropsWithChildren<{}>) {
 
   const contextActionsValue = useMemo(
     () => ({
-      setUser,
+      setUser: (newUser: User) => {
+        // If user is changing (different ID), clear cache first
+        if (user && newUser && user.id !== newUser.id) {
+          clearUserSpecificCache();
+        }
+        setUser(newUser);
+      },
       logOut,
     }),
-    [logOut]
+    [logOut, user, clearUserSpecificCache]
   );
 
   const contextTokensValue = useMemo(
