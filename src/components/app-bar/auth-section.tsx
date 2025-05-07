@@ -44,6 +44,13 @@ const AuthSection = () => {
             >
               <Text>{t("common:navigation.profile")}</Text>
             </Menu.Item>
+            <Menu.Item
+              component={Link}
+              href="/profile/notifications"
+              data-testid="user-notifications"
+            >
+              <Text>{t("common:navigation.notifications")}</Text>
+            </Menu.Item>
             <Menu.Item onClick={() => logOut()} data-testid="logout-menu-item">
               <Text>{t("common:navigation.logout")}</Text>
             </Menu.Item>
