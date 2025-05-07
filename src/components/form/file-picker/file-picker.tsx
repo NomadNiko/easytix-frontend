@@ -10,10 +10,12 @@ import {
   ActionIcon,
   useMantineTheme,
   Group,
+  Tooltip,
+  Badge,
 } from "@mantine/core";
 import { Button } from "@mantine/core";
 import React, { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, FileRejection } from "react-dropzone";
 import {
   Controller,
   ControllerProps,
@@ -21,7 +23,26 @@ import {
   FieldValues,
 } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { IconX, IconFile, IconDownload } from "@tabler/icons-react";
+import {
+  IconX,
+  IconFile,
+  IconDownload,
+  IconInfoCircle,
+} from "@tabler/icons-react";
+
+// List of common file types to display to users
+const COMMON_FILE_TYPES = [
+  { ext: "pdf", desc: "PDF Documents" },
+  { ext: "doc,docx", desc: "Word Documents" },
+  { ext: "xls,xlsx", desc: "Excel Spreadsheets" },
+  { ext: "ppt,pptx", desc: "PowerPoint Presentations" },
+  { ext: "txt", desc: "Text Files" },
+  { ext: "csv", desc: "CSV Files" },
+  { ext: "zip,rar", desc: "Compressed Archives" },
+  { ext: "jpg,jpeg,png", desc: "Images" },
+  { ext: "mp3,wav", desc: "Audio Files" },
+  { ext: "mp4,avi,mov", desc: "Video Files" },
+];
 
 type FilePickerProps = {
   error?: string;
@@ -39,27 +60,35 @@ function FilePicker(props: FilePickerProps) {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState<string | undefined>(undefined);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fetchFileUpload = useFileGeneralUploadService();
   const theme = useMantineTheme();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (isLoading) return; // Prevent multiple uploads while loading
+      if (isLoading || acceptedFiles.length === 0) return;
+
+      setUploadError(null);
       setIsLoading(true);
+
       try {
         const file = acceptedFiles[0];
-        setFileName(file.name); // Store original filename for display
 
-        // Use direct file upload, no presigned URLs
+        // Safely get file name
+        const safeFileName = file?.name || "unknown-file";
+        setFileName(safeFileName);
+
         const { status, data } = await fetchFileUpload(file);
 
         if (status === HTTP_CODES_ENUM.CREATED) {
           onChange(data.file);
         } else {
           console.error("File upload failed with status:", status);
+          setUploadError("Upload failed. Please try again.");
         }
       } catch (error) {
         console.error("File upload failed with error:", error);
+        setUploadError("An error occurred while uploading.");
       } finally {
         setIsLoading(false);
       }
@@ -67,11 +96,31 @@ function FilePicker(props: FilePickerProps) {
     [fetchFileUpload, onChange, isLoading]
   );
 
+  // Handle rejected files (e.g., too large)
+  const onDropRejected = useCallback(
+    (rejectedFiles: FileRejection[]) => {
+      if (rejectedFiles.length === 0) return;
+
+      const rejection = rejectedFiles[0];
+      if (rejection?.errors[0]?.code === "file-too-large") {
+        setUploadError(
+          `File is too large. Maximum size is ${props.maxSize ? Math.round(props.maxSize / (1024 * 1024)) : 20}MB.`
+        );
+      } else {
+        setUploadError("File was rejected. Please try another file.");
+      }
+    },
+    [props.maxSize]
+  );
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     maxFiles: 1,
     maxSize: props.maxSize || 20 * 1024 * 1024, // Default to 20MB if not specified
     disabled: isLoading || props.disabled,
+    // Critical fix: Set to undefined to allow ALL file types
+    accept: undefined,
   });
 
   const removeFileHandle = useCallback(
@@ -79,6 +128,7 @@ function FilePicker(props: FilePickerProps) {
       event.stopPropagation();
       onChange(null);
       setFileName(undefined);
+      setUploadError(null);
     },
     [onChange]
   );
@@ -125,6 +175,7 @@ function FilePicker(props: FilePickerProps) {
           </Text>
         </Box>
       )}
+
       {props?.value && (
         <Box
           style={{
@@ -153,6 +204,7 @@ function FilePicker(props: FilePickerProps) {
           </Group>
         </Box>
       )}
+
       <Box mt={props.value ? 0 : theme.spacing.md} onClick={handleButtonClick}>
         <Button
           component="label"
@@ -166,17 +218,54 @@ function FilePicker(props: FilePickerProps) {
           <input {...getInputProps()} />
         </Button>
       </Box>
+
       <Text mt="xs" size="sm" color="dimmed">
         {t("common:formInputs.filePicker.dragAndDrop") ||
           "or drag and drop a file here"}
       </Text>
+
+      {/* Display any upload errors */}
+      {uploadError && (
+        <Text color="red" size="sm" mt="xs">
+          {uploadError}
+        </Text>
+      )}
+
+      {/* Added new section for file types */}
+      <Box mt="md" w="100%">
+        <Group align="center" mb="xs">
+          <Text size="sm" fw={500}>
+            Supported File Types:
+          </Text>
+          <Tooltip label="All file types are accepted including ZIP, RAR, DOC, PDF, etc.">
+            <ActionIcon variant="transparent" size="xs">
+              <IconInfoCircle size={16} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+        <Group gap="xs" align="center">
+          {COMMON_FILE_TYPES.map((type) => (
+            <Badge
+              key={type.ext}
+              size="sm"
+              radius="sm"
+              color="blue"
+              variant="light"
+            >
+              {type.desc}
+            </Badge>
+          ))}
+        </Group>
+      </Box>
+
       <Text mt="xs" size="xs" color="dimmed">
         Max file size:{" "}
         {props.maxSize
           ? `${Math.round(props.maxSize / (1024 * 1024))}MB`
           : "20MB"}
       </Text>
-      {props.error && (
+
+      {props.error && !uploadError && (
         <Text color="red" size="sm" mt="xs">
           {props.error}
         </Text>
