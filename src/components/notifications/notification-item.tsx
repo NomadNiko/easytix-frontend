@@ -1,5 +1,12 @@
 // src/components/notifications/notification-item.tsx
-import { Box, Group, Text, ActionIcon, useMantineTheme } from "@mantine/core";
+import {
+  Box,
+  Group,
+  Text,
+  ActionIcon,
+  useMantineTheme,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { formatDistance } from "date-fns";
 import { Notification } from "@/services/api/services/notifications";
@@ -22,6 +29,8 @@ const NotificationItem = ({
   showActions = true,
 }: NotificationItemProps) => {
   const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
   const markAsReadMutation = useMarkNotificationAsReadMutation();
   const deleteNotificationMutation = useDeleteNotificationMutation();
 
@@ -58,14 +67,20 @@ const NotificationItem = ({
         borderRadius: theme.radius.sm,
         backgroundColor: notification.isRead
           ? "transparent"
-          : theme.colors.blue[0],
+          : isDark
+            ? theme.colors.blue[9] // Dark mode unread background
+            : theme.colors.blue[0], // Light mode unread background
         transition: "background-color 0.2s",
         border: notification.isRead
           ? undefined
-          : `1px solid ${theme.colors.blue[3]}`,
+          : isDark
+            ? `1px solid ${theme.colors.blue[7]}` // Dark mode unread border
+            : `1px solid ${theme.colors.blue[3]}`, // Light mode unread border
         cursor: "pointer",
         "&:hover": {
-          backgroundColor: theme.colors.gray[1],
+          backgroundColor: isDark
+            ? theme.colors.dark[6] // Dark mode hover
+            : theme.colors.gray[1], // Light mode hover
         },
       }}
       onClick={handleClick}

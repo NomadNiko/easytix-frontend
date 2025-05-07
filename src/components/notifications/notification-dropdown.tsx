@@ -1,5 +1,4 @@
 // src/components/notifications/notification-dropdown.tsx
-"use client";
 import {
   Stack,
   Group,
@@ -10,7 +9,6 @@ import {
   Center,
   Loader,
 } from "@mantine/core";
-import { useState } from "react";
 import { useTranslation } from "@/services/i18n/client";
 import Link from "@/components/link";
 import {
@@ -18,27 +16,25 @@ import {
   useMarkAllNotificationsAsReadMutation,
 } from "@/app/[language]/profile/queries/notifications-queries";
 import NotificationItem from "./notification-item";
-import NotificationDetailModal from "./notification-detail-modal";
 import { IconInbox } from "@tabler/icons-react";
 import { Notification } from "@/services/api/services/notifications";
 
 interface NotificationDropdownProps {
   closeMenu: () => void;
+  onSelectNotification: (notification: Notification) => void;
 }
 
-const NotificationDropdown = ({ closeMenu }: NotificationDropdownProps) => {
+const NotificationDropdown = ({
+  closeMenu,
+  onSelectNotification,
+}: NotificationDropdownProps) => {
   const { t } = useTranslation("notifications");
-  const [selectedNotification, setSelectedNotification] =
-    useState<Notification | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
   const { data: infiniteData, isLoading } = useNotificationsInfiniteQuery({
     limit: 5, // Only show 5 most recent notifications
   });
 
   // Get the first page of notifications only for the dropdown
   const notifications = infiniteData?.pages[0]?.data || [];
-
   const markAllAsReadMutation = useMarkAllNotificationsAsReadMutation();
 
   const handleMarkAllAsRead = () => {
@@ -46,74 +42,60 @@ const NotificationDropdown = ({ closeMenu }: NotificationDropdownProps) => {
   };
 
   const handleSelectNotification = (notification: Notification) => {
-    setSelectedNotification(notification);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleCloseDetailModal = () => {
-    setIsDetailModalOpen(false);
+    onSelectNotification(notification);
   };
 
   return (
-    <>
-      <Stack p="xs" gap="xs">
-        <Group justify="space-between">
-          <Text fw={600}>{t("notifications:recent")}</Text>
-          {notifications.length > 0 && (
-            <Button
-              variant="subtle"
-              size="xs"
-              onClick={handleMarkAllAsRead}
-              loading={markAllAsReadMutation.isPending}
-            >
-              {t("notifications:markAllAsRead")}
-            </Button>
-          )}
-        </Group>
-        <Divider />
-        {isLoading ? (
-          <Center p="md">
-            <Loader size="sm" />
-          </Center>
-        ) : notifications.length === 0 ? (
-          <Stack align="center" gap="xs" py="md">
-            <IconInbox size={32} opacity={0.5} />
-            <Text size="sm" color="dimmed" ta="center">
-              {t("notifications:noNotifications")}
-            </Text>
-          </Stack>
-        ) : (
-          <ScrollArea style={{ maxHeight: 400 }} offsetScrollbars>
-            <Stack gap="xs">
-              {notifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onSelect={handleSelectNotification}
-                  onClick={closeMenu}
-                  showActions={false}
-                />
-              ))}
-            </Stack>
-          </ScrollArea>
+    <Stack p="xs" gap="xs">
+      <Group justify="space-between">
+        <Text fw={600}>{t("notifications:recent")}</Text>
+        {notifications.length > 0 && (
+          <Button
+            variant="subtle"
+            size="xs"
+            onClick={handleMarkAllAsRead}
+            loading={markAllAsReadMutation.isPending}
+          >
+            {t("notifications:markAllAsRead")}
+          </Button>
         )}
-        <Divider />
-        <Button
-          variant="subtle"
-          component={Link}
-          href="/profile/notifications"
-          onClick={closeMenu}
-        >
-          {t("notifications:viewAll")}
-        </Button>
-      </Stack>
-
-      <NotificationDetailModal
-        notification={selectedNotification}
-        isOpen={isDetailModalOpen}
-        onClose={handleCloseDetailModal}
-      />
-    </>
+      </Group>
+      <Divider />
+      {isLoading ? (
+        <Center p="md">
+          <Loader size="sm" />
+        </Center>
+      ) : notifications.length === 0 ? (
+        <Stack align="center" gap="xs" py="md">
+          <IconInbox size={32} opacity={0.5} />
+          <Text size="sm" color="dimmed" ta="center">
+            {t("notifications:noNotifications")}
+          </Text>
+        </Stack>
+      ) : (
+        <ScrollArea style={{ maxHeight: 400 }} offsetScrollbars>
+          <Stack gap="xs">
+            {notifications.map((notification) => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+                onSelect={handleSelectNotification}
+                showActions={false}
+              />
+            ))}
+          </Stack>
+        </ScrollArea>
+      )}
+      <Divider />
+      <Button
+        variant="subtle"
+        component={Link}
+        href="/profile/notifications"
+        onClick={closeMenu}
+      >
+        {t("notifications:viewAll")}
+      </Button>
+    </Stack>
   );
 };
 
