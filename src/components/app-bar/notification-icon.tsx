@@ -73,11 +73,30 @@ const NotificationIcon = () => {
           <Indicator
             disabled={!unreadCount || isLoading}
             label={unreadCount > 99 ? "99+" : unreadCount}
-            size={16}
+            size={20} /* Increased from 16 to 20 for more space */
             offset={4}
             inline
             color="red"
             withBorder
+            processing={false}
+            styles={{
+              indicator: {
+                padding:
+                  unreadCount > 9
+                    ? "0 6px"
+                    : "0 4px" /* Dynamic padding based on digits */,
+                fontSize: "12px",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth:
+                  unreadCount > 99 ? "24px" : unreadCount > 9 ? "20px" : "16px",
+                height: "20px" /* Fixed height */,
+                lineHeight: 1,
+                paddingTop: "1px" /* Slight shift downward */,
+              },
+            }}
           >
             <ActionIcon
               onClick={handleToggleMenu}
