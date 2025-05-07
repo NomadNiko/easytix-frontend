@@ -13,6 +13,7 @@ interface BroadcastNotificationDto {
   title: string;
   message: string;
   link?: string;
+  linkLabel?: string;
 }
 
 interface MultipleNotificationsDto {
@@ -20,6 +21,7 @@ interface MultipleNotificationsDto {
   title: string;
   message: string;
   link?: string;
+  linkLabel?: string;
 }
 
 // Factory for creating the appropriate service based on notification type
@@ -28,7 +30,6 @@ export const usePostAdminNotificationService = (type: NotificationType) => {
     type === "broadcast"
       ? "/v1/admin/notifications/broadcast"
       : "/v1/admin/notifications/send-to-users";
-
   return createPostService<
     BroadcastNotificationDto | MultipleNotificationsDto,
     void
@@ -46,11 +47,9 @@ export const useAdminNotificationMutation = (type: NotificationType) => {
       data: BroadcastNotificationDto | MultipleNotificationsDto
     ) => {
       const { status } = await postNotification(data);
-
       if (status !== HTTP_CODES_ENUM.NO_CONTENT) {
         throw new Error("Failed to send notification");
       }
-
       return;
     },
     onSuccess: () => {
@@ -58,7 +57,6 @@ export const useAdminNotificationMutation = (type: NotificationType) => {
         type === "broadcast"
           ? t("admin-notifications:alerts.broadcastSuccess")
           : t("admin-notifications:alerts.multipleSuccess");
-
       enqueueSnackbar(successMessage, { variant: "success" });
     },
     onError: () => {
@@ -66,7 +64,6 @@ export const useAdminNotificationMutation = (type: NotificationType) => {
         type === "broadcast"
           ? t("admin-notifications:alerts.broadcastError")
           : t("admin-notifications:alerts.multipleError");
-
       enqueueSnackbar(errorMessage, { variant: "error" });
     },
   });

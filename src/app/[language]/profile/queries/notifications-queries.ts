@@ -4,6 +4,8 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  InfiniteData,
 } from "@tanstack/react-query";
 import { useSnackbar } from "@/components/mantine/feedback/notification-service";
 import { useTranslation } from "@/services/i18n/client";
@@ -16,6 +18,7 @@ import {
   useMarkAllNotificationsAsReadService,
   useDeleteNotificationService,
   NotificationsQueryParams,
+  Notification,
 } from "@/services/api/services/notifications";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
@@ -47,30 +50,48 @@ export const notificationsQueryKeys = createQueryKeys(["notifications"], {
   }),
 });
 
+// Define the return type structure for notifications query pages
+export interface NotificationsPage {
+  data: Notification[];
+  page: number;
+  hasMore: boolean;
+}
+
 export const useNotificationsInfiniteQuery = (
-  filters?: Omit<NotificationsQueryParams, "page">
+  filters?: Omit<NotificationsQueryParams, "page">,
+  options?: Partial<
+    UseInfiniteQueryOptions<
+      NotificationsPage,
+      Error,
+      InfiniteData<NotificationsPage>
+    >
+  >
 ) => {
   const getNotificationsService = useGetNotificationsService();
   const limit = filters?.limit || 10;
   const { user } = useAuth();
   const userId = user?.id;
 
-  return useInfiniteQuery({
+  return useInfiniteQuery<
+    NotificationsPage,
+    Error,
+    InfiniteData<NotificationsPage>
+  >({
     queryKey: notificationsQueryKeys.list().sub.by({ filters, userId }).key,
     queryFn: async ({ pageParam = 1, signal }) => {
       const { status, data } = await getNotificationsService(
         undefined,
-        { ...filters, page: pageParam, limit },
+        { ...filters, page: pageParam as number, limit },
         { signal }
       );
       if (status === HTTP_CODES_ENUM.OK) {
         return {
           data,
-          page: pageParam,
+          page: pageParam as number,
           hasMore: data.length === limit, // Determine if there are more items
         };
       }
-      return { data: [], page: pageParam, hasMore: false };
+      return { data: [], page: pageParam as number, hasMore: false };
     },
     getNextPageParam: (lastPage) => {
       if (!lastPage.hasMore) return undefined;
@@ -79,6 +100,7 @@ export const useNotificationsInfiniteQuery = (
     initialPageParam: 1,
     staleTime: 30000, // 30 seconds
     enabled: !!userId, // Only run query if user is logged in
+    ...options,
   });
 };
 
@@ -86,7 +108,6 @@ export const useUnreadNotificationsCountQuery = (enabled = true) => {
   const getUnreadCountService = useGetUnreadCountService();
   const { user } = useAuth();
   const userId = user?.id;
-
   return useQuery({
     queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
     queryFn: async ({ signal }) => {
@@ -111,7 +132,6 @@ export const useMarkNotificationAsReadMutation = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const userId = user?.id;
-
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status, data } = await markAsReadService(undefined, { id });
@@ -138,7 +158,6 @@ export const useMarkAllNotificationsAsReadMutation = () => {
   const { t } = useTranslation("notifications");
   const { user } = useAuth();
   const userId = user?.id;
-
   return useMutation({
     mutationFn: async () => {
       const { status } = await markAllAsReadService();
@@ -172,7 +191,6 @@ export const useDeleteNotificationMutation = () => {
   const { t } = useTranslation("notifications");
   const { user } = useAuth();
   const userId = user?.id;
-
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status } = await deleteNotificationService({ id });

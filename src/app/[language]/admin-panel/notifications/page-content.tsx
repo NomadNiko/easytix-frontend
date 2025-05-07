@@ -28,6 +28,7 @@ type BroadcastNotificationForm = {
   title: string;
   message: string;
   link?: string;
+  linkLabel?: string;
 };
 
 type MultipleNotificationForm = {
@@ -35,6 +36,7 @@ type MultipleNotificationForm = {
   title: string;
   message: string;
   link?: string;
+  linkLabel?: string;
 };
 
 function AdminNotificationsContent() {
@@ -65,6 +67,7 @@ function AdminNotificationsContent() {
       title: "",
       message: "",
       link: "",
+      linkLabel: "",
     },
   });
 
@@ -75,6 +78,7 @@ function AdminNotificationsContent() {
       title: "",
       message: "",
       link: "",
+      linkLabel: "",
     },
   });
 
@@ -118,7 +122,6 @@ function AdminNotificationsContent() {
     <Container size="md">
       <Stack gap="lg" py="lg">
         <Title order={3}>{t("admin-notifications:title")}</Title>
-
         <Tabs value={activeTab} onChange={setActiveTab}>
           <Tabs.List>
             <Tabs.Tab value="broadcast">
@@ -128,7 +131,6 @@ function AdminNotificationsContent() {
               {t("admin-notifications:tabs.multiple")}
             </Tabs.Tab>
           </Tabs.List>
-
           <Tabs.Panel value="broadcast">
             <Paper p="md" withBorder mt="md">
               <form
@@ -138,7 +140,6 @@ function AdminNotificationsContent() {
                   <Text fw={500}>
                     {t("admin-notifications:broadcast.description")}
                   </Text>
-
                   <Controller
                     name="title"
                     control={broadcastForm.control}
@@ -159,7 +160,6 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
                   <Controller
                     name="message"
                     control={broadcastForm.control}
@@ -181,7 +181,6 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
                   <Controller
                     name="link"
                     control={broadcastForm.control}
@@ -194,7 +193,20 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
+                  <Controller
+                    name="linkLabel"
+                    control={broadcastForm.control}
+                    render={({ field, fieldState }) => (
+                      <TextInput
+                        {...field}
+                        label={t("admin-notifications:fields.linkLabel")}
+                        placeholder={t(
+                          "admin-notifications:placeholders.linkLabel"
+                        )}
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
                   <Group justify="right" mt="md">
                     <Button
                       type="submit"
@@ -207,7 +219,6 @@ function AdminNotificationsContent() {
               </form>
             </Paper>
           </Tabs.Panel>
-
           <Tabs.Panel value="multiple">
             <Paper p="md" withBorder mt="md">
               <form onSubmit={multipleForm.handleSubmit(handleMultipleSubmit)}>
@@ -215,7 +226,6 @@ function AdminNotificationsContent() {
                   <Text fw={500}>
                     {t("admin-notifications:multiple.description")}
                   </Text>
-
                   <Box>
                     <Text size="sm" fw={500} mb={5}>
                       {t("admin-notifications:fields.users")}
@@ -234,7 +244,6 @@ function AdminNotificationsContent() {
                       </Text>
                     )}
                   </Box>
-
                   <Controller
                     name="title"
                     control={multipleForm.control}
@@ -255,7 +264,6 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
                   <Controller
                     name="message"
                     control={multipleForm.control}
@@ -277,7 +285,6 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
                   <Controller
                     name="link"
                     control={multipleForm.control}
@@ -290,7 +297,20 @@ function AdminNotificationsContent() {
                       />
                     )}
                   />
-
+                  <Controller
+                    name="linkLabel"
+                    control={multipleForm.control}
+                    render={({ field, fieldState }) => (
+                      <TextInput
+                        {...field}
+                        label={t("admin-notifications:fields.linkLabel")}
+                        placeholder={t(
+                          "admin-notifications:placeholders.linkLabel"
+                        )}
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
                   <Group justify="right" mt="md">
                     <Button
                       type="submit"

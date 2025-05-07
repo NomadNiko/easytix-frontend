@@ -1,4 +1,5 @@
 // src/components/app-bar/notification-icon.tsx
+// src/components/app-bar/notification-icon.tsx
 import { useState, useEffect } from "react";
 import { ActionIcon, Indicator, Menu } from "@mantine/core";
 import { IconBell } from "@tabler/icons-react";
@@ -46,6 +47,12 @@ const NotificationIcon = () => {
 
   const handleToggleMenu = () => {
     setMenuOpened((prev) => !prev);
+    // Force a refetch when we open the menu to ensure fresh data
+    if (!menuOpened) {
+      queryClient.invalidateQueries({
+        queryKey: notificationsQueryKeys.list().key,
+      });
+    }
   };
 
   const handleSelectNotification = (notification: Notification) => {
@@ -94,7 +101,7 @@ const NotificationIcon = () => {
                   unreadCount > 99 ? "24px" : unreadCount > 9 ? "20px" : "16px",
                 height: "20px" /* Fixed height */,
                 lineHeight: 1,
-                paddingTop: "1px" /* Slight shift downward */,
+                paddingTop: "2px" /* Slight shift downward */,
               },
             }}
           >

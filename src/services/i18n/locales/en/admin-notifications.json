@@ -14,12 +14,14 @@
     "title": "Title",
     "message": "Message",
     "link": "Link (Optional)",
+    "linkLabel": "Link Label (Optional)",
     "users": "Select Users"
   },
   "placeholders": {
     "title": "Enter notification title",
     "message": "Enter notification message",
     "link": "Enter optional URL or path",
+    "linkLabel": "Enter button text for link",
     "users": "Search and select users"
   },
   "actions": {

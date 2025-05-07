@@ -14,11 +14,14 @@ import Link from "@/components/link";
 import {
   useNotificationsInfiniteQuery,
   useMarkAllNotificationsAsReadMutation,
+  notificationsQueryKeys,
 } from "@/app/[language]/profile/queries/notifications-queries";
 import NotificationItem from "./notification-item";
 import { IconInbox } from "@tabler/icons-react";
 import { Notification } from "@/services/api/services/notifications";
 import useAuth from "@/services/auth/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 interface NotificationDropdownProps {
   closeMenu: () => void;
@@ -31,11 +34,26 @@ const NotificationDropdown = ({
 }: NotificationDropdownProps) => {
   const { t } = useTranslation("notifications");
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Force refetch when dropdown opens
+  useEffect(() => {
+    // Invalidate notifications query to force a fresh fetch
+    queryClient.invalidateQueries({
+      queryKey: notificationsQueryKeys.list().key,
+    });
+  }, [queryClient]);
 
   // Only fetch notifications when user is authenticated and the dropdown is open
-  const { data: infiniteData, isLoading } = useNotificationsInfiniteQuery({
-    limit: 5, // Only show 5 most recent notifications
-  });
+  const { data: infiniteData, isLoading } = useNotificationsInfiniteQuery(
+    {
+      limit: 5, // Only show 5 most recent notifications
+    },
+    {
+      staleTime: 0,
+      refetchOnMount: "always",
+    }
+  );
 
   // Get the first page of notifications only for the dropdown
   const notifications = infiniteData?.pages[0]?.data || [];

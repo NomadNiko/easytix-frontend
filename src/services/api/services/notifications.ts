@@ -12,6 +12,7 @@ export type Notification = {
   message: string;
   isRead: boolean;
   link?: string;
+  linkLabel?: string;
   createdAt: string;
   updatedAt: string;
 };

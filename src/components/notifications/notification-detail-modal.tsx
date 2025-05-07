@@ -34,7 +34,6 @@ export default function NotificationDetailModal({
 
   const handleDelete = async () => {
     if (!notification) return;
-
     await deleteMutation.mutateAsync({ id: notification.id });
     onClose();
   };
@@ -59,11 +58,9 @@ export default function NotificationDetailModal({
         <Text size="sm" c="dimmed">
           {formattedDate}
         </Text>
-
         <Paper p="md" withBorder>
           <Text>{notification.message}</Text>
         </Paper>
-
         {notification.link && (
           <Button
             component="a"
@@ -72,10 +69,9 @@ export default function NotificationDetailModal({
             fullWidth
             onClick={onClose}
           >
-            {t("notifications:viewLink")}
+            {notification.linkLabel || t("notifications:viewLink")}
           </Button>
         )}
-
         <Group justify="space-between" mt="md">
           <Button onClick={onClose} variant="subtle">
             {t("notifications:close")}

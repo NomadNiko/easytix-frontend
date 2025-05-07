@@ -20,6 +20,7 @@ import { IconSearch, IconInbox } from "@tabler/icons-react";
 import {
   useNotificationsInfiniteQuery,
   useMarkAllNotificationsAsReadMutation,
+  type NotificationsPage,
 } from "../queries/notifications-queries";
 import NotificationItem from "@/components/notifications/notification-item";
 import NotificationDetailModal from "@/components/notifications/notification-detail-modal";
@@ -54,7 +55,8 @@ function NotificationsPageContent() {
   const markAllAsReadMutation = useMarkAllNotificationsAsReadMutation();
 
   // Flatten all pages of notifications into a single array
-  const notifications = infiniteData?.pages.flatMap((page) => page.data) || [];
+  const notifications =
+    infiniteData?.pages.flatMap((page: NotificationsPage) => page.data) || [];
 
   // Handle debounced search
   useEffect(() => {
