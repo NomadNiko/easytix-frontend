@@ -191,6 +191,7 @@ export const useDeleteNotificationMutation = () => {
   const { t } = useTranslation("notifications");
   const { user } = useAuth();
   const userId = user?.id;
+
   return useMutation({
     mutationFn: async ({ id }: { id: string }) => {
       const { status } = await deleteNotificationService({ id });
@@ -198,14 +199,34 @@ export const useDeleteNotificationMutation = () => {
         throw new Error("Failed to delete notification");
       }
     },
-    onSuccess: () => {
-      // Update both the list and the unread count
+    onSuccess: (_, { id }) => {
+      // Update the query cache directly to remove the deleted notification
+      queryClient.setQueriesData(
+        { queryKey: notificationsQueryKeys.list().sub.by({ userId }).key },
+        (oldData: InfiniteData<NotificationsPage> | undefined) => {
+          if (!oldData) return oldData;
+
+          // Create a new pages array with the deleted notification removed
+          const newPages = oldData.pages.map((page) => ({
+            ...page,
+            data: page.data.filter((notification) => notification.id !== id),
+          }));
+
+          return {
+            ...oldData,
+            pages: newPages,
+          };
+        }
+      );
+
+      // Also invalidate the queries to ensure data consistency
       queryClient.invalidateQueries({
         queryKey: notificationsQueryKeys.list().sub.by({ userId }).key,
       });
       queryClient.invalidateQueries({
         queryKey: notificationsQueryKeys.unreadCount().sub.by({ userId }).key,
       });
+
       enqueueSnackbar(t("notifications:alerts.delete.success"), {
         variant: "success",
       });

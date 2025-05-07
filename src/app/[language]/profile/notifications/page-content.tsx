@@ -46,6 +46,7 @@ function NotificationsPageContent() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    refetch, // Add this
   } = useNotificationsInfiniteQuery({
     limit: 10,
     search: debouncedSearch,
@@ -101,6 +102,11 @@ function NotificationsPageContent() {
     );
   }
 
+  const handleForceRefresh = () => {
+    // Force a complete refetch when a notification is deleted
+    refetch();
+  };
+
   return (
     <Container size="md">
       <Stack gap="md" py="lg">
@@ -152,6 +158,7 @@ function NotificationsPageContent() {
                 notification={notification}
                 onSelect={handleSelectNotification}
                 showActions={true}
+                onDelete={handleForceRefresh}
               />
             ))}
             {hasNextPage && (
@@ -172,6 +179,7 @@ function NotificationsPageContent() {
         notification={selectedNotification}
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
+        onDelete={handleForceRefresh}
       />
     </Container>
   );

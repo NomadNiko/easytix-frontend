@@ -20,6 +20,7 @@ interface NotificationItemProps {
   onSelect: (notification: Notification) => void;
   onClick?: () => void;
   showActions?: boolean;
+  onDelete?: () => void; // Added onDelete callback prop
 }
 
 const NotificationItem = ({
@@ -27,6 +28,7 @@ const NotificationItem = ({
   onSelect,
   onClick,
   showActions = true,
+  onDelete, // Include the new prop in the component parameters
 }: NotificationItemProps) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -51,7 +53,17 @@ const NotificationItem = ({
 
   const handleDelete = (event: React.MouseEvent) => {
     event.stopPropagation();
-    deleteNotificationMutation.mutate({ id: notification.id });
+    deleteNotificationMutation.mutate(
+      { id: notification.id },
+      {
+        onSuccess: () => {
+          // Call the onDelete callback to refresh parent component
+          if (onDelete) {
+            onDelete();
+          }
+        },
+      }
+    );
   };
 
   // Determine if message is long and should be truncated

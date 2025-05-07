@@ -1,4 +1,5 @@
 // src/components/notifications/notification-detail-modal.tsx
+
 import { useState } from "react";
 import { Modal, Text, Group, Button, Paper, Stack } from "@mantine/core";
 import { formatDistance } from "date-fns";
@@ -14,12 +15,14 @@ interface NotificationDetailModalProps {
   notification: Notification | null;
   isOpen: boolean;
   onClose: () => void;
+  onDelete?: () => void; // Add this prop to force refresh parent
 }
 
 export default function NotificationDetailModal({
   notification,
   isOpen,
   onClose,
+  onDelete,
 }: NotificationDetailModalProps) {
   const { t } = useTranslation("notifications");
   const deleteMutation = useDeleteNotificationMutation();
@@ -34,7 +37,14 @@ export default function NotificationDetailModal({
 
   const handleDelete = async () => {
     if (!notification) return;
+
     await deleteMutation.mutateAsync({ id: notification.id });
+
+    // Explicitly force refresh the parent component
+    if (onDelete) {
+      onDelete();
+    }
+
     onClose();
   };
 
