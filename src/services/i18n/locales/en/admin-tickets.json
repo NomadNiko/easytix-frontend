@@ -1,0 +1,32 @@
+{
+  "title": "Ticket Management",
+  "queueManagement": "Queue Management",
+  "categoryManagement": "Category Management",
+  "statistics": {
+    "title": "Ticket Statistics",
+    "totalTickets": "Total Tickets",
+    "openTickets": "Open Tickets",
+    "closedTickets": "Closed Tickets",
+    "averageResponseTime": "Average Response Time",
+    "highPriorityTickets": "High Priority Tickets"
+  },
+  "settings": {
+    "title": "Ticket System Settings",
+    "notifications": "Email Notifications",
+    "autoAssignment": "Auto-Assignment",
+    "defaultPriority": "Default Priority",
+    "enableFeatures": "Enable Features"
+  },
+  "reports": {
+    "title": "Ticket Reports",
+    "responseTime": "Response Time",
+    "resolutionTime": "Resolution Time",
+    "byQueue": "Tickets by Queue",
+    "byCategory": "Tickets by Category",
+    "byStatus": "Tickets by Status",
+    "byUser": "Tickets by User",
+    "generateReport": "Generate Report",
+    "exportToCsv": "Export to CSV",
+    "exportToPdf": "Export to PDF"
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "admin": {
+    "queueManagement": "Queue Management",
+    "queues": "Queues",
+    "categories": "Categories"
+  },
+  "queues": {
+    "pageTitle": "Queues",
+    "empty": "No queues found",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "assignedUsers": "Assigned Users",
+      "queue": "Queue"
+    },
+    "placeholders": {
+      "name": "Enter queue name",
+      "description": "Enter queue description",
+      "selectQueue": "Select a queue"
+    },
+    "actions": {
+      "create": "Create Queue",
+      "edit": "Edit Queue",
+      "delete": "Delete Queue"
+    },
+    "validation": {
+      "nameRequired": "Queue name is required"
+    },
+    "confirmDelete": {
+      "title": "Delete Queue",
+      "message": "Are you sure you want to delete queue '{{name}}'? This will delete all tickets in this queue."
+    },
+    "users": "Users",
+    "nothingFound": "No queues found",
+    "manageUsers": {
+      "title": "Manage Queue Users",
+      "description": "Assign service desk users to this queue. Only assigned users can manage tickets in this queue.",
+      "selectUsers": "Select Users",
+      "selectUsersPlaceholder": "Select users to assign"
+    },
+    "alerts": {
+      "create": {
+        "success": "Queue created successfully",
+        "error": "Failed to create queue"
+      },
+      "update": {
+        "success": "Queue updated successfully",
+        "error": "Failed to update queue"
+      },
+      "delete": {
+        "success": "Queue deleted successfully",
+        "error": "Failed to delete queue"
+      },
+      "assignUser": {
+        "success": "User assigned to queue successfully",
+        "error": "Failed to assign user to queue"
+      },
+      "removeUser": {
+        "success": "User removed from queue successfully",
+        "error": "Failed to remove user from queue"
+      }
+    }
+  },
+  "categories": {
+    "pageTitle": "Categories",
+    "empty": "No categories found",
+    "selectQueue": "Select Queue",
+    "selectQueuePlaceholder": "Select a queue to manage its categories",
+    "selectQueueFirst": "Please select a queue first",
+    "fields": {
+      "name": "Name",
+      "category": "Category"
+    },
+    "placeholders": {
+      "name": "Enter category name",
+      "selectCategory": "Select a category"
+    },
+    "actions": {
+      "create": "Create Category",
+      "edit": "Edit Category",
+      "delete": "Delete Category"
+    },
+    "validation": {
+      "nameRequired": "Category name is required"
+    },
+    "confirmDelete": {
+      "title": "Delete Category",
+      "message": "Are you sure you want to delete category '{{name}}'? Tickets in this category will need to be reassigned."
+    },
+    "nothingFound": "No categories found",
+    "alerts": {
+      "create": {
+        "success": "Category created successfully",
+        "error": "Failed to create category"
+      },
+      "update": {
+        "success": "Category updated successfully",
+        "error": "Failed to update category"
+      },
+      "delete": {
+        "success": "Category deleted successfully",
+        "error": "Failed to delete category"
+      }
+    }
+  },
+  "tickets": {
+    "pageTitle": "Tickets",
+    "ticketList": "Ticket List",
+    "createTicket": "Create Ticket",
+    "editTicket": "Edit Ticket",
+    "ticketDetails": "Ticket Details",
+    "notFound": "Ticket not found",
+    "empty": "No tickets found",
+    "timeline": "Timeline",
+    "noHistory": "No history items found",
+    "notAssigned": "Not Assigned",
+    "commentPlaceholder": "Add a comment...",
+    "tabs": {
+      "all": "All Tickets",
+      "assigned": "Assigned to Me",
+      "unassigned": "Unassigned",
+      "created": "Created by Me",
+      "open": "Open Tickets",
+      "closed": "Closed Tickets"
+    },
+    "fields": {
+      "id": "ID",
+      "title": "Title",
+      "details": "Description",
+      "status": "Status",
+      "priority": "Priority",
+      "created": "Created",
+      "assignedTo": "Assigned To",
+      "createdBy": "Created By",
+      "attachment": "Attachment",
+      "attachments": "Attachments",
+      "queue": "Queue",
+      "category": "Category"
+    },
+    "placeholders": {
+      "title": "Enter ticket title",
+      "details": "Enter ticket details",
+      "priority": "Select priority"
+    },
+    "statuses": {
+      "opened": "Open",
+      "closed": "Closed"
+    },
+    "priorities": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "actions": {
+      "create": "Create Ticket",
+      "edit": "Edit",
+      "view": "View",
+      "assign": "Assign",
+      "reassign": "Reassign",
+      "selectUser": "Select user",
+      "closeTicket": "Close Ticket",
+      "reopenTicket": "Reopen Ticket",
+      "editTicket": "Edit Ticket",
+      "addComment": "Add Comment",
+      "download": "Download"
+    },
+    "filters": {
+      "queue": "Queue",
+      "status": "Status",
+      "priority": "Priority",
+      "search": "Search",
+      "anyQueue": "Any Queue",
+      "anyStatus": "Any Status",
+      "anyPriority": "Any Priority",
+      "searchPlaceholder": "Search by title or description",
+      "clearFilters": "Clear Filters"
+    },
+    "validation": {
+      "queueIdRequired": "Queue is required",
+      "categoryIdRequired": "Category is required",
+      "titleRequired": "Title is required",
+      "detailsRequired": "Description is required",
+      "priorityRequired": "Priority is required"
+    },
+    "alerts": {
+      "create": {
+        "success": "Ticket created successfully",
+        "error": "Failed to create ticket"
+      },
+      "update": {
+        "success": "Ticket updated successfully",
+        "error": "Failed to update ticket"
+      },
+      "assign": {
+        "success": "Ticket assigned successfully",
+        "error": "Failed to assign ticket"
+      },
+      "updateStatus": {
+        "success": "Ticket status updated successfully",
+        "error": "Failed to update ticket status"
+      },
+      "addDocument": {
+        "success": "Document added to ticket successfully",
+        "error": "Failed to add document to ticket"
+      },
+      "removeDocument": {
+        "success": "Document removed from ticket successfully",
+        "error": "Failed to remove document from ticket"
+      },
+      "delete": {
+        "success": "Ticket deleted successfully",
+        "error": "Failed to delete ticket"
+      }
+    }
+  },
+  "historyTypes": {
+    "comment": "Comment",
+    "created": "Created",
+    "assigned": "Assigned",
+    "status_changed": "Status Changed",
+    "closed": "Closed",
+    "reopened": "Reopened",
+    "document_added": "Document Added",
+    "document_removed": "Document Removed",
+    "priority_changed": "Priority Changed",
+    "category_changed": "Category Changed"
+  },
+  "historyItems": {
+    "alerts": {
+      "createComment": {
+        "success": "Comment added successfully",
+        "error": "Failed to add comment"
+      }
+    }
+  }
+}

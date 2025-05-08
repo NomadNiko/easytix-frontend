@@ -1,0 +1,61 @@
+{
+  "ticketList": {
+    "title": "Tickets",
+    "emptyState": "No tickets found",
+    "loadMore": "Load More Tickets",
+    "refresh": "Refresh Tickets",
+    "sort": {
+      "title": "Sort By",
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "priority": "Priority",
+      "status": "Status"
+    }
+  },
+  "ticketDetails": {
+    "relatedTickets": "Related Tickets",
+    "activityLog": "Activity Log",
+    "attachments": "Attachments",
+    "addAttachment": "Add Attachment",
+    "relatedLinks": "Related Links",
+    "addLink": "Add Link"
+  },
+  "ticketForm": {
+    "ticketInfo": "Ticket Information",
+    "requesterInfo": "Requester Information",
+    "additionalInfo": "Additional Information",
+    "requiredFields": "* Required fields",
+    "optionalFields": "Optional fields",
+    "saveAsDraft": "Save as Draft"
+  },
+  "ticketTimeline": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "olderEvents": "Older Events"
+  },
+  "ticketFilters": {
+    "filterBy": "Filter By",
+    "dateRange": "Date Range",
+    "assignees": "Assignees",
+    "categories": "Categories",
+    "tags": "Tags",
+    "saveFilter": "Save Filter",
+    "savedFilters": "Saved Filters",
+    "applyFilter": "Apply Filter",
+    "resetFilters": "Reset Filters"
+  },
+  "queueManagement": {
+    "editQueue": "Edit Queue",
+    "queueSettings": "Queue Settings",
+    "defaultAssignee": "Default Assignee",
+    "notificationSettings": "Notification Settings",
+    "accessRights": "Access Rights",
+    "automationRules": "Automation Rules"
+  },
+  "categoryManagement": {
+    "editCategory": "Edit Category",
+    "parentCategory": "Parent Category",
+    "subcategories": "Subcategories",
+    "addSubcategory": "Add Subcategory"
+  }
+}

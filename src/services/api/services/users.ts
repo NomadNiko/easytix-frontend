@@ -9,6 +9,9 @@ import {
   createDeleteService,
 } from "../factory";
 
+// Use export type for re-exporting types when isolatedModules is enabled
+export type { User } from "../types/user";
+
 // Type definitions
 export type UsersRequest = {
   page: number;

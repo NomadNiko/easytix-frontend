@@ -1,5 +1,6 @@
 {
   "app-name": "EasyTix",
+  "title": "EasyTix System",
   "loading": "Loading ...",
   "navigation": {
     "home": "Home",
@@ -8,13 +9,43 @@
     "profile": "Profile",
     "notifications": "Notifications",
     "users": "Users",
+    "tickets": "Tickets",
+    "queues": "Queues",
     "logout": "Logout"
+  },
+  "fields": {
+    "actions": "Actions",
+    "name": "Name",
+    "description": "Description",
+    "status": "Status",
+    "priority": "Priority",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At"
+  },
+  "actions": {
+    "create": "Create",
+    "edit": "Edit",
+    "update": "Update",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "close": "Close",
+    "view": "View",
+    "filter": "Filter",
+    "search": "Search",
+    "clear": "Clear",
+    "assign": "Assign",
+    "unassign": "Unassign",
+    "download": "Download",
+    "upload": "Upload"
   },
   "formInputs": {
     "avatarInput": {
       "dropzoneText": "Drop the image here ...",
       "dragAndDrop": "Or drag 'n' drop some image here",
-      "selectFile": "Select an image"
+      "selectFile": "Select an image",
+      "imageAlt": "Uploaded image"
     },
     "multipleImageInput": {
       "dropzoneText": "Drop the image here ...",
@@ -24,13 +55,42 @@
     "singleImageInput": {
       "dropzoneText": "Drop the image here ...",
       "dragAndDrop": "Or drag 'n' drop some images here",
-      "selectFile": "Select an image"
+      "selectFile": "Select an image",
+      "imageAlt": "Uploaded image"
     },
     "filePicker": {
       "dropzoneText": "Drop the file here ...",
       "dragAndDrop": "Or drag 'n' drop a file here",
-      "selectFile": "Select a file"
+      "selectFile": "Select a file",
+      "uploadedFile": "Uploaded file",
+      "remove": "Remove",
+      "uploadFailed": "Upload failed",
+      "uploadError": "An error occurred during upload",
+      "fileRequired": "Please select a file"
     }
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid": "This field is invalid",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be at most {{max}} characters",
+    "email": "Must be a valid email",
+    "match": "Fields must match",
+    "number": "Must be a number",
+    "greaterThan": "Must be greater than {{value}}",
+    "lessThan": "Must be less than {{value}}"
+  },
+  "alerts": {
+    "success": "Operation successful",
+    "error": "An error occurred",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No notifications",
+    "markAllAsRead": "Mark all as read",
+    "viewAll": "View all"
   },
   "leavePage": {
     "title": "Leave this page?",
@@ -41,6 +101,13 @@
   "auth": {
     "facebook": {
       "action": "Login with Facebook"
+    },
+    "google": {
+      "action": "Login with Google"
     }
-  }
+  },
+  "nothingFound": "Nothing found",
+  "uploadFileInstructions": "Drop files here or click to browse",
+  "uploadingFile": "Uploading file...",
+  "errorOccurred": "An error occurred"
 }
