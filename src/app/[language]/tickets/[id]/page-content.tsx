@@ -25,12 +25,10 @@ interface UserInfo {
   id: string;
   name: string;
 }
-
 interface CategoryInfo {
   id: string;
   name: string;
 }
-
 interface DocumentInfo {
   id: string;
   name: string;
@@ -41,7 +39,6 @@ function TicketPage() {
   // Get the ID from URL parameters
   const params = useParams();
   const id = params.id as string;
-
   const { t } = useTranslation("tickets");
   const router = useRouter();
   const language = useLanguage();
@@ -117,6 +114,8 @@ function TicketPage() {
         url: `/api/documents/${docId}`,
       }));
       setDocuments(mockDocuments);
+    } else {
+      setDocuments([]);
     }
   }, [ticket?.documentIds]);
 

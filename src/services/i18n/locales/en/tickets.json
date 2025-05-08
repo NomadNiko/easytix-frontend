@@ -115,6 +115,7 @@
     "noHistory": "No history items found",
     "notAssigned": "Not Assigned",
     "commentPlaceholder": "Add a comment...",
+    "noAttachments": "No attachments",
     "tabs": {
       "all": "All Tickets",
       "assigned": "Assigned to Me",
@@ -162,7 +163,9 @@
       "reopenTicket": "Reopen Ticket",
       "editTicket": "Edit Ticket",
       "addComment": "Add Comment",
-      "download": "Download"
+      "download": "Download",
+      "addAttachment": "Add Attachment",
+      "deleteAttachment": "Delete Attachment"
     },
     "filters": {
       "queue": "Queue",

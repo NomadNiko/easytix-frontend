@@ -89,6 +89,8 @@ export const useQueueQuery = (id: string, enabled = true) => {
   });
 };
 
+export { useGetQueueService };
+
 export const useCreateQueueMutation = () => {
   const createQueueService = useCreateQueueService();
   const queryClient = useQueryClient();
