@@ -69,7 +69,6 @@ export function TicketDetails({
   users,
   categories,
   isLoading,
-  documents,
 }: TicketDetailsProps) {
   const { t } = useTranslation("tickets");
   const [isAssigning, setIsAssigning] = useState(false);
@@ -77,6 +76,9 @@ export function TicketDetails({
     ticket.assignedToId
   );
   const [isUploading, setIsUploading] = useState(false);
+  const [documentList, setDocumentList] = useState<
+    { id: string; name: string; url: string }[]
+  >([]);
 
   // Services
   const getQueueService = useGetQueueService();
@@ -84,10 +86,31 @@ export function TicketDetails({
   const fileUploadService = useFileGeneralUploadService();
   const addDocumentMutation = useAddDocumentToTicketMutation();
   const removeDocumentMutation = useRemoveDocumentFromTicketMutation();
-
   const [queueUsers, setQueueUsers] = useState<{ id: string; name: string }[]>(
     []
   );
+
+  // Load document information
+  useEffect(() => {
+    if (ticket?.documentIds && ticket.documentIds.length > 0) {
+      // Create document info from document IDs
+      const s3BaseUrl =
+        "https://ixplor-bucket-test-01.s3.us-east-2.amazonaws.com/";
+
+      const docInfos = ticket.documentIds.map((docId) => {
+        return {
+          id: docId,
+          name: `Document-${docId.substring(docId.length - 6)}`,
+          // Use the same URL pattern as profile documents
+          url: docId.startsWith("http") ? docId : `${s3BaseUrl}${docId}`,
+        };
+      });
+
+      setDocumentList(docInfos);
+    } else {
+      setDocumentList([]);
+    }
+  }, [ticket?.documentIds]);
 
   // Load queue users
   useEffect(() => {
@@ -98,14 +121,12 @@ export function TicketDetails({
           { id: ticket.queueId },
           undefined
         );
-
         if (queueStatus === HTTP_CODES_ENUM.OK && queueData) {
           // Then get all users
           const { status, data } = await getUsersService(undefined, {
             page: 1,
             limit: 50,
           });
-
           if (status === HTTP_CODES_ENUM.OK) {
             // Filter users based on queue assignment
             const formattedUsers = data.data
@@ -116,7 +137,6 @@ export function TicketDetails({
                 id: user.id.toString(),
                 name: `${user.firstName} ${user.lastName}`,
               }));
-
             setQueueUsers(formattedUsers);
           }
         }
@@ -124,7 +144,6 @@ export function TicketDetails({
         console.error("Error fetching queue users:", error);
       }
     };
-
     if (ticket?.queueId) {
       fetchQueueUsers();
     }
@@ -157,7 +176,6 @@ export function TicketDetails({
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setIsUploading(true);
     try {
       // Upload the file
@@ -351,7 +369,6 @@ export function TicketDetails({
           labelPosition="left"
         />
         <Text mb="lg">{ticket.details}</Text>
-
         <Divider
           mb="md"
           label={t("tickets:tickets.fields.attachments")}
@@ -376,7 +393,7 @@ export function TicketDetails({
           </Button>
         </Group>
         <Group mb="lg">
-          {documents.map((doc) => (
+          {documentList.map((doc) => (
             <Card key={doc.id} withBorder p="xs" style={{ width: "auto" }}>
               <Group>
                 <IconFileText size={16} />
@@ -404,7 +421,7 @@ export function TicketDetails({
               </Group>
             </Card>
           ))}
-          {documents.length === 0 && (
+          {documentList.length === 0 && (
             <Text color="dimmed">{t("tickets:tickets.noAttachments")}</Text>
           )}
         </Group>
