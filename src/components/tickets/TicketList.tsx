@@ -23,6 +23,9 @@ import {
 } from "@/services/api/services/tickets";
 import { formatDate } from "@/utils/format-date";
 import { QueueSelect } from "./queues/QueueSelect";
+import { ResponsiveDisplay } from "@/components/responsive-display/ResponsiveDisplay";
+import { TicketListMobile } from "./TicketListMobile";
+import { TicketFiltersMobile } from "./TicketFiltersMobile";
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -130,7 +133,8 @@ export function TicketList({
     );
   }
 
-  return (
+  // Desktop version with full table
+  const DesktopContent = () => (
     <Paper p="md" withBorder>
       <Title order={4} mb="md">
         {t("tickets:tickets.ticketList")}
@@ -276,5 +280,27 @@ export function TicketList({
         </Table>
       )}
     </Paper>
+  );
+
+  // Mobile version with simplified cards
+  const MobileContent = () => (
+    <Paper p="md" withBorder>
+      <Title order={4} mb="md">
+        {t("tickets:tickets.ticketList")}
+      </Title>
+      <TicketFiltersMobile filters={filters} onFilterChange={onFilterChange} />
+      <TicketListMobile
+        tickets={tickets}
+        onViewTicket={onViewTicket}
+        isLoading={isLoading}
+      />
+    </Paper>
+  );
+
+  return (
+    <ResponsiveDisplay
+      desktopContent={<DesktopContent />}
+      mobileContent={<MobileContent />}
+    />
   );
 }
