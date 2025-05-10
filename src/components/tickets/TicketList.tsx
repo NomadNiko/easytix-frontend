@@ -1,5 +1,5 @@
 // src/components/tickets/TicketList.tsx
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Table,
   Group,
@@ -65,6 +65,16 @@ export function TicketList({
 }: TicketListProps) {
   const { t } = useTranslation("tickets");
 
+  // Add local state for the search input
+  const [searchInput, setSearchInput] = useState(filters.search || "");
+  // Reference to track timeout
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Update searchInput when filters.search changes externally
+  useEffect(() => {
+    setSearchInput(filters.search || "");
+  }, [filters.search]);
+
   const handleFilterChange = <K extends keyof typeof filters>(
     field: K,
     value: (typeof filters)[K]
@@ -74,6 +84,33 @@ export function TicketList({
       [field]: value,
     });
   };
+
+  // Debounced search function
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set a new timeout
+    timeoutRef.current = setTimeout(() => {
+      onFilterChange({
+        ...filters,
+        search: value || null,
+      });
+    }, 500); // 500ms debounce time
+  };
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleClearFilters = () => {
     onFilterChange({
@@ -178,15 +215,19 @@ export function TicketList({
             <TextInput
               label={t("tickets:tickets.filters.search")}
               placeholder={t("tickets:tickets.filters.searchPlaceholder")}
-              value={filters.search || ""}
-              onChange={(e) =>
-                handleFilterChange("search", e.target.value || null)
-              }
+              value={searchInput}
+              onChange={(e) => handleSearchChange(e.target.value)}
               rightSection={
-                filters.search ? (
+                searchInput ? (
                   <ActionIcon
                     size="sm"
-                    onClick={() => handleFilterChange("search", null)}
+                    onClick={() => {
+                      setSearchInput("");
+                      onFilterChange({
+                        ...filters,
+                        search: null,
+                      });
+                    }}
                   >
                     <IconX size={16} />
                   </ActionIcon>
@@ -288,7 +329,13 @@ export function TicketList({
       <Title order={4} mb="md">
         {t("tickets:tickets.ticketList")}
       </Title>
-      <TicketFiltersMobile filters={filters} onFilterChange={onFilterChange} />
+      <TicketFiltersMobile
+        filters={filters}
+        onFilterChange={onFilterChange}
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        handleSearchChange={handleSearchChange}
+      />
       <TicketListMobile
         tickets={tickets}
         onViewTicket={onViewTicket}

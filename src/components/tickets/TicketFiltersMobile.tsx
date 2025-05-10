@@ -1,5 +1,5 @@
 // src/components/tickets/TicketFiltersMobile.tsx
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Accordion,
   Box,
@@ -27,13 +27,39 @@ interface TicketFiltersMobileProps {
     priority?: TicketPriority | null;
     search?: string | null;
   }) => void;
+  // New props for debounced search
+  searchInput?: string;
+  setSearchInput?: React.Dispatch<React.SetStateAction<string>>;
+  handleSearchChange?: (value: string) => void;
 }
 
 export function TicketFiltersMobile({
   filters,
   onFilterChange,
+  searchInput: propSearchInput,
+  setSearchInput: propSetSearchInput,
+  handleSearchChange: propHandleSearchChange,
 }: TicketFiltersMobileProps) {
   const { t } = useTranslation("tickets");
+
+  // Local state for search input if not provided by parent
+  const [localSearchInput, setLocalSearchInput] = useState(
+    filters.search || ""
+  );
+  // Reference to track timeout
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use props or local state
+  const searchInput =
+    propSearchInput !== undefined ? propSearchInput : localSearchInput;
+  const setSearchInput = propSetSearchInput || setLocalSearchInput;
+
+  // Update searchInput when filters.search changes externally
+  useEffect(() => {
+    if (!propSearchInput) {
+      setLocalSearchInput(filters.search || "");
+    }
+  }, [filters.search, propSearchInput]);
 
   const handleFilterChange = <K extends keyof typeof filters>(
     field: K,
@@ -44,6 +70,35 @@ export function TicketFiltersMobile({
       [field]: value,
     });
   };
+
+  // Debounced search function if not provided by parent
+  const handleSearchChange =
+    propHandleSearchChange ||
+    ((value: string) => {
+      setLocalSearchInput(value);
+
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      // Set a new timeout
+      timeoutRef.current = setTimeout(() => {
+        onFilterChange({
+          ...filters,
+          search: value || null,
+        });
+      }, 500); // 500ms debounce time
+    });
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleClearFilters = () => {
     onFilterChange({
@@ -80,15 +135,19 @@ export function TicketFiltersMobile({
               <TextInput
                 label={t("tickets:tickets.filters.search")}
                 placeholder={t("tickets:tickets.filters.searchPlaceholder")}
-                value={filters.search || ""}
-                onChange={(e) =>
-                  handleFilterChange("search", e.target.value || null)
-                }
+                value={searchInput}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 rightSection={
-                  filters.search ? (
+                  searchInput ? (
                     <ActionIcon
                       size="sm"
-                      onClick={() => handleFilterChange("search", null)}
+                      onClick={() => {
+                        setSearchInput("");
+                        onFilterChange({
+                          ...filters,
+                          search: null,
+                        });
+                      }}
                     >
                       <IconX size={16} />
                     </ActionIcon>
