@@ -14,7 +14,7 @@ import {
   Button,
   Title,
 } from "@mantine/core";
-import { IconEdit, IconEye, IconSearch, IconX } from "@tabler/icons-react";
+import { IconEye, IconSearch, IconX } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
   Ticket,
@@ -43,10 +43,19 @@ interface TicketListProps {
   isLoading: boolean;
 }
 
+// Define consistent column widths to use across the application
+const COLUMN_WIDTHS = {
+  id: "10%",
+  title: "35%",
+  status: "15%",
+  priority: "15%",
+  date: "15%",
+  actions: "10%",
+};
+
 export function TicketList({
   tickets,
   onViewTicket,
-  onEditTicket,
   onFilterChange,
   filters,
   isLoading,
@@ -78,7 +87,6 @@ export function TicketList({
       [TicketPriority.MEDIUM]: "yellow",
       [TicketPriority.LOW]: "green",
     };
-
     return (
       <Badge color={colorMap[priority]} size="sm">
         {priority}
@@ -91,7 +99,6 @@ export function TicketList({
       [TicketStatus.OPENED]: "blue",
       [TicketStatus.CLOSED]: "gray",
     };
-
     return (
       <Badge color={colorMap[status]} size="sm">
         {status}
@@ -128,7 +135,6 @@ export function TicketList({
       <Title order={4} mb="md">
         {t("tickets:tickets.ticketList")}
       </Title>
-
       {/* Filters */}
       <Paper withBorder p="md" mb="md">
         <Grid>
@@ -140,7 +146,6 @@ export function TicketList({
               placeholder={t("tickets:tickets.filters.anyQueue")}
             />
           </Grid.Col>
-
           <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
             <Select
               label={t("tickets:tickets.filters.status")}
@@ -153,7 +158,6 @@ export function TicketList({
               clearable
             />
           </Grid.Col>
-
           <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
             <Select
               label={t("tickets:tickets.filters.priority")}
@@ -166,7 +170,6 @@ export function TicketList({
               clearable
             />
           </Grid.Col>
-
           <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
             <TextInput
               label={t("tickets:tickets.filters.search")}
@@ -190,7 +193,6 @@ export function TicketList({
             />
           </Grid.Col>
         </Grid>
-
         <Group justify="flex-end" mt="md">
           <Button
             variant="light"
@@ -202,7 +204,6 @@ export function TicketList({
           </Button>
         </Group>
       </Paper>
-
       {tickets.length === 0 ? (
         <Card withBorder p="xl" radius="md" my="md">
           <Text ta="center" fw={500} c="dimmed">
@@ -213,35 +214,51 @@ export function TicketList({
         <Table horizontalSpacing="sm" verticalSpacing="sm">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t("tickets:tickets.fields.id")}</Table.Th>
-              <Table.Th>{t("tickets:tickets.fields.title")}</Table.Th>
-              <Table.Th>{t("tickets:tickets.fields.status")}</Table.Th>
-              <Table.Th>{t("tickets:tickets.fields.priority")}</Table.Th>
-              <Table.Th>{t("tickets:tickets.fields.created")}</Table.Th>
-              <Table.Th>{t("common:fields.actions")}</Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.id }}>
+                {t("tickets:tickets.fields.id")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.title }}>
+                {t("tickets:tickets.fields.title")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.status }}>
+                {t("tickets:tickets.fields.status")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.priority }}>
+                {t("tickets:tickets.fields.priority")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.date }}>
+                {t("tickets:tickets.fields.created")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.actions }}>
+                {t("common:fields.actions")}
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {tickets.map((ticket) => (
               <Table.Tr key={ticket.id}>
-                <Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.id }}>
                   <Text size="sm" fw={500}>
                     #{ticket.id.substring(ticket.id.length - 6)}
                   </Text>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.title }}>
                   <Text size="sm" fw={500} lineClamp={1}>
                     {ticket.title}
                   </Text>
                 </Table.Td>
-                <Table.Td>{renderStatusBadge(ticket.status)}</Table.Td>
-                <Table.Td>{renderPriorityBadge(ticket.priority)}</Table.Td>
-                <Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.status }}>
+                  {renderStatusBadge(ticket.status)}
+                </Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.priority }}>
+                  {renderPriorityBadge(ticket.priority)}
+                </Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.date }}>
                   <Text size="sm" c="dimmed">
                     {formatDate(new Date(ticket.createdAt))}
                   </Text>
                 </Table.Td>
-                <Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.actions }}>
                   <Group gap="xs">
                     <ActionIcon
                       size="sm"
@@ -250,13 +267,6 @@ export function TicketList({
                       onClick={() => onViewTicket(ticket.id)}
                     >
                       <IconEye size={16} />
-                    </ActionIcon>
-                    <ActionIcon
-                      size="sm"
-                      variant="light"
-                      onClick={() => onEditTicket(ticket.id)}
-                    >
-                      <IconEdit size={16} />
                     </ActionIcon>
                   </Group>
                 </Table.Td>

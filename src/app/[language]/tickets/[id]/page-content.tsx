@@ -1,10 +1,9 @@
+// src/app/[language]/tickets/[id]/page-content.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Text } from "@mantine/core";
-import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/services/i18n/client";
-import useLanguage from "@/services/i18n/use-language";
 import {
   useTicketQuery,
   useAssignTicketMutation,
@@ -24,7 +23,6 @@ interface UserInfo {
   id: string;
   name: string;
 }
-
 interface CategoryInfo {
   id: string;
   name: string;
@@ -35,8 +33,6 @@ function TicketPage() {
   const params = useParams();
   const id = params.id as string;
   const { t } = useTranslation("tickets");
-  const router = useRouter();
-  const language = useLanguage();
 
   // Data states with proper typing
   const [users, setUsers] = useState<UserInfo[]>([]);
@@ -110,10 +106,6 @@ function TicketPage() {
     createCommentMutation.mutate({ ticketId: id, details: comment });
   };
 
-  const handleEditTicket = () => {
-    router.push(`/${language}/tickets/${id}/edit`);
-  };
-
   if (isTicketLoading) {
     return (
       <Container size="xl">
@@ -144,7 +136,6 @@ function TicketPage() {
         onAddComment={handleAddComment}
         onAssign={handleAssignTicket}
         onStatusChange={handleStatusChange}
-        onEditTicket={handleEditTicket}
         users={users}
         categories={categories}
         isLoading={isTicketLoading || isHistoryLoading}
