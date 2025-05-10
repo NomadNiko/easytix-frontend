@@ -1,7 +1,6 @@
 // src/components/tickets/TicketDetails.tsx
 import React, { useState, useEffect } from "react";
 import {
-  Card,
   Group,
   Text,
   Badge,
@@ -13,7 +12,6 @@ import {
   ActionIcon,
   Stack,
   Select,
-  Tooltip,
 } from "@mantine/core";
 import {
   IconCalendar,
@@ -22,10 +20,6 @@ import {
   IconEdit,
   IconCheck,
   IconX,
-  IconFileText,
-  IconDownload,
-  IconUpload,
-  IconTrash,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
@@ -37,14 +31,9 @@ import { HistoryItem } from "@/services/api/services/history-items";
 import { formatDate } from "@/utils/format-date";
 import { TicketTimeline } from "./TicketTimeline";
 import { CommentBox } from "./CommentBox";
+import TicketDocumentsSection from "./documents/TicketDocumentsSection";
 import { useGetQueueService } from "@/app/[language]/tickets/queries/queue-queries";
-import { useFileGeneralUploadService } from "@/services/api/services/files-general";
-import {
-  useAddDocumentToTicketMutation,
-  useRemoveDocumentFromTicketMutation,
-} from "@/app/[language]/tickets/queries/ticket-queries";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
-import { useGetUsersService } from "@/services/api/services/users";
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -56,7 +45,6 @@ interface TicketDetailsProps {
   users: { id: string; name: string }[];
   categories: { id: string; name: string }[];
   isLoading: boolean;
-  documents: { id: string; name: string; url: string }[];
 }
 
 export function TicketDetails({
@@ -75,79 +63,43 @@ export function TicketDetails({
   const [selectedUser, setSelectedUser] = useState<string | null>(
     ticket.assignedToId
   );
-  const [isUploading, setIsUploading] = useState(false);
-  const [documentList, setDocumentList] = useState<
-    { id: string; name: string; url: string }[]
-  >([]);
-
-  // Services
-  const getQueueService = useGetQueueService();
-  const getUsersService = useGetUsersService();
-  const fileUploadService = useFileGeneralUploadService();
-  const addDocumentMutation = useAddDocumentToTicketMutation();
-  const removeDocumentMutation = useRemoveDocumentFromTicketMutation();
+  // Add state for queue-filtered users
   const [queueUsers, setQueueUsers] = useState<{ id: string; name: string }[]>(
     []
   );
 
-  // Load document information
-  useEffect(() => {
-    if (ticket?.documentIds && ticket.documentIds.length > 0) {
-      // Create document info from document IDs
-      const s3BaseUrl =
-        "https://ixplor-bucket-test-01.s3.us-east-2.amazonaws.com/";
+  // Get queue service to fetch queue details
+  const getQueueService = useGetQueueService();
 
-      const docInfos = ticket.documentIds.map((docId) => {
-        return {
-          id: docId,
-          name: `Document-${docId.substring(docId.length - 6)}`,
-          // Use the same URL pattern as profile documents
-          url: docId.startsWith("http") ? docId : `${s3BaseUrl}${docId}`,
-        };
-      });
-
-      setDocumentList(docInfos);
-    } else {
-      setDocumentList([]);
-    }
-  }, [ticket?.documentIds]);
-
-  // Load queue users
+  // Filter users based on queue assignment
   useEffect(() => {
     const fetchQueueUsers = async () => {
       try {
         // First get the queue details to access assignedUserIds
-        const { status: queueStatus, data: queueData } = await getQueueService(
+        const { status, data } = await getQueueService(
           { id: ticket.queueId },
           undefined
         );
-        if (queueStatus === HTTP_CODES_ENUM.OK && queueData) {
-          // Then get all users
-          const { status, data } = await getUsersService(undefined, {
-            page: 1,
-            limit: 50,
-          });
-          if (status === HTTP_CODES_ENUM.OK) {
-            // Filter users based on queue assignment
-            const formattedUsers = data.data
-              .filter((user) =>
-                queueData.assignedUserIds.includes(user.id.toString())
-              )
-              .map((user) => ({
-                id: user.id.toString(),
-                name: `${user.firstName} ${user.lastName}`,
-              }));
-            setQueueUsers(formattedUsers);
-          }
+
+        if (status === HTTP_CODES_ENUM.OK && data) {
+          // Filter users to only include those assigned to this queue
+          const filteredUsers = users.filter((user) =>
+            data.assignedUserIds.includes(user.id)
+          );
+
+          setQueueUsers(filteredUsers);
         }
       } catch (error) {
-        console.error("Error fetching queue users:", error);
+        console.error("Error fetching queue details:", error);
+        // Fallback to all users if there's an error
+        setQueueUsers(users);
       }
     };
+
     if (ticket?.queueId) {
       fetchQueueUsers();
     }
-  }, [getQueueService, getUsersService, ticket?.queueId]);
+  }, [ticket.queueId, users, getQueueService]);
 
   const handleAssignSubmit = () => {
     if (selectedUser) {
@@ -169,36 +121,6 @@ export function TicketDetails({
   const getUserName = (userId: string) => {
     const user = users.find((u) => u.id === userId);
     return user ? user.name : userId;
-  };
-
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setIsUploading(true);
-    try {
-      // Upload the file
-      const { status, data } = await fileUploadService(file);
-      if (status === HTTP_CODES_ENUM.CREATED) {
-        // Add the file to the ticket
-        addDocumentMutation.mutate({
-          id: ticket.id,
-          fileId: data.file.id,
-        });
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleDeleteFile = (documentId: string) => {
-    removeDocumentMutation.mutate({
-      id: ticket.id,
-      documentId,
-    });
   };
 
   const renderPriorityBadge = (priority: TicketPriority) => {
@@ -319,7 +241,7 @@ export function TicketDetails({
                   onChange={setSelectedUser}
                   searchable
                   w={200}
-                  nothingFoundMessage="No users assigned to this queue"
+                  nothingFoundMessage={t("tickets:tickets.noQueueUsers")}
                 />
                 <ActionIcon
                   variant="filled"
@@ -369,63 +291,11 @@ export function TicketDetails({
           labelPosition="left"
         />
         <Text mb="lg">{ticket.details}</Text>
-        <Divider
-          mb="md"
-          label={t("tickets:tickets.fields.attachments")}
-          labelPosition="left"
-        />
-        <Group mb="md">
-          <Button
-            component="label"
-            leftSection={<IconUpload size={16} />}
-            loading={isUploading}
-            size="xs"
-          >
-            {isUploading
-              ? t("common:loading")
-              : t("tickets:tickets.actions.addAttachment")}
-            <input
-              type="file"
-              style={{ display: "none" }}
-              onChange={handleFileUpload}
-              disabled={isUploading}
-            />
-          </Button>
-        </Group>
-        <Group mb="lg">
-          {documentList.map((doc) => (
-            <Card key={doc.id} withBorder p="xs" style={{ width: "auto" }}>
-              <Group>
-                <IconFileText size={16} />
-                <Text size="sm">{doc.name}</Text>
-                <Group gap="xs">
-                  <Tooltip label={t("tickets:tickets.actions.download")}>
-                    <ActionIcon
-                      component="a"
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <IconDownload size={16} />
-                    </ActionIcon>
-                  </Tooltip>
-                  <Tooltip label={t("common:actions.delete")}>
-                    <ActionIcon
-                      color="red"
-                      onClick={() => handleDeleteFile(doc.id)}
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </Group>
-            </Card>
-          ))}
-          {documentList.length === 0 && (
-            <Text color="dimmed">{t("tickets:tickets.noAttachments")}</Text>
-          )}
-        </Group>
+
+        {/* Use our new TicketDocumentsSection component here */}
+        <TicketDocumentsSection ticketId={ticket.id} />
       </Paper>
+
       <Paper withBorder p="md">
         <Title order={5} mb="md">
           {t("tickets:tickets.timeline")}

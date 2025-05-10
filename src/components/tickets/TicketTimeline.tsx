@@ -41,6 +41,41 @@ export function TicketTimeline({ historyItems, users }: TicketTimelineProps) {
     return user ? user.name : userId;
   };
 
+  // Parse assignment details to get user names
+  const parseAssignmentDetails = (details: string) => {
+    // Check if it's a reassignment (from user X to user Y)
+    const reassignMatch = details.match(
+      /from user ([a-f0-9]+) to user ([a-f0-9]+)/
+    );
+    if (reassignMatch) {
+      const [, fromUserId, toUserId] = reassignMatch;
+      return {
+        fromUser: getUserName(fromUserId),
+        toUser: getUserName(toUserId),
+        isReassign: true,
+      };
+    }
+
+    // Check if it's a direct assignment (to user Y)
+    const initialAssignMatch = details.match(/to user ([a-f0-9]+)/);
+    if (initialAssignMatch) {
+      const [, toUserId] = initialAssignMatch;
+      return {
+        fromUser: null,
+        toUser: getUserName(toUserId),
+        isReassign: false,
+      };
+    }
+
+    return { fromUser: null, toUser: null, isReassign: false };
+  };
+
+  // Extract document name from history details
+  const getDocumentDetails = (details: string) => {
+    const match = details.match(/: (.+)/);
+    return match ? match[1] : "Unknown document";
+  };
+
   const getIconForHistoryType = (type: HistoryItemType) => {
     switch (type) {
       case HistoryItemType.COMMENT:
@@ -131,7 +166,6 @@ export function TicketTimeline({ historyItems, users }: TicketTimelineProps) {
               </Text>
             }
           />
-
           {items.map((item) => (
             <Timeline.Item
               key={item.id}
@@ -146,20 +180,14 @@ export function TicketTimeline({ historyItems, users }: TicketTimelineProps) {
                 >
                   {getUserName(item.userId).charAt(0)}
                 </Avatar>
-
-                <Box>
+                <Box style={{ flexGrow: 1 }}>
                   <Group gap="xs">
                     <Text size="sm" fw={500}>
                       {getUserName(item.userId)}
                     </Text>
-                    {!isUserAction(item.type) && (
-                      <Badge
-                        size="sm"
-                        color={getColorForHistoryType(item.type)}
-                      >
-                        {t(`tickets:historyTypes.${item.type.toLowerCase()}`)}
-                      </Badge>
-                    )}
+                    <Badge size="sm" color={getColorForHistoryType(item.type)}>
+                      {t(`tickets:historyTypes.${item.type.toLowerCase()}`)}
+                    </Badge>
                     <Text size="xs" c="dimmed">
                       {new Date(item.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
@@ -168,10 +196,54 @@ export function TicketTimeline({ historyItems, users }: TicketTimelineProps) {
                     </Text>
                   </Group>
 
-                  {isUserAction(item.type) && (
+                  {/* Content based on history type */}
+                  {isUserAction(item.type) ? (
                     <Text size="sm" mt="xs">
                       {item.details}
                     </Text>
+                  ) : item.type === HistoryItemType.ASSIGNED ? (
+                    <Text size="sm" mt="xs">
+                      {(() => {
+                        const { fromUser, toUser, isReassign } =
+                          parseAssignmentDetails(item.details);
+                        if (isReassign && fromUser && toUser) {
+                          return (
+                            <>
+                              Reassigned from{" "}
+                              <Text span fw={500}>
+                                {fromUser}
+                              </Text>{" "}
+                              to{" "}
+                              <Text span fw={500}>
+                                {toUser}
+                              </Text>
+                            </>
+                          );
+                        } else if (toUser) {
+                          return (
+                            <>
+                              Assigned to{" "}
+                              <Text span fw={500}>
+                                {toUser}
+                              </Text>
+                            </>
+                          );
+                        }
+                        return item.details;
+                      })()}
+                    </Text>
+                  ) : (
+                    (item.type === HistoryItemType.DOCUMENT_ADDED ||
+                      item.type === HistoryItemType.DOCUMENT_REMOVED) && (
+                      <Text size="sm" mt="xs">
+                        {item.type === HistoryItemType.DOCUMENT_ADDED
+                          ? "Added document: "
+                          : "Removed document: "}
+                        <Text span fw={500}>
+                          {getDocumentDetails(item.details)}
+                        </Text>
+                      </Text>
+                    )
                   )}
                 </Box>
               </Group>

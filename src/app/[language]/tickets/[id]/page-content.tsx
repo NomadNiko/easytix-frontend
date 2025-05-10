@@ -1,4 +1,3 @@
-// src/app/[language]/tickets/[id]/page-content.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Text } from "@mantine/core";
@@ -25,14 +24,10 @@ interface UserInfo {
   id: string;
   name: string;
 }
+
 interface CategoryInfo {
   id: string;
   name: string;
-}
-interface DocumentInfo {
-  id: string;
-  name: string;
-  url: string;
 }
 
 function TicketPage() {
@@ -46,7 +41,6 @@ function TicketPage() {
   // Data states with proper typing
   const [users, setUsers] = useState<UserInfo[]>([]);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
-  const [documents, setDocuments] = useState<DocumentInfo[]>([]);
 
   // Queries and services
   const { data: ticket, isLoading: isTicketLoading } = useTicketQuery(id);
@@ -104,21 +98,6 @@ function TicketPage() {
     }
   }, [ticket?.queueId, getCategoriesService]);
 
-  // Load document information
-  useEffect(() => {
-    if (ticket?.documentIds && ticket.documentIds.length > 0) {
-      // Create document info from document IDs
-      const mockDocuments = ticket.documentIds.map((docId) => ({
-        id: docId,
-        name: `Document-${docId.substring(docId.length - 6)}`,
-        url: `/api/documents/${docId}`,
-      }));
-      setDocuments(mockDocuments);
-    } else {
-      setDocuments([]);
-    }
-  }, [ticket?.documentIds]);
-
   const handleAssignTicket = (userId: string) => {
     assignTicketMutation.mutate({ id, userId });
   };
@@ -169,7 +148,6 @@ function TicketPage() {
         users={users}
         categories={categories}
         isLoading={isTicketLoading || isHistoryLoading}
-        documents={documents}
       />
     </Container>
   );
