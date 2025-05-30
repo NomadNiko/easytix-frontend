@@ -8,7 +8,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 
 - **Frontend**: https://etdev.nomadsoft.us
 - **Backend API**: https://etdevserver.nomadsoft.us
-- **Test Credentials**: admin@example.com / secret
+- **Test Credentials**: aloha@ixplor.app / password
 
 ## 📱 Screenshots
 
@@ -24,9 +24,16 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 | **Tickets Management** | ![Desktop Tickets](screenshots/06-tickets-list-desktop.png) | ![Mobile Tickets](screenshots/06-tickets-list-mobile.png) |
 | **User Administration** | ![Desktop Admin Users](screenshots/07-admin-users-desktop.png) | ![Mobile Admin Users](screenshots/07-admin-users-mobile.png) |
 | **Queue Management** | ![Desktop Admin Queues](screenshots/08-admin-queues-desktop.png) | ![Mobile Admin Queues](screenshots/08-admin-queues-mobile.png) |
-| **User Profile** | ![Desktop Profile](screenshots/09-profile-desktop.png) | ![Mobile Profile](screenshots/09-profile-mobile.png) |
-| **Notification Settings** | ![Desktop Notifications](screenshots/10-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/10-notification-settings-mobile.png) |
-| **Admin Notifications** | ![Desktop Admin Notifications](screenshots/11-admin-notifications-desktop.png) | ![Mobile Admin Notifications](screenshots/11-admin-notifications-mobile.png) |
+| **Admin Notifications** | ![Desktop Admin Notifications](screenshots/09-admin-notifications-desktop.png) | ![Mobile Admin Notifications](screenshots/09-admin-notifications-mobile.png) |
+| **User Profile** | ![Desktop Profile](screenshots/10-profile-desktop.png) | ![Mobile Profile](screenshots/10-profile-mobile.png) |
+| **Notification Settings** | ![Desktop Notifications](screenshots/11-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/11-notification-settings-mobile.png) |
+
+### 🎯 **Modal Interactions**
+
+| Feature | Desktop Modal |
+|---------|---------------|
+| **User Tickets Modal** | ![User Tickets Modal](screenshots/12-user-tickets-modal-desktop.png) |
+| **User Queue Assignment Modal** | ![User Queues Modal](screenshots/13-user-queues-modal-desktop.png) |
 
 ## 🚀 Key Features
 
