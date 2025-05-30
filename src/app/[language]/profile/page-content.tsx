@@ -42,14 +42,25 @@ function Profile() {
             </Title>
           )}
           <Box>
-            <Button
-              component={Link}
-              href="/profile/edit"
-              data-testid="edit-profile"
-              size="compact-sm"
-            >
-              {t("profile:actions.edit")}
-            </Button>
+            <Group gap="xs">
+              <Button
+                component={Link}
+                href="/profile/edit"
+                data-testid="edit-profile"
+                size="compact-sm"
+              >
+                {t("profile:actions.edit")}
+              </Button>
+              <Button
+                component={Link}
+                href="/profile/notification-settings"
+                data-testid="notification-settings"
+                size="compact-sm"
+                variant="light"
+              >
+                {t("profile:actions.notificationSettings")}
+              </Button>
+            </Group>
           </Box>
         </Stack>
       </Group>

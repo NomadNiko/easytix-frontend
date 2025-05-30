@@ -6,7 +6,8 @@
   "actions": {
     "edit": "Edit",
     "submit": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "notificationSettings": "Notification Settings"
   },
   "inputs": {
     "firstName": {
@@ -117,6 +118,77 @@
         "success": "Document deleted successfully",
         "error": "Failed to delete document"
       }
+    }
+  },
+  "notificationSettings": {
+    "pageTitle": "Notification Settings",
+    "title": "Notification Settings",
+    "description": "Choose how you want to be notified about different events in EasyTix.",
+    "info": "Settings are saved automatically when you toggle them. Security-related notifications cannot be disabled for your safety.",
+    "categories": {
+      "ticketEvents": "Ticket Events",
+      "communication": "Communication",
+      "changes": "Changes & Updates",
+      "security": "Security Events",
+      "system": "System Events"
+    },
+    "events": {
+      "ticketCreated": {
+        "title": "Ticket Created",
+        "description": "When you create a new support ticket"
+      },
+      "ticketAssigned": {
+        "title": "Ticket Assigned",
+        "description": "When a ticket is assigned to you or by you"
+      },
+      "ticketStatusChanged": {
+        "title": "Status Changed",
+        "description": "When a ticket's status changes (opened, closed, etc.)"
+      },
+      "ticketClosed": {
+        "title": "Ticket Closed",
+        "description": "When a ticket is closed with resolution notes"
+      },
+      "ticketResolved": {
+        "title": "Ticket Resolved",
+        "description": "When a ticket is marked as resolved"
+      },
+      "newComment": {
+        "title": "New Comments",
+        "description": "When someone comments on your tickets"
+      },
+      "priorityChanged": {
+        "title": "Priority Changed",
+        "description": "When a ticket's priority level is modified"
+      },
+      "categoryChanged": {
+        "title": "Category Changed",
+        "description": "When a ticket is moved to a different category"
+      },
+      "documentAdded": {
+        "title": "Document Added",
+        "description": "When documents are attached to your tickets"
+      },
+      "passwordChanged": {
+        "title": "Password Changed",
+        "description": "When your password is changed (always enabled for security)"
+      },
+      "emailChanged": {
+        "title": "Email Changed",
+        "description": "When your email address is changed (always enabled for security)"
+      },
+      "highPriorityAlert": {
+        "title": "High Priority Alerts",
+        "description": "When high priority tickets are created or assigned"
+      },
+      "queueAssignment": {
+        "title": "Queue Assignment",
+        "description": "When you're added to or removed from support queues"
+      }
+    },
+    "alerts": {
+      "updated": "Notification preferences updated successfully",
+      "error": "Failed to update notification preferences"
     }
   }
 }
