@@ -6,14 +6,17 @@
     "column1": "ID",
     "column2": "Name",
     "column3": "Email",
-    "column4": "Role"
+    "column4": "Phone",
+    "column5": "Role"
   },
   "actions": {
     "add": "Add User",
     "edit": "Edit User",
     "delete": "Delete",
     "create": "Create User",
-    "changePassword": "Password"
+    "changePassword": "Password",
+    "viewTickets": "Tickets",
+    "manageQueues": "Queues"
   },
   "confirm": {
     "delete": {

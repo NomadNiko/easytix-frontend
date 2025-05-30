@@ -37,11 +37,14 @@ function UserTableRow({ user }: UserTableRowProps) {
       <td style={{ width: 200, textAlign: "left" }}>
         {user?.firstName} {user?.lastName}
       </td>
-      <td style={{ width: 200, textAlign: "left" }}>{user?.email}</td>
+      <td style={{ width: 180, textAlign: "left" }}>{user?.email}</td>
+      <td style={{ width: 120, textAlign: "left" }}>
+        {user?.phoneNumber || "-"}
+      </td>
       <td style={{ width: 100, textAlign: "left" }}>
         {tRoles(`role.${user?.role?.id}`)}
       </td>
-      <td style={{ width: 375, textAlign: "right" }}>
+      <td style={{ width: 450, textAlign: "right" }}>
         {user && <UserActions user={user} />}
       </td>
     </>

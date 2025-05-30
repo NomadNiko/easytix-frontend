@@ -39,13 +39,23 @@ function UserTableHeader({
         </TableSortCell>
         {/* Email column - flexible width, sortable, left-aligned */}
         <TableSortCell<User>
-          width={200}
+          width={180}
           orderBy={orderBy}
           order={order}
           column="email"
           handleRequestSort={handleRequestSort}
         >
           {tUsers("admin-panel-users:table.column3")}
+        </TableSortCell>
+        {/* Phone column - fixed width, sortable, left-aligned */}
+        <TableSortCell<User>
+          width={120}
+          orderBy={orderBy}
+          order={order}
+          column="phoneNumber"
+          handleRequestSort={handleRequestSort}
+        >
+          {tUsers("admin-panel-users:table.column4")}
         </TableSortCell>
         {/* Role column - fixed width, centered */}
         <TableSortCell<User>
@@ -55,15 +65,15 @@ function UserTableHeader({
           column="role"
           handleRequestSort={handleRequestSort}
         >
-          {tUsers("admin-panel-users:table.column4")}
+          {tUsers("admin-panel-users:table.column5")}
         </TableSortCell>
         {/* Actions column - fixed width, centered */}
-        <th style={{ width: 375, textAlign: "right" }}></th>
+        <th style={{ width: 450, textAlign: "right" }}></th>
       </tr>
       {/* Loading indicator row */}
       {isFetchingNextPage && (
         <tr>
-          <td colSpan={6} style={{ padding: 0 }}>
+          <td colSpan={7} style={{ padding: 0 }}>
             <Loader size="sm" style={{ width: "100%" }} />
           </td>
         </tr>

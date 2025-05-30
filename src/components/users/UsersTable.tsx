@@ -60,7 +60,7 @@ function UsersTable({
             <tbody>
               {isFetchingNextPage && (
                 <tr>
-                  <td colSpan={6} style={{ padding: 0 }}>
+                  <td colSpan={7} style={{ padding: 0 }}>
                     <Loader size="sm" style={{ width: "100%" }} />
                   </td>
                 </tr>
@@ -74,7 +74,7 @@ function UsersTable({
               ) : (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     style={{ textAlign: "center", padding: theme.spacing.lg }}
                   >
                     {isLoading ? (

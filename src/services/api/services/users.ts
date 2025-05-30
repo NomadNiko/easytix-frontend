@@ -105,3 +105,21 @@ export const useDeleteUsersService = createDeleteService<
   UsersDeleteResponse,
   UsersDeleteRequest
 >((params) => `/v1/users/${params.id}`);
+
+interface NotificationPreferences {
+  [key: string]: {
+    email: boolean;
+    notification: boolean;
+  };
+}
+
+export const useGetUserNotificationPreferencesService = createGetService<
+  NotificationPreferences,
+  { id: User["id"] }
+>((params) => `/v1/users/${params.id}/notification-preferences`);
+
+export const useUpdateUserNotificationPreferencesService = createPatchService<
+  NotificationPreferences,
+  NotificationPreferences,
+  { id: User["id"] }
+>((params) => `/v1/users/${params.id}/notification-preferences`);
