@@ -24,17 +24,11 @@ import SocialAuth from "@/services/social-auth/social-auth";
 import { isGoogleAuthEnabled } from "@/services/social-auth/google/google-config";
 import useGlobalLoading from "@/services/loading/use-global-loading";
 
-type TPolicy = {
-  id: string;
-  name: string;
-};
-
 type SignUpFormData = {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  policy: TPolicy[];
 };
 
 const useValidationSchema = () => {
@@ -54,10 +48,6 @@ const useValidationSchema = () => {
       .string()
       .min(6, t("sign-up:inputs.password.validation.min"))
       .required(t("sign-up:inputs.password.validation.required")),
-    policy: yup
-      .array()
-      .min(1, t("sign-up:inputs.policy.validation.required"))
-      .required(),
   });
 };
 
@@ -92,7 +82,6 @@ function Form() {
       lastName: "",
       email: "",
       password: "",
-      policy: [],
     },
   });
 
