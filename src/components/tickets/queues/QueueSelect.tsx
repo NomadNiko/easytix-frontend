@@ -51,6 +51,7 @@ export function QueueSelect({
       disabled={disabled || isLoading}
       searchable
       nothingFoundMessage={t("tickets:queues.nothingFound")}
+      data-testid="ticket-queue"
     />
   );
 }

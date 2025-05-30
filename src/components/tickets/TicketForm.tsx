@@ -137,6 +137,7 @@ export function TicketForm({
               error={fieldState.error?.message}
               required
               mt="md"
+              data-testid="ticket-title"
               {...field}
             />
           )}
@@ -153,6 +154,7 @@ export function TicketForm({
               error={fieldState.error?.message}
               required
               mt="md"
+              data-testid="ticket-priority"
               {...field}
             />
           )}
@@ -169,6 +171,7 @@ export function TicketForm({
               required
               minRows={4}
               mt="md"
+              data-testid="ticket-details"
               {...field}
             />
           )}
@@ -191,11 +194,17 @@ export function TicketForm({
               onClick={onCancel}
               disabled={isSubmitting}
               size="compact-sm"
+              data-testid="ticket-cancel"
             >
               {t("common:actions.cancel")}
             </Button>
           )}
-          <Button type="submit" loading={isSubmitting} size="compact-sm">
+          <Button
+            type="submit"
+            loading={isSubmitting}
+            size="compact-sm"
+            data-testid="ticket-submit"
+          >
             {initialValues
               ? t("common:actions.update")
               : t("common:actions.create")}

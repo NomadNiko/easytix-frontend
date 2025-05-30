@@ -65,6 +65,7 @@ export function CategorySelect({
       disabled={disabled || isLoading || !queueId}
       searchable
       nothingFoundMessage={t("tickets:categories.nothingFound")}
+      data-testid="ticket-category"
     />
   );
 }

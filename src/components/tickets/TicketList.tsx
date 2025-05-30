@@ -197,6 +197,7 @@ export function TicketList({
                 handleFilterChange("status", value as TicketStatus | null)
               }
               clearable
+              data-testid="ticket-filter-status"
             />
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
@@ -209,6 +210,7 @@ export function TicketList({
                 handleFilterChange("priority", value as TicketPriority | null)
               }
               clearable
+              data-testid="ticket-filter-priority"
             />
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
@@ -217,6 +219,7 @@ export function TicketList({
               placeholder={t("tickets:tickets.filters.searchPlaceholder")}
               value={searchInput}
               onChange={(e) => handleSearchChange(e.target.value)}
+              data-testid="ticket-filter-search"
               rightSection={
                 searchInput ? (
                   <ActionIcon
@@ -228,6 +231,7 @@ export function TicketList({
                         search: null,
                       });
                     }}
+                    data-testid="ticket-filter-search-clear"
                   >
                     <IconX size={16} />
                   </ActionIcon>
@@ -244,6 +248,7 @@ export function TicketList({
             leftSection={<IconX size={16} />}
             onClick={handleClearFilters}
             size="compact-sm"
+            data-testid="ticket-filter-clear-all"
           >
             {t("tickets:tickets.filters.clearFilters")}
           </Button>
@@ -310,6 +315,7 @@ export function TicketList({
                       variant="light"
                       color="blue"
                       onClick={() => onViewTicket(ticket.id)}
+                      data-testid={`ticket-view-${ticket.id}`}
                     >
                       <IconEye size={16} />
                     </ActionIcon>

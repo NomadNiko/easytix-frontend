@@ -120,6 +120,7 @@ function TicketsPage() {
           leftSection={<IconPlus size={16} />}
           onClick={() => setIsCreateModalOpen(true)}
           size="compact-sm"
+          data-testid="create-ticket-button"
         >
           {t("tickets:tickets.actions.create")}
         </Button>

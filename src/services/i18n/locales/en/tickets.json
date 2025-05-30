@@ -214,8 +214,97 @@
       "delete": {
         "success": "Ticket deleted successfully",
         "error": "Failed to delete ticket"
+      },
+      "publicTicketCreated": "Your ticket has been submitted successfully!",
+      "accountCreated": "An account has been created for you. Please check your email for login credentials.",
+      "createError": "Failed to submit ticket. Please try again."
+    }
+  },
+  "inputs": {
+    "queue": {
+      "label": "Queue",
+      "placeholder": "Select a queue",
+      "validation": {
+        "required": "Queue is required"
+      }
+    },
+    "category": {
+      "label": "Category",
+      "placeholder": "Select a category",
+      "validation": {
+        "required": "Category is required"
+      }
+    },
+    "title": {
+      "label": "Title",
+      "placeholder": "Brief description of your issue",
+      "validation": {
+        "required": "Title is required"
+      }
+    },
+    "details": {
+      "label": "Details",
+      "placeholder": "Provide detailed information about your issue",
+      "validation": {
+        "required": "Details are required"
+      }
+    },
+    "priority": {
+      "label": "Priority",
+      "validation": {
+        "required": "Priority is required"
+      }
+    },
+    "attachments": {
+      "label": "Attachments"
+    },
+    "firstName": {
+      "label": "First Name",
+      "placeholder": "John",
+      "validation": {
+        "required": "First name is required"
+      }
+    },
+    "lastName": {
+      "label": "Last Name",
+      "placeholder": "Doe",
+      "validation": {
+        "required": "Last name is required"
+      }
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "john.doe@example.com",
+      "validation": {
+        "required": "Email is required",
+        "invalid": "Email must be valid"
+      }
+    },
+    "phoneNumber": {
+      "label": "Phone Number",
+      "placeholder": "+1234567890",
+      "validation": {
+        "required": "Phone number is required"
       }
     }
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "actions": {
+    "submitTicket": "Submit Ticket"
+  },
+  "publicForm": {
+    "pageTitle": "Submit a Support Ticket",
+    "pageDescription": "Fill out the form below to submit a support ticket. We'll get back to you as soon as possible.",
+    "existingUser": "Already have an account?",
+    "signIn": "Sign in here",
+    "ticketInfo": "Ticket Information",
+    "contactInfo": "Contact Information",
+    "contactInfoDescription": "If you don't have an account, we'll create one for you and send your login credentials to your email.",
+    "disclaimer": "By submitting this form, you agree to create an account with us. Your login credentials will be sent to your email."
   },
   "historyTypes": {
     "comment": "Comment",

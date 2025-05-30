@@ -34,6 +34,7 @@ const DesktopNavigation = ({ onCloseMenu }: DesktopNavigationProps) => {
             component={Link}
             href={item.path}
             size="compact-sm"
+            data-testid={`nav-${item.path.replace(/\//g, "-").substring(1) || "home"}`}
           >
             {t(item.label)}
           </Button>

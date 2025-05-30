@@ -47,6 +47,7 @@ function SignIn() {
       email: "",
       password: "",
     },
+    mode: "onTouched",
   });
 
   const { handleSubmit, setError, control } = methods;
