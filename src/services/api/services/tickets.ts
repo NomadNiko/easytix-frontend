@@ -139,3 +139,24 @@ export const useRemoveDocumentFromTicketService = createDeleteService<
 export const useDeleteTicketService = createDeleteService<void, { id: string }>(
   (params) => `/v1/tickets/${params.id}`
 );
+
+// Public ticket creation (no auth required)
+export type PublicTicketCreateRequest = {
+  // Ticket fields
+  queueId: string;
+  categoryId: string;
+  title: string;
+  details: string;
+  priority: TicketPriority;
+  documentIds?: string[];
+  // User fields
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+};
+
+export const useCreatePublicTicketService = createPostService<
+  PublicTicketCreateRequest,
+  Ticket
+>("/v1/tickets/public");
