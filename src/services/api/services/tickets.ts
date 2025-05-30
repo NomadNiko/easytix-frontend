@@ -32,6 +32,7 @@ export type Ticket = {
   createdAt: string;
   updatedAt: string;
   closedAt: string | null;
+  closingNotes: string | null;
 };
 
 export type TicketsQueryParams = {
@@ -62,6 +63,8 @@ export type TicketUpdateRequest = {
   status?: TicketStatus;
   priority?: TicketPriority;
   assignedToId?: string | null;
+  closingNotes?: string | null;
+  closedAt?: Date | null;
 };
 
 export type TicketAssignRequest = {

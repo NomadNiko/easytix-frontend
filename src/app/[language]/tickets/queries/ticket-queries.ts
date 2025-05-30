@@ -11,7 +11,6 @@ import {
   useCreateTicketService,
   useUpdateTicketService,
   useAssignTicketService,
-  useUpdateTicketStatusService,
   useAddDocumentToTicketService,
   useRemoveDocumentFromTicketService,
   useDeleteTicketService,
@@ -189,7 +188,7 @@ export const useAssignTicketMutation = () => {
 };
 
 export const useUpdateTicketStatusMutation = () => {
-  const updateStatusService = useUpdateTicketStatusService();
+  const updateTicketService = useUpdateTicketService();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation("tickets");
@@ -198,12 +197,14 @@ export const useUpdateTicketStatusMutation = () => {
     mutationFn: async ({
       id,
       status,
+      closingNotes,
     }: {
       id: string;
       status: TicketStatus;
+      closingNotes?: string;
     }) => {
       const { status: responseStatus, data: responseData } =
-        await updateStatusService({ status }, { id });
+        await updateTicketService({ status, closingNotes }, { id });
       if (responseStatus !== HTTP_CODES_ENUM.OK) {
         throw new Error("Failed to update ticket status");
       }

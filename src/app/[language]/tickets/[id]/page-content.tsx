@@ -98,8 +98,8 @@ function TicketPage() {
     assignTicketMutation.mutate({ id, userId });
   };
 
-  const handleStatusChange = (status: TicketStatus) => {
-    updateStatusMutation.mutate({ id, status });
+  const handleStatusChange = (status: TicketStatus, closingNotes?: string) => {
+    updateStatusMutation.mutate({ id, status, closingNotes });
   };
 
   const handleAddComment = (comment: string) => {

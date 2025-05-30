@@ -15,6 +15,7 @@ import {
   TextInput,
   Textarea,
 } from "@mantine/core";
+import { Modal } from "@/components/mantine/feedback/Modal";
 import {
   IconCalendar,
   IconCategory,
@@ -44,7 +45,7 @@ interface TicketDetailsProps {
   historyItems: HistoryItem[];
   onAddComment: (comment: string) => void;
   onAssign: (userId: string) => void;
-  onStatusChange: (status: TicketStatus) => void;
+  onStatusChange: (status: TicketStatus, closingNotes?: string) => void;
   users: { id: string; name: string }[];
   categories: { id: string; name: string }[];
   isLoading: boolean;
@@ -69,6 +70,10 @@ export function TicketDetails({
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [isEditingPriority, setIsEditingPriority] = useState(false);
   const [isEditingDetails, setIsEditingDetails] = useState(false);
+
+  // Closing modal states
+  const [showClosingModal, setShowClosingModal] = useState(false);
+  const [closingNotes, setClosingNotes] = useState("");
 
   // Field values
   const [selectedUser, setSelectedUser] = useState<string | null>(
@@ -259,11 +264,25 @@ export function TicketDetails({
   ];
 
   const toggleStatus = () => {
-    const newStatus =
-      ticket.status === TicketStatus.OPENED
-        ? TicketStatus.CLOSED
-        : TicketStatus.OPENED;
-    onStatusChange(newStatus);
+    if (ticket.status === TicketStatus.OPENED) {
+      // Show modal for closing notes when closing
+      setShowClosingModal(true);
+    } else {
+      // Directly reopen without modal
+      onStatusChange(TicketStatus.OPENED);
+    }
+  };
+
+  const handleCloseTicket = () => {
+    // Pass closing notes along with status change
+    onStatusChange(TicketStatus.CLOSED, closingNotes || undefined);
+    setShowClosingModal(false);
+    setClosingNotes("");
+  };
+
+  const handleCancelClose = () => {
+    setShowClosingModal(false);
+    setClosingNotes("");
   };
 
   if (isLoading) {
@@ -529,6 +548,43 @@ export function TicketDetails({
         <Divider my="md" />
         <CommentBox onSubmit={onAddComment} />
       </Paper>
+
+      {/* Closing Notes Modal */}
+      <Modal
+        opened={showClosingModal}
+        onClose={handleCancelClose}
+        title={t("tickets:tickets.actions.closeTicketModal")}
+        centered
+        maxWidth="sm"
+        actions={[
+          <Button
+            key="cancel"
+            variant="light"
+            color="gray"
+            onClick={handleCancelClose}
+          >
+            {t("common:actions.cancel")}
+          </Button>,
+          <Button key="close" color="red" onClick={handleCloseTicket}>
+            {t("tickets:tickets.actions.closeTicket")}
+          </Button>,
+        ]}
+      >
+        <Stack>
+          <Text size="sm" c="dimmed">
+            {t("tickets:tickets.actions.closeTicketDescription")}
+          </Text>
+          <Textarea
+            label={t("tickets:tickets.fields.closingNotes")}
+            placeholder={t("tickets:tickets.placeholders.closingNotes")}
+            value={closingNotes}
+            onChange={(event) => setClosingNotes(event.currentTarget.value)}
+            minRows={3}
+            maxRows={6}
+            autosize
+          />
+        </Stack>
+      </Modal>
     </Stack>
   );
 }

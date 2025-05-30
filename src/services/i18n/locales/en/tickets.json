@@ -136,12 +136,14 @@
       "attachment": "Attachment",
       "attachments": "Attachments",
       "queue": "Queue",
-      "category": "Category"
+      "category": "Category",
+      "closingNotes": "Closing Notes"
     },
     "placeholders": {
       "title": "Enter ticket title",
       "details": "Enter ticket details",
-      "priority": "Select priority"
+      "priority": "Select priority",
+      "closingNotes": "Enter closing notes (optional)..."
     },
     "statuses": {
       "opened": "Open",
@@ -160,6 +162,8 @@
       "reassign": "Reassign",
       "selectUser": "Select user",
       "closeTicket": "Close Ticket",
+      "closeTicketModal": "Close Ticket",
+      "closeTicketDescription": "Please provide closing notes (optional) before closing this ticket. These notes will help document the resolution.",
       "reopenTicket": "Reopen Ticket",
       "editTicket": "Edit Ticket",
       "addComment": "Add Comment",
