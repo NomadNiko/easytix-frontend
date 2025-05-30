@@ -14,26 +14,26 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 
 ### Desktop vs Mobile Views
 
-| Feature | Desktop (1280x720) | Mobile (375x667) |
+*Screenshots show actual viewport content (what users see on screen) at realistic resolutions*
+
+| Feature | Desktop (1024x768) | Mobile (375x667) |
 |---------|-------------------|------------------|
 | **Landing Page** | ![Desktop Landing](screenshots/01-landing-desktop.png) | ![Mobile Landing](screenshots/01-landing-mobile.png) |
 | **Sign Up** | ![Desktop Signup](screenshots/02-signup-desktop.png) | ![Mobile Signup](screenshots/02-signup-mobile.png) |
 | **Sign In** | ![Desktop Signin](screenshots/03-signin-desktop.png) | ![Mobile Signin](screenshots/03-signin-mobile.png) |
 | **Public Ticket Submission** | ![Desktop Public Ticket](screenshots/04-public-ticket-desktop.png) | ![Mobile Public Ticket](screenshots/04-public-ticket-mobile.png) |
-| **Dashboard** | ![Desktop Dashboard](screenshots/05-dashboard-desktop.png) | ![Mobile Dashboard](screenshots/05-dashboard-mobile.png) |
-| **Tickets Management** | ![Desktop Tickets](screenshots/06-tickets-list-desktop.png) | ![Mobile Tickets](screenshots/06-tickets-list-mobile.png) |
-| **User Administration** | ![Desktop Admin Users](screenshots/07-admin-users-desktop.png) | ![Mobile Admin Users](screenshots/07-admin-users-mobile.png) |
-| **Queue Management** | ![Desktop Admin Queues](screenshots/08-admin-queues-desktop.png) | ![Mobile Admin Queues](screenshots/08-admin-queues-mobile.png) |
-| **Admin Notifications** | ![Desktop Admin Notifications](screenshots/09-admin-notifications-desktop.png) | ![Mobile Admin Notifications](screenshots/09-admin-notifications-mobile.png) |
-| **User Profile** | ![Desktop Profile](screenshots/10-profile-desktop.png) | ![Mobile Profile](screenshots/10-profile-mobile.png) |
-| **Notification Settings** | ![Desktop Notifications](screenshots/11-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/11-notification-settings-mobile.png) |
+| **Tickets Management** | ![Desktop Tickets](screenshots/05-tickets-list-desktop.png) | ![Mobile Tickets](screenshots/05-tickets-list-mobile.png) |
+| **User Administration** | ![Desktop Admin Users](screenshots/06-admin-users-desktop.png) | ![Mobile Admin Users](screenshots/06-admin-users-mobile.png) |
+| **Queue Management** | ![Desktop Admin Queues](screenshots/07-admin-queues-desktop.png) | ![Mobile Admin Queues](screenshots/07-admin-queues-mobile.png) |
+| **User Profile** | ![Desktop Profile](screenshots/08-profile-desktop.png) | ![Mobile Profile](screenshots/08-profile-mobile.png) |
+| **Notification Settings** | ![Desktop Notifications](screenshots/09-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/09-notification-settings-mobile.png) |
 
-### 🎯 **Modal Interactions**
+### 🎯 **Advanced Features**
 
 | Feature | Desktop Modal |
 |---------|---------------|
-| **User Tickets Modal** | ![User Tickets Modal](screenshots/12-user-tickets-modal-desktop.png) |
-| **User Queue Assignment Modal** | ![User Queues Modal](screenshots/13-user-queues-modal-desktop.png) |
+| **User Tickets Modal** | ![User Tickets Modal](screenshots/10-user-tickets-modal-desktop.png) |
+| **User Queue Assignment Modal** | ![User Queues Modal](screenshots/11-user-queues-modal-desktop.png) |
 
 ## 🚀 Key Features
 
