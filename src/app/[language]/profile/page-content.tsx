@@ -36,6 +36,11 @@ function Profile() {
           <Title order={5} mb="md" data-testid="user-email">
             {user?.email}
           </Title>
+          {user?.phoneNumber && (
+            <Title order={5} mb="md" data-testid="user-phone">
+              {user?.phoneNumber}
+            </Title>
+          )}
           <Box>
             <Button
               component={Link}

@@ -16,6 +16,7 @@ import { useSnackbar } from "@/components/mantine/feedback/notification-service"
 export type EditProfileBasicInfoFormData = {
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
   photo?: FileEntity;
 };
 
@@ -43,6 +44,7 @@ export function BasicInfoForm() {
     defaultValues: {
       firstName: "",
       lastName: "",
+      phoneNumber: "",
       photo: undefined,
     },
   });
@@ -75,6 +77,7 @@ export function BasicInfoForm() {
     reset({
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
+      phoneNumber: user?.phoneNumber ?? "",
       photo: user?.photo,
     });
   }, [user, reset]);
@@ -114,6 +117,20 @@ export function BasicInfoForm() {
                   label={t("profile:inputs.lastName.label")}
                   error={fieldState.error?.message}
                   data-testid="last-name"
+                />
+              )}
+            />
+
+            <Controller
+              name="phoneNumber"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextInput
+                  {...field}
+                  label={t("profile:inputs.phoneNumber.label")}
+                  placeholder="+1234567890"
+                  error={fieldState.error?.message}
+                  data-testid="phone-number"
                 />
               )}
             />
