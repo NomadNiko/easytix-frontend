@@ -17,11 +17,18 @@ export const createNavigationConfig = (): NavigationItem[] => [
     label: "common:navigation.home",
     path: "/",
   },
-  // Show tickets for authenticated users
+  // Show tickets pages - all authenticated users can access my-tickets
+  {
+    label: "common:navigation.myTickets",
+    path: "/my-tickets",
+    requiresAuth: true,
+    // No role restriction - all authenticated users can see their own tickets
+  },
   {
     label: "common:navigation.tickets",
     path: "/tickets",
     requiresAuth: true,
+    roles: [RoleEnum.ADMIN, RoleEnum.SERVICE_DESK], // Only for admin (role=1) and service desk (role=2)
   },
   // Show submit ticket for non-authenticated users
   {

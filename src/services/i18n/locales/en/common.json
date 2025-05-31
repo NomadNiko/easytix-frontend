@@ -10,6 +10,7 @@
     "notifications": "Notifications",
     "users": "Users",
     "tickets": "Tickets",
+    "myTickets": "My Tickets",
     "submit_ticket": "Submit Ticket",
     "queues": "Queues",
     "logout": "Logout"

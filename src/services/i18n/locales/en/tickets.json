@@ -103,6 +103,14 @@
       }
     }
   },
+  "myTickets": {
+    "pageTitle": "My Tickets",
+    "description": "View and manage your support tickets",
+    "openTickets": "Open Tickets",
+    "closedTickets": "Closed Tickets",
+    "empty": "You haven't created any tickets yet",
+    "emptyDescription": "Create your first ticket to get started with our support system"
+  },
   "tickets": {
     "pageTitle": "Tickets",
     "ticketList": "Ticket List",
