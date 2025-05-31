@@ -10,6 +10,7 @@ import { InfinityPaginationType } from "../types/infinity-pagination";
 // Type definitions
 export type Queue = {
   id: string;
+  customId: string;
   name: string;
   description: string;
   assignedUserIds: string[];

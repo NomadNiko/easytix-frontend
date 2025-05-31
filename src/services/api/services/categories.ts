@@ -9,6 +9,7 @@ import {
 // Type definitions
 export type Category = {
   id: string;
+  customId: string;
   queueId: string;
   name: string;
   createdAt: string;

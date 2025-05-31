@@ -13,6 +13,7 @@
     "myTickets": "My Tickets",
     "submit_ticket": "Submit Ticket",
     "queues": "Queues",
+    "systemDefaults": "System Defaults",
     "logout": "Logout"
   },
   "fields": {

@@ -162,4 +162,6 @@ export type PublicTicketCreateRequest = {
 export const useCreatePublicTicketService = createPostService<
   PublicTicketCreateRequest,
   Ticket
->("/v1/tickets/public");
+>("/v1/tickets/public", {
+  requiresAuth: false,
+});

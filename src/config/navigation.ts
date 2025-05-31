@@ -51,6 +51,11 @@ export const createNavigationConfig = (): NavigationItem[] => [
     path: "/admin-panel/notifications",
     roles: [RoleEnum.ADMIN],
   },
+  {
+    label: "common:navigation.systemDefaults",
+    path: "/admin-panel/system-defaults",
+    roles: [RoleEnum.ADMIN],
+  },
 ];
 
 // Return navigation config with authentication items
