@@ -14,30 +14,31 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 
 ### Desktop vs Mobile Views
 
-*Screenshots show actual viewport content (what users see on screen) at realistic resolutions*
+_Screenshots show actual viewport content (what users see on screen) at realistic resolutions_
 
-| Feature | Desktop (1024x768) | Mobile (375x667) |
-|---------|-------------------|------------------|
-| **Landing Page** | ![Desktop Landing](screenshots/01-landing-desktop.png) | ![Mobile Landing](screenshots/01-landing-mobile.png) |
-| **Sign Up** | ![Desktop Signup](screenshots/02-signup-desktop.png) | ![Mobile Signup](screenshots/02-signup-mobile.png) |
-| **Sign In** | ![Desktop Signin](screenshots/03-signin-desktop.png) | ![Mobile Signin](screenshots/03-signin-mobile.png) |
-| **Public Ticket Submission** | ![Desktop Public Ticket](screenshots/04-public-ticket-desktop.png) | ![Mobile Public Ticket](screenshots/04-public-ticket-mobile.png) |
-| **Tickets Management** | ![Desktop Tickets](screenshots/05-tickets-list-desktop.png) | ![Mobile Tickets](screenshots/05-tickets-list-mobile.png) |
-| **User Administration** | ![Desktop Admin Users](screenshots/06-admin-users-desktop.png) | ![Mobile Admin Users](screenshots/06-admin-users-mobile.png) |
-| **Queue Management** | ![Desktop Admin Queues](screenshots/07-admin-queues-desktop.png) | ![Mobile Admin Queues](screenshots/07-admin-queues-mobile.png) |
-| **User Profile** | ![Desktop Profile](screenshots/08-profile-desktop.png) | ![Mobile Profile](screenshots/08-profile-mobile.png) |
-| **Notification Settings** | ![Desktop Notifications](screenshots/09-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/09-notification-settings-mobile.png) |
+| Feature                      | Desktop (1024x768)                                                         | Mobile (375x667)                                                         |
+| ---------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Landing Page**             | ![Desktop Landing](screenshots/01-landing-desktop.png)                     | ![Mobile Landing](screenshots/01-landing-mobile.png)                     |
+| **Sign Up**                  | ![Desktop Signup](screenshots/02-signup-desktop.png)                       | ![Mobile Signup](screenshots/02-signup-mobile.png)                       |
+| **Sign In**                  | ![Desktop Signin](screenshots/03-signin-desktop.png)                       | ![Mobile Signin](screenshots/03-signin-mobile.png)                       |
+| **Public Ticket Submission** | ![Desktop Public Ticket](screenshots/04-public-ticket-desktop.png)         | ![Mobile Public Ticket](screenshots/04-public-ticket-mobile.png)         |
+| **Tickets Management**       | ![Desktop Tickets](screenshots/05-tickets-list-desktop.png)                | ![Mobile Tickets](screenshots/05-tickets-list-mobile.png)                |
+| **User Administration**      | ![Desktop Admin Users](screenshots/06-admin-users-desktop.png)             | ![Mobile Admin Users](screenshots/06-admin-users-mobile.png)             |
+| **Queue Management**         | ![Desktop Admin Queues](screenshots/07-admin-queues-desktop.png)           | ![Mobile Admin Queues](screenshots/07-admin-queues-mobile.png)           |
+| **User Profile**             | ![Desktop Profile](screenshots/08-profile-desktop.png)                     | ![Mobile Profile](screenshots/08-profile-mobile.png)                     |
+| **Notification Settings**    | ![Desktop Notifications](screenshots/09-notification-settings-desktop.png) | ![Mobile Notifications](screenshots/09-notification-settings-mobile.png) |
 
 ### 🎯 **Advanced Features**
 
-| Feature | Desktop Modal |
-|---------|---------------|
-| **User Tickets Modal** | ![User Tickets Modal](screenshots/10-user-tickets-modal-desktop.png) |
-| **User Queue Assignment Modal** | ![User Queues Modal](screenshots/11-user-queues-modal-desktop.png) |
+| Feature                         | Desktop Modal                                                        |
+| ------------------------------- | -------------------------------------------------------------------- |
+| **User Tickets Modal**          | ![User Tickets Modal](screenshots/10-user-tickets-modal-desktop.png) |
+| **User Queue Assignment Modal** | ![User Queues Modal](screenshots/11-user-queues-modal-desktop.png)   |
 
 ## 🚀 Key Features
 
 ### 🎫 Ticket Management
+
 - **Public Ticket Submission** - Anonymous users can submit tickets with contact information
 - **Internal Ticket System** - Authenticated users can create, view, and manage tickets
 - **Priority & Status Management** - High/Medium/Low priority with Open/Closed status tracking
@@ -47,6 +48,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 - **Advanced Filtering** - Filter by status, priority, queue, assigned user, and search
 
 ### 👥 User Management
+
 - **Role-based Access Control** - Admin and User roles with different permissions
 - **User Administration** - Complete CRUD operations for user management
 - **Profile Management** - Users can update their personal information and avatar
@@ -55,6 +57,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 - **User Ticket Viewing** - Admins can view all tickets created by any user
 
 ### 🔔 Advanced Notification System
+
 - **Granular Preferences** - Users control email and in-app notification preferences
 - **Smart Notifications** - Respects user preferences before sending notifications
 - **Email Integration** - Automated email notifications for ticket updates
@@ -62,12 +65,14 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 - **Admin Broadcasting** - Admins can send system-wide notifications
 
 ### 🏗️ Queue & Category Management
+
 - **Dynamic Queues** - Create and manage departmental queues
 - **Category System** - Organize tickets by categories within queues
 - **User Assignment** - Assign specific users to queues for ticket handling
 - **Queue Analytics** - Track queue performance and ticket distribution
 
 ### 🔐 Authentication & Security
+
 - **JWT-based Authentication** - Secure token-based authentication system
 - **Email Verification** - Account activation via email confirmation
 - **Password Reset** - Secure password reset workflow
@@ -75,6 +80,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 - **Guest Route Protection** - Secure route access based on authentication status
 
 ### 📱 Responsive Design
+
 - **Mobile-first Approach** - Fully responsive design for all screen sizes
 - **Touch-friendly Interface** - Optimized for mobile interaction
 - **Progressive Web App Ready** - PWA capabilities for mobile app-like experience
@@ -83,6 +89,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 ## 🛠️ Technology Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **UI Library**: Mantine UI v7
@@ -94,6 +101,7 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 - **Testing**: Playwright E2E testing
 
 ### Backend
+
 - **Framework**: NestJS
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT with Passport
@@ -106,19 +114,22 @@ A modern, full-featured ticket management system built with Next.js 15 and NestJ
 ## 🏃‍♂️ Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - MongoDB
 - SMTP service for emails
 
 ### Installation
 
 1. **Clone the repositories**
+
 ```bash
 git clone https://github.com/NomadNiko/easytix-frontend.git
 git clone https://github.com/NomadNiko/easytix-backend.git
 ```
 
 2. **Frontend Setup**
+
 ```bash
 cd easytix-frontend
 npm install
@@ -128,6 +139,7 @@ npm run dev
 ```
 
 3. **Backend Setup**
+
 ```bash
 cd easytix-backend
 npm install
@@ -139,12 +151,14 @@ npm run start:dev
 ### Environment Variables
 
 **Frontend (.env.local)**
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 **Backend (.env)**
+
 ```env
 NODE_ENV=development
 APP_PORT=3001
@@ -158,6 +172,7 @@ MAIL_PASSWORD=your-app-password
 ## 📋 API Documentation
 
 The backend provides comprehensive API documentation via Swagger UI:
+
 - **Development**: http://localhost:3001/docs
 - **Production**: https://etdevserver.nomadsoft.us/docs
 
@@ -199,6 +214,7 @@ POST /notifications/broadcast
 ## 🧪 Testing
 
 ### E2E Testing with Playwright
+
 ```bash
 # Run all tests
 npm run test:e2e
@@ -211,6 +227,7 @@ npx playwright test --headed
 ```
 
 ### Test Coverage
+
 - ✅ Authentication flows (sign in, sign up, password reset)
 - ✅ Ticket creation and management
 - ✅ User profile management
@@ -222,6 +239,7 @@ npx playwright test --headed
 ### Production Deployment with PM2
 
 1. **Build the applications**
+
 ```bash
 # Frontend
 cd easytix-frontend
@@ -233,11 +251,13 @@ npm run build
 ```
 
 2. **Start with PM2**
+
 ```bash
 pm2 start ecosystem.config.js
 ```
 
 ### Docker Deployment
+
 ```bash
 # Backend with MongoDB
 docker-compose up -d
@@ -250,12 +270,14 @@ docker run -p 3000:3000 easytix-frontend
 ## 🔧 Development
 
 ### Code Quality
+
 - **ESLint**: Configured for Next.js and NestJS best practices
 - **Prettier**: Consistent code formatting
 - **TypeScript**: Full type safety across the stack
 - **Husky**: Pre-commit hooks for quality gates
 
 ### Development Workflow
+
 1. Create feature branch from `main`
 2. Implement changes with tests
 3. Run linting and formatting: `npm run lint && npm run format`
@@ -307,6 +329,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 For support, questions, or feature requests:
+
 - 📧 Email: support@nomadsoft.us
 - 🐛 Issues: [GitHub Issues](https://github.com/NomadNiko/easytix-frontend/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/NomadNiko/easytix-frontend/discussions)

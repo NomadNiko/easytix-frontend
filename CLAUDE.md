@@ -52,6 +52,33 @@
 - Route guards check roles and redirect appropriately
 - Public forms create users with random passwords and send welcome emails
 
+## Final Steps After Any Development Work
+
+⚠️ **CRITICAL**: Always run these steps after any code changes:
+
+1. **Format Frontend Code** (if working on frontend)
+
+   ```bash
+   cd /var/www/easytix-frontend
+   npx prettier --write .
+   ```
+
+2. **Build Both Projects**
+
+   ```bash
+   # Frontend
+   cd /var/www/easytix-frontend && yarn build
+
+   # Backend
+   cd /var/www/easytix-backend && yarn build
+   ```
+
+3. **Restart PM2 Instances**
+   ```bash
+   pm2 restart easytix-frontend
+   pm2 restart easytix-backend
+   ```
+
 ## Notes
 
 - Both frontend and backend are already running using PM2

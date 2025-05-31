@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { User } from "@/services/api/types/user";
 import { useRouter } from "next/navigation";
 import { IconExternalLink } from "@tabler/icons-react";
+import useLanguage from "@/services/i18n/use-language";
 
 interface UserTicketsModalProps {
   user: User;
@@ -41,6 +42,7 @@ export function UserTicketsModal({
 }: UserTicketsModalProps) {
   // const { t } = useTranslation("admin-panel-users");
   const router = useRouter();
+  const language = useLanguage();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(false);
   const getTicketsService = useGetTicketsService();
@@ -73,7 +75,7 @@ export function UserTicketsModal({
   }, [opened]);
 
   const handleTicketClick = (ticketId: string) => {
-    router.push(`/tickets/${ticketId}`);
+    router.push(`/${language}/tickets/${ticketId}`);
     onClose();
   };
 
