@@ -298,7 +298,8 @@
     "low": "Low"
   },
   "actions": {
-    "submitTicket": "Submit Ticket"
+    "submitTicket": "Submit Ticket",
+    "createTicket": "Create Ticket"
   },
   "publicForm": {
     "pageTitle": "Submit a Support Ticket",
@@ -309,6 +310,13 @@
     "contactInfo": "Contact Information",
     "contactInfoDescription": "If you don't have an account, we'll create one for you and send your login credentials to your email.",
     "disclaimer": "By submitting this form, you agree to create an account with us. Your login credentials will be sent to your email."
+  },
+  "form": {
+    "createTicket": "Create New Ticket",
+    "createTicketDescription": "Fill out the form below to create a new support ticket.",
+    "ticketDetails": "Ticket Details",
+    "attachmentsNote": "File attachments can be added after the ticket is created.",
+    "createTicketNote": "Your ticket will be created and you'll be redirected to view it."
   },
   "historyTypes": {
     "comment": "Comment",
