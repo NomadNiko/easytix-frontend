@@ -3,7 +3,7 @@ import { useTranslation } from "@/services/i18n/client";
 import { Group } from "@mantine/core";
 import { Button } from "@mantine/core";
 import Link from "@/components/link";
-import { getNavigationConfig } from "@/config/navigation";
+import { getNavigationConfig, NavigationItem } from "@/config/navigation";
 import useAuth from "@/services/auth/use-auth";
 
 interface DesktopNavigationProps {
@@ -22,10 +22,22 @@ const DesktopNavigation = ({ onCloseMenu }: DesktopNavigationProps) => {
     return roles.map(String).includes(String(user.role.id));
   };
 
+  // Check if the nav item should be shown based on authentication status
+  const shouldShowItem = (item: NavigationItem): boolean => {
+    // Check role requirements
+    if (!hasRequiredRole(item.roles)) return false;
+
+    // Check authentication requirements
+    if (item.requiresAuth && !user) return false;
+    if (item.requiresGuest && user) return false;
+
+    return true;
+  };
+
   return (
     <Group gap="sm" visibleFrom="sm">
       {navItems.map((item) => {
-        if (item.mobileOnly || !hasRequiredRole(item.roles)) return null;
+        if (item.mobileOnly || !shouldShowItem(item)) return null;
         return (
           <Button
             key={item.path}

@@ -8,6 +8,8 @@ export interface NavigationItem {
   mobileOnly?: boolean; // Only show in mobile menu
   desktopOnly?: boolean; // Only show in desktop menu
   children?: NavigationItem[]; // Submenu items
+  requiresAuth?: boolean; // Requires authentication
+  requiresGuest?: boolean; // Only show to non-authenticated users
 }
 
 export const createNavigationConfig = (): NavigationItem[] => [
@@ -15,9 +17,17 @@ export const createNavigationConfig = (): NavigationItem[] => [
     label: "common:navigation.home",
     path: "/",
   },
+  // Show tickets for authenticated users
   {
     label: "common:navigation.tickets",
     path: "/tickets",
+    requiresAuth: true,
+  },
+  // Show submit ticket for non-authenticated users
+  {
+    label: "common:navigation.submit_ticket",
+    path: "/submit-ticket",
+    requiresGuest: true,
   },
   {
     label: "common:navigation.users",

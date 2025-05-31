@@ -1,4 +1,23 @@
 {
   "title": "EasyTix",
-  "description": "Welcome to EasyTix.<br>Nomad Niko is working away build out the App. <br> - EasyTix Team"
+  "description": "Welcome to EasyTix.<br>Nomad Niko is working away build out the App. <br> - EasyTix Team",
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}!",
+    "subtitle": "Manage your tickets and access system features",
+    "adminBadge": "Administrator",
+    "quickActions": "Quick Actions",
+    "goTo": "Go to",
+    "createTicket": "Create Ticket",
+    "createTicketDesc": "Submit a new support ticket",
+    "viewTickets": "View Tickets",
+    "viewTicketsDesc": "See all your tickets and their status",
+    "notifications": "Notifications",
+    "notificationsDesc": "Check your latest notifications",
+    "profile": "Profile Settings",
+    "profileDesc": "Update your profile and preferences",
+    "manageUsersDesc": "Add, edit, and manage system users",
+    "manageQueuesDesc": "Configure queues and assignments",
+    "adminNotifications": "Admin Notifications",
+    "adminNotificationsDesc": "Send system-wide notifications"
+  }
 }

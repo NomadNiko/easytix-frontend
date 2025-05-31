@@ -2,7 +2,7 @@
 import { useTranslation } from "@/services/i18n/client";
 import { Divider, Stack } from "@mantine/core";
 import Link from "@/components/link";
-import { getNavigationConfig } from "@/config/navigation";
+import { getNavigationConfig, NavigationItem } from "@/config/navigation";
 import useAuth from "@/services/auth/use-auth";
 import { IS_SIGN_UP_ENABLED } from "@/services/auth/config";
 import { Button } from "@mantine/core";
@@ -23,11 +23,23 @@ const MobileNavigation = ({ onCloseMenu }: MobileNavigationProps) => {
     return roles.map(String).includes(String(user.role.id));
   };
 
+  // Check if the nav item should be shown based on authentication status
+  const shouldShowItem = (item: NavigationItem): boolean => {
+    // Check role requirements
+    if (!hasRequiredRole(item.roles)) return false;
+
+    // Check authentication requirements
+    if (item.requiresAuth && !user) return false;
+    if (item.requiresGuest && user) return false;
+
+    return true;
+  };
+
   return (
     <Stack>
       {/* Navigation Items */}
       {navItems.map((item) => {
-        if (item.desktopOnly || !hasRequiredRole(item.roles)) return null;
+        if (item.desktopOnly || !shouldShowItem(item)) return null;
         return (
           <Button
             key={item.path}
