@@ -1,5 +1,5 @@
 // src/components/tickets/TicketList.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Group,
@@ -8,13 +8,13 @@ import {
   Text,
   Card,
   Select,
-  TextInput,
+  Input,
   Grid,
   Paper,
   Button,
   Title,
 } from "@mantine/core";
-import { IconEye, IconSearch, IconX } from "@tabler/icons-react";
+import { IconSearch, IconX } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
   Ticket,
@@ -37,6 +37,7 @@ interface TicketListProps {
     priority?: TicketPriority | null;
     search?: string | null;
   }) => void;
+  onImmediateSearch?: (searchTerm: string) => void;
   filters: {
     queueId?: string | null;
     status?: TicketStatus | null;
@@ -44,31 +45,37 @@ interface TicketListProps {
     search?: string | null;
   };
   isLoading: boolean;
+  hasNextPage?: boolean;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
 }
 
 // Define consistent column widths to use across the application
 const COLUMN_WIDTHS = {
-  id: "10%",
-  title: "35%",
-  status: "15%",
-  priority: "15%",
-  date: "15%",
-  actions: "10%",
+  id: "8%",
+  title: "25%",
+  queue: "15%",
+  category: "15%",
+  status: "12%",
+  priority: "12%",
+  date: "13%",
 };
 
 export function TicketList({
   tickets,
   onViewTicket,
   onFilterChange,
+  onImmediateSearch,
   filters,
   isLoading,
+  hasNextPage,
+  onLoadMore,
+  isLoadingMore,
 }: TicketListProps) {
   const { t } = useTranslation("tickets");
 
   // Add local state for the search input
   const [searchInput, setSearchInput] = useState(filters.search || "");
-  // Reference to track timeout
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update searchInput when filters.search changes externally
   useEffect(() => {
@@ -85,32 +92,33 @@ export function TicketList({
     });
   };
 
-  // Debounced search function
-  const handleSearchChange = (value: string) => {
-    setSearchInput(value);
-
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    // Set a new timeout
-    timeoutRef.current = setTimeout(() => {
+  // Execute search - called by Enter key or search icon click
+  const executeSearch = () => {
+    const searchTerm = searchInput || null;
+    if (onImmediateSearch) {
+      // Use immediate search to bypass debouncing
+      onImmediateSearch(searchTerm || "");
+    } else {
+      // Fallback to regular filter change
       onFilterChange({
         ...filters,
-        search: value || null,
+        search: searchTerm,
       });
-    }, 500); // 500ms debounce time
+    }
   };
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+  // Handle search input change (only updates local state)
+  const handleSearchInputChange = (value: string) => {
+    setSearchInput(value);
+  };
+
+  // Handle Enter key down
+  const handleSearchKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      executeSearch();
+    }
+  };
 
   const handleClearFilters = () => {
     onFilterChange({
@@ -171,15 +179,64 @@ export function TicketList({
   }
 
   // Desktop version with full table
-  const DesktopContent = () => (
+  const desktopContent = (
     <Paper p="md" withBorder>
       <Title order={4} mb="md">
         {t("tickets:tickets.ticketList")}
       </Title>
+
+      {/* Search Bar - Isolated */}
+      <Paper withBorder p="md" mb="md">
+        <Grid>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <Input.Wrapper label={t("tickets:tickets.filters.search")}>
+              <div style={{ position: "relative" }}>
+                <Input
+                  placeholder={t("tickets:tickets.filters.searchPlaceholder")}
+                  value={searchInput}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  data-testid="ticket-filter-search"
+                  rightSection={
+                    <ActionIcon
+                      size="sm"
+                      variant="filled"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        executeSearch();
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onPointerDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      data-testid="ticket-filter-search-execute"
+                      style={{
+                        cursor: "pointer",
+                        zIndex: 100,
+                        position: "relative",
+                        pointerEvents: "all",
+                      }}
+                      aria-label="Search"
+                    >
+                      <IconSearch size={16} />
+                    </ActionIcon>
+                  }
+                />
+              </div>
+            </Input.Wrapper>
+          </Grid.Col>
+        </Grid>
+      </Paper>
+
       {/* Filters */}
       <Paper withBorder p="md" mb="md">
         <Grid>
-          <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
             <QueueSelect
               value={filters.queueId || null}
               onChange={(value) => handleFilterChange("queueId", value)}
@@ -187,7 +244,7 @@ export function TicketList({
               placeholder={t("tickets:tickets.filters.anyQueue")}
             />
           </Grid.Col>
-          <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
             <Select
               label={t("tickets:tickets.filters.status")}
               placeholder={t("tickets:tickets.filters.anyStatus")}
@@ -200,7 +257,7 @@ export function TicketList({
               data-testid="ticket-filter-status"
             />
           </Grid.Col>
-          <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
             <Select
               label={t("tickets:tickets.filters.priority")}
               placeholder={t("tickets:tickets.filters.anyPriority")}
@@ -211,34 +268,6 @@ export function TicketList({
               }
               clearable
               data-testid="ticket-filter-priority"
-            />
-          </Grid.Col>
-          <Grid.Col span={{ xs: 12, sm: 6, md: 3 }}>
-            <TextInput
-              label={t("tickets:tickets.filters.search")}
-              placeholder={t("tickets:tickets.filters.searchPlaceholder")}
-              value={searchInput}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              data-testid="ticket-filter-search"
-              rightSection={
-                searchInput ? (
-                  <ActionIcon
-                    size="sm"
-                    onClick={() => {
-                      setSearchInput("");
-                      onFilterChange({
-                        ...filters,
-                        search: null,
-                      });
-                    }}
-                    data-testid="ticket-filter-search-clear"
-                  >
-                    <IconX size={16} />
-                  </ActionIcon>
-                ) : (
-                  <IconSearch size={16} />
-                )
-              }
             />
           </Grid.Col>
         </Grid>
@@ -254,6 +283,14 @@ export function TicketList({
           </Button>
         </Group>
       </Paper>
+      {/* Results count */}
+      {!isLoading && (
+        <Text size="sm" c="dimmed" mb="md">
+          {tickets.length > 0
+            ? t("tickets:tickets.resultsCount", { count: tickets.length })
+            : t("tickets:tickets.noResults")}
+        </Text>
+      )}
       {tickets.length === 0 ? (
         <Card withBorder p="xl" radius="md" my="md">
           <Text ta="center" fw={500} c="dimmed">
@@ -270,6 +307,12 @@ export function TicketList({
               <Table.Th style={{ width: COLUMN_WIDTHS.title }}>
                 {t("tickets:tickets.fields.title")}
               </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.queue }}>
+                {t("tickets:tickets.fields.queue")}
+              </Table.Th>
+              <Table.Th style={{ width: COLUMN_WIDTHS.category }}>
+                {t("tickets:tickets.fields.category")}
+              </Table.Th>
               <Table.Th style={{ width: COLUMN_WIDTHS.status }}>
                 {t("tickets:tickets.fields.status")}
               </Table.Th>
@@ -279,14 +322,16 @@ export function TicketList({
               <Table.Th style={{ width: COLUMN_WIDTHS.date }}>
                 {t("tickets:tickets.fields.created")}
               </Table.Th>
-              <Table.Th style={{ width: COLUMN_WIDTHS.actions }}>
-                {t("common:fields.actions")}
-              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {tickets.map((ticket) => (
-              <Table.Tr key={ticket.id}>
+              <Table.Tr
+                key={ticket.id}
+                style={{ cursor: "pointer" }}
+                onClick={() => onViewTicket(ticket.id)}
+                data-testid={`ticket-row-${ticket.id}`}
+              >
                 <Table.Td style={{ width: COLUMN_WIDTHS.id }}>
                   <Text size="sm" fw={500}>
                     #{ticket.id.substring(ticket.id.length - 6)}
@@ -295,6 +340,16 @@ export function TicketList({
                 <Table.Td style={{ width: COLUMN_WIDTHS.title }}>
                   <Text size="sm" fw={500} lineClamp={1}>
                     {ticket.title}
+                  </Text>
+                </Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.queue }}>
+                  <Text size="sm" lineClamp={1}>
+                    {ticket.queue?.name || "-"}
+                  </Text>
+                </Table.Td>
+                <Table.Td style={{ width: COLUMN_WIDTHS.category }}>
+                  <Text size="sm" lineClamp={1}>
+                    {ticket.category?.name || "-"}
                   </Text>
                 </Table.Td>
                 <Table.Td style={{ width: COLUMN_WIDTHS.status }}>
@@ -308,52 +363,102 @@ export function TicketList({
                     {formatDate(new Date(ticket.createdAt))}
                   </Text>
                 </Table.Td>
-                <Table.Td style={{ width: COLUMN_WIDTHS.actions }}>
-                  <Group gap="xs">
-                    <ActionIcon
-                      size="sm"
-                      variant="light"
-                      color="blue"
-                      onClick={() => onViewTicket(ticket.id)}
-                      data-testid={`ticket-view-${ticket.id}`}
-                    >
-                      <IconEye size={16} />
-                    </ActionIcon>
-                  </Group>
-                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
         </Table>
       )}
+      {hasNextPage && !isLoading && (
+        <Group justify="center" mt="xl">
+          <Button
+            onClick={onLoadMore}
+            loading={isLoadingMore}
+            variant="subtle"
+            size="lg"
+            data-testid="load-more-tickets"
+          >
+            {t("common:loadMore")}
+          </Button>
+        </Group>
+      )}
     </Paper>
   );
 
   // Mobile version with simplified cards
-  const MobileContent = () => (
+  const mobileContent = (
     <Paper p="md" withBorder>
       <Title order={4} mb="md">
         {t("tickets:tickets.ticketList")}
       </Title>
-      <TicketFiltersMobile
-        filters={filters}
-        onFilterChange={onFilterChange}
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        handleSearchChange={handleSearchChange}
-      />
+
+      {/* Search Bar - Isolated */}
+      <Paper withBorder p="md" mb="md">
+        <Input.Wrapper label={t("tickets:tickets.filters.search")}>
+          <div style={{ position: "relative" }}>
+            <Input
+              placeholder={t("tickets:tickets.filters.searchPlaceholder")}
+              value={searchInput}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              data-testid="ticket-filter-search-mobile"
+              rightSection={
+                <ActionIcon
+                  size="sm"
+                  variant="filled"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    executeSearch();
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  data-testid="ticket-filter-search-execute-mobile"
+                  style={{
+                    cursor: "pointer",
+                    zIndex: 100,
+                    position: "relative",
+                    pointerEvents: "all",
+                  }}
+                  aria-label="Search"
+                >
+                  <IconSearch size={16} />
+                </ActionIcon>
+              }
+            />
+          </div>
+        </Input.Wrapper>
+      </Paper>
+
+      <TicketFiltersMobile filters={filters} onFilterChange={onFilterChange} />
+      {/* Results count */}
+      {!isLoading && (
+        <Text size="sm" c="dimmed" mb="md">
+          {tickets.length > 0
+            ? t("tickets:tickets.resultsCount", { count: tickets.length })
+            : t("tickets:tickets.noResults")}
+        </Text>
+      )}
       <TicketListMobile
         tickets={tickets}
         onViewTicket={onViewTicket}
         isLoading={isLoading}
+        hasNextPage={hasNextPage}
+        onLoadMore={onLoadMore}
+        isLoadingMore={isLoadingMore}
       />
     </Paper>
   );
 
   return (
     <ResponsiveDisplay
-      desktopContent={<DesktopContent />}
-      mobileContent={<MobileContent />}
+      desktopContent={desktopContent}
+      mobileContent={mobileContent}
     />
   );
 }

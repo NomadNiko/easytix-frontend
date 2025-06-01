@@ -7,6 +7,8 @@ import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
 import {
   useGetTicketsService,
+  useGetAllTicketsService,
+  useGetTicketStatisticsService,
   useGetTicketService,
   useCreateTicketService,
   useUpdateTicketService,
@@ -18,6 +20,7 @@ import {
   TicketUpdateRequest,
   TicketStatus,
   TicketsQueryParams,
+  TicketsPaginatedResponse,
 } from "@/services/api/services/tickets";
 
 export const ticketQueryKeys = createQueryKeys(["tickets"], {
@@ -47,8 +50,8 @@ export const useTicketsQuery = (
 ) => {
   const getTicketsService = useGetTicketsService();
 
-  return useQuery({
-    queryKey: ticketQueryKeys.list().sub.by(filters).key,
+  return useQuery<TicketsPaginatedResponse>({
+    queryKey: ["tickets", "list", JSON.stringify(filters || {})],
     queryFn: async ({ signal }) => {
       const { status, data } = await getTicketsService(undefined, filters, {
         signal,
@@ -56,7 +59,55 @@ export const useTicketsQuery = (
       if (status === HTTP_CODES_ENUM.OK) {
         return data;
       }
+      return { data: [], hasNextPage: false };
+    },
+    enabled,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+export const useAllTicketsQuery = (
+  filters?: TicketsQueryParams,
+  enabled = true
+) => {
+  const getAllTicketsService = useGetAllTicketsService();
+
+  return useQuery({
+    queryKey: ["tickets", "all", filters],
+    queryFn: async ({ signal }) => {
+      const { status, data } = await getAllTicketsService(undefined, filters, {
+        signal,
+      });
+      if (status === HTTP_CODES_ENUM.OK) {
+        return data;
+      }
       return [];
+    },
+    enabled,
+  });
+};
+
+export const useTicketStatisticsQuery = (
+  filters?: TicketsQueryParams,
+  enabled = true
+) => {
+  const getTicketStatisticsService = useGetTicketStatisticsService();
+
+  return useQuery({
+    queryKey: ["tickets", "statistics", filters],
+    queryFn: async ({ signal }) => {
+      const { status, data } = await getTicketStatisticsService(
+        undefined,
+        filters,
+        {
+          signal,
+        }
+      );
+      if (status === HTTP_CODES_ENUM.OK) {
+        return data;
+      }
+      return null;
     },
     enabled,
   });

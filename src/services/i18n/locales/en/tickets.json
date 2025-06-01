@@ -119,6 +119,8 @@
     "ticketDetails": "Ticket Details",
     "notFound": "Ticket not found",
     "empty": "No tickets found",
+    "resultsCount": "{{count}} tickets found",
+    "noResults": "No tickets found",
     "timeline": "Timeline",
     "noHistory": "No history items found",
     "notAssigned": "Not Assigned",

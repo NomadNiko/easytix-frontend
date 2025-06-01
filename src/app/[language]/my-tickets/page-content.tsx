@@ -19,7 +19,8 @@ import { IconPlus, IconEye, IconCalendar, IconUser } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/services/auth/use-auth";
 import {
-  useTicketsQuery,
+  useAllTicketsQuery,
+  useTicketStatisticsQuery,
   useCreateTicketMutation,
   TicketStatus,
   TicketPriority,
@@ -38,10 +39,18 @@ function MyTicketsPage() {
 
   const createTicketMutation = useCreateTicketMutation();
 
-  // Query only user's own tickets
-  const { data: tickets, isLoading } = useTicketsQuery({
+  // Query all user's tickets (no pagination)
+  const { data: tickets = [], isLoading: ticketsLoading } = useAllTicketsQuery({
     createdById: user?.id?.toString(),
   });
+
+  // Get accurate statistics for user's tickets
+  const { data: statistics, isLoading: statsLoading } =
+    useTicketStatisticsQuery({
+      createdById: user?.id?.toString(),
+    });
+
+  const isLoading = ticketsLoading || statsLoading;
 
   const handleCreateTicket = (values: {
     queueId: string;
@@ -150,11 +159,17 @@ function MyTicketsPage() {
     </Card>
   );
 
-  // Separate tickets by status
-  const openTickets =
-    tickets?.filter((ticket) => ticket.status === TicketStatus.OPENED) || [];
-  const closedTickets =
-    tickets?.filter((ticket) => ticket.status === TicketStatus.CLOSED) || [];
+  // Separate tickets by status (from actual data)
+  const openTickets = tickets.filter(
+    (ticket) => ticket.status === TicketStatus.OPENED
+  );
+  const closedTickets = tickets.filter(
+    (ticket) => ticket.status === TicketStatus.CLOSED
+  );
+
+  // Use statistics for accurate counts (fallback to filtered counts if stats unavailable)
+  const openCount = statistics?.open ?? openTickets.length;
+  const closedCount = statistics?.closed ?? closedTickets.length;
 
   if (isLoading) {
     return (
@@ -192,7 +207,7 @@ function MyTicketsPage() {
               {t("tickets:myTickets.openTickets")}
             </Text>
             <Text size="xl" fw={700} c="blue">
-              {openTickets.length}
+              {openCount}
             </Text>
           </Card>
         </Grid.Col>
@@ -202,7 +217,7 @@ function MyTicketsPage() {
               {t("tickets:myTickets.closedTickets")}
             </Text>
             <Text size="xl" fw={700} c="gray">
-              {closedTickets.length}
+              {closedCount}
             </Text>
           </Card>
         </Grid.Col>

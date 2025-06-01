@@ -12,6 +12,8 @@ import {
   TicketStatus,
   TicketPriority,
 } from "@/app/[language]/tickets/queries/ticket-queries";
+import { TicketsPaginatedResponse } from "@/services/api/services/tickets";
+import { Ticket } from "@/services/api/services/tickets";
 import { TicketForm } from "@/components/tickets/TicketForm";
 import { TicketList } from "@/components/tickets/TicketList";
 import useLanguage from "@/services/i18n/use-language";
@@ -32,6 +34,8 @@ function TicketsPage() {
   const { user } = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("all");
+  const [page, setPage] = useState(1);
+  const [allTickets, setAllTickets] = useState<Ticket[]>([]);
 
   // Filters state
   const [filters, setFilters] = useState<TicketFilters>({
@@ -41,17 +45,33 @@ function TicketsPage() {
     search: null,
   });
 
+  // Debounced search to prevent excessive API calls
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string | null>(
+    null
+  );
+
+  // Debounce search term updates
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(filters.search);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [filters.search]);
+
   const createTicketMutation = useCreateTicketMutation();
 
   // Determine query filters based on active tab and filters state
-  const getQueryFilters = () => {
+  const getQueryFilters = React.useCallback(() => {
     const queryFilters: Record<string, string | null> = {};
 
     // Add base filters
     if (filters.queueId) queryFilters.queueId = filters.queueId;
     if (filters.status) queryFilters.status = filters.status;
     if (filters.priority) queryFilters.priority = filters.priority;
-    if (filters.search) queryFilters.search = filters.search;
+    if (debouncedSearchTerm) queryFilters.search = debouncedSearchTerm;
 
     // Add tab-specific filters
     if (activeTab === "assigned" && user) {
@@ -67,9 +87,65 @@ function TicketsPage() {
     }
 
     return queryFilters;
-  };
+  }, [
+    filters.queueId,
+    filters.status,
+    filters.priority,
+    debouncedSearchTerm,
+    activeTab,
+    user,
+  ]);
 
-  const { data: tickets, isLoading } = useTicketsQuery(getQueryFilters());
+  const queryFilters = React.useMemo(
+    () => ({
+      ...getQueryFilters(),
+      page,
+      limit: 20,
+    }),
+    [getQueryFilters, page]
+  );
+
+  const {
+    data: ticketsResponse,
+    isLoading,
+    isFetching,
+  } = useTicketsQuery(queryFilters);
+
+  // Safely access the response data
+  const ticketsData = React.useMemo(() => {
+    return (ticketsResponse as TicketsPaginatedResponse)?.data || [];
+  }, [ticketsResponse]);
+
+  const hasNextPage = React.useMemo(() => {
+    return (ticketsResponse as TicketsPaginatedResponse)?.hasNextPage || false;
+  }, [ticketsResponse]);
+
+  // Update allTickets when new data arrives
+  React.useEffect(() => {
+    if (ticketsData.length > 0 || page === 1) {
+      if (page === 1) {
+        setAllTickets(ticketsData);
+      } else {
+        setAllTickets((prev) => [...prev, ...ticketsData]);
+      }
+    }
+  }, [ticketsData, page]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+    setAllTickets([]);
+  }, [
+    filters.queueId,
+    filters.status,
+    filters.priority,
+    debouncedSearchTerm,
+    activeTab,
+  ]);
+
+  const handleLoadMore = () => {
+    setPage((prev) => prev + 1);
+  };
 
   const handleCreateTicket = (values: {
     queueId: string;
@@ -112,6 +188,15 @@ function TicketsPage() {
     }));
   };
 
+  const handleImmediateSearch = (searchTerm: string) => {
+    // For immediate search (Enter key or search icon), bypass debounce
+    setDebouncedSearchTerm(searchTerm);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      search: searchTerm,
+    }));
+  };
+
   return (
     <Container size="xl">
       <Group justify="apart" mb="lg">
@@ -142,12 +227,16 @@ function TicketsPage() {
         </Tabs.List>
       </Tabs>
       <TicketList
-        tickets={tickets || []}
+        tickets={allTickets}
         onViewTicket={handleViewTicket}
         onEditTicket={handleEditTicket}
         onFilterChange={handleFilterChange}
+        onImmediateSearch={handleImmediateSearch}
         filters={filters}
-        isLoading={isLoading}
+        isLoading={isLoading && page === 1}
+        hasNextPage={hasNextPage}
+        onLoadMore={handleLoadMore}
+        isLoadingMore={isFetching && page > 1}
       />
       {/* Create Ticket Modal */}
       <Modal

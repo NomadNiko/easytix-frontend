@@ -57,7 +57,7 @@ export function UserTicketsModal({
       });
 
       if (response.status === 200 && response.data) {
-        setTickets(response.data || []);
+        setTickets(response.data.data || []);
       }
     } catch (error) {
       console.error("Error fetching user tickets:", error);

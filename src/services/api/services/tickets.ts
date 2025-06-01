@@ -33,6 +33,29 @@ export type Ticket = {
   updatedAt: string;
   closedAt: string | null;
   closingNotes: string | null;
+  queue?: { id: string; name: string };
+  category?: { id: string; name: string };
+};
+
+export type TicketsPaginatedResponse = {
+  data: Ticket[];
+  hasNextPage: boolean;
+};
+
+export type TicketStatistics = {
+  total: number;
+  open: number;
+  closed: number;
+  byPriority: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  byQueue: Array<{
+    queueId: string;
+    queueName: string;
+    count: number;
+  }>;
 };
 
 export type TicketsQueryParams = {
@@ -94,10 +117,26 @@ const formatTicketsQueryParams = (params: TicketsQueryParams) => {
 
 // API Services
 export const useGetTicketsService = createGetService<
-  Ticket[],
+  TicketsPaginatedResponse,
   void,
   TicketsQueryParams
 >("/v1/tickets", {
+  formatQueryParams: formatTicketsQueryParams,
+});
+
+export const useGetAllTicketsService = createGetService<
+  Ticket[],
+  void,
+  TicketsQueryParams
+>("/v1/tickets/all", {
+  formatQueryParams: formatTicketsQueryParams,
+});
+
+export const useGetTicketStatisticsService = createGetService<
+  TicketStatistics,
+  void,
+  TicketsQueryParams
+>("/v1/tickets/statistics", {
   formatQueryParams: formatTicketsQueryParams,
 });
 
