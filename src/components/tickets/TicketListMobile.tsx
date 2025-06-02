@@ -44,6 +44,8 @@ export function TicketListMobile({
   const renderStatusBadge = (status: TicketStatus) => {
     const colorMap: Record<TicketStatus, string> = {
       [TicketStatus.OPENED]: "blue",
+      [TicketStatus.IN_PROGRESS]: "yellow",
+      [TicketStatus.RESOLVED]: "green",
       [TicketStatus.CLOSED]: "gray",
     };
     return (

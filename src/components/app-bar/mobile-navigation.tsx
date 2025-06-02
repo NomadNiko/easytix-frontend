@@ -35,24 +35,64 @@ const MobileNavigation = ({ onCloseMenu }: MobileNavigationProps) => {
     return true;
   };
 
-  return (
-    <Stack>
-      {/* Navigation Items */}
-      {navItems.map((item) => {
-        if (item.desktopOnly || !shouldShowItem(item)) return null;
-        return (
+  const renderNavItem = (item: NavigationItem) => {
+    if (item.desktopOnly || !shouldShowItem(item)) return null;
+
+    // If item has children, render them as separate items with indentation
+    if (item.children && item.children.length > 0) {
+      const visibleChildren = item.children.filter((child) =>
+        shouldShowItem(child)
+      );
+      if (visibleChildren.length === 0) return null;
+
+      return (
+        <Stack key={item.path} gap="xs">
+          {/* Parent category as disabled button for visual grouping */}
           <Button
-            key={item.path}
-            component={Link}
-            href={item.path}
-            variant="subtle"
+            variant="light"
             fullWidth
-            onClick={onCloseMenu} // Add this handler to close menu on click
+            disabled
+            style={{ cursor: "default" }}
           >
             {t(item.label)}
           </Button>
-        );
-      })}
+          {/* Child items with slight indentation */}
+          {visibleChildren.map((child) => (
+            <Button
+              key={child.path}
+              component={Link}
+              href={child.path}
+              variant="subtle"
+              fullWidth
+              onClick={onCloseMenu}
+              style={{ paddingLeft: "24px" }}
+            >
+              {t(child.label)}
+            </Button>
+          ))}
+        </Stack>
+      );
+    }
+
+    // Regular navigation item
+    return (
+      <Button
+        key={item.path}
+        component={Link}
+        href={item.path}
+        variant="subtle"
+        fullWidth
+        onClick={onCloseMenu}
+      >
+        {t(item.label)}
+      </Button>
+    );
+  };
+
+  return (
+    <Stack>
+      {/* Navigation Items */}
+      {navItems.map(renderNavItem)}
       {/* Authentication Items (mobile only) */}
       {isLoaded && !user && (
         <>

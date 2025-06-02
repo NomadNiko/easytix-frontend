@@ -25,6 +25,7 @@ interface TicketFilters {
   search: string | null;
   assignedToId?: string | null;
   createdById?: string | null;
+  userIds?: string[] | null;
 }
 
 function TicketsPage() {
@@ -43,6 +44,7 @@ function TicketsPage() {
     status: null,
     priority: null,
     search: null,
+    userIds: null,
   });
 
   // Debounced search to prevent excessive API calls
@@ -65,13 +67,15 @@ function TicketsPage() {
 
   // Determine query filters based on active tab and filters state
   const getQueryFilters = React.useCallback(() => {
-    const queryFilters: Record<string, string | null> = {};
+    const queryFilters: Record<string, string | string[] | null> = {};
 
     // Add base filters
     if (filters.queueId) queryFilters.queueId = filters.queueId;
     if (filters.status) queryFilters.status = filters.status;
     if (filters.priority) queryFilters.priority = filters.priority;
     if (debouncedSearchTerm) queryFilters.search = debouncedSearchTerm;
+    if (filters.userIds && filters.userIds.length > 0)
+      queryFilters.userIds = filters.userIds;
 
     // Add tab-specific filters
     if (activeTab === "assigned" && user) {
@@ -91,6 +95,7 @@ function TicketsPage() {
     filters.queueId,
     filters.status,
     filters.priority,
+    filters.userIds,
     debouncedSearchTerm,
     activeTab,
     user,
@@ -120,6 +125,10 @@ function TicketsPage() {
     return (ticketsResponse as TicketsPaginatedResponse)?.hasNextPage || false;
   }, [ticketsResponse]);
 
+  const totalCount = React.useMemo(() => {
+    return (ticketsResponse as TicketsPaginatedResponse)?.total || 0;
+  }, [ticketsResponse]);
+
   // Update allTickets when new data arrives
   React.useEffect(() => {
     if (ticketsData.length > 0 || page === 1) {
@@ -139,6 +148,7 @@ function TicketsPage() {
     filters.queueId,
     filters.status,
     filters.priority,
+    filters.userIds,
     debouncedSearchTerm,
     activeTab,
   ]);
@@ -228,6 +238,7 @@ function TicketsPage() {
       </Tabs>
       <TicketList
         tickets={allTickets}
+        totalCount={totalCount}
         onViewTicket={handleViewTicket}
         onEditTicket={handleEditTicket}
         onFilterChange={handleFilterChange}

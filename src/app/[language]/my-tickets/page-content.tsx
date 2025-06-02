@@ -98,13 +98,15 @@ function MyTicketsPage() {
   const renderStatusBadge = (status: TicketStatus) => {
     const colorMap: Record<TicketStatus, string> = {
       [TicketStatus.OPENED]: "blue",
+      [TicketStatus.IN_PROGRESS]: "yellow",
+      [TicketStatus.RESOLVED]: "green",
       [TicketStatus.CLOSED]: "gray",
     };
+
+    const statusKey = status.toLowerCase().replace(" ", "");
     return (
       <Badge color={colorMap[status]} size="sm" variant="filled">
-        {status === TicketStatus.OPENED
-          ? t("tickets:tickets.statuses.opened")
-          : t("tickets:tickets.statuses.closed")}
+        {t(`tickets:tickets.statuses.${statusKey}`)}
       </Badge>
     );
   };

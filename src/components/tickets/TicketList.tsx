@@ -13,6 +13,7 @@ import {
   Paper,
   Button,
   Title,
+  MultiSelect,
 } from "@mantine/core";
 import { IconSearch, IconX } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
@@ -26,9 +27,12 @@ import { QueueSelect } from "./queues/QueueSelect";
 import { ResponsiveDisplay } from "@/components/responsive-display/ResponsiveDisplay";
 import { TicketListMobile } from "./TicketListMobile";
 import { TicketFiltersMobile } from "./TicketFiltersMobile";
+import { useGetUsersService } from "@/services/api/services/users";
+import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
 interface TicketListProps {
   tickets: Ticket[];
+  totalCount?: number;
   onViewTicket: (ticketId: string) => void;
   onEditTicket: (ticketId: string) => void;
   onFilterChange: (filters: {
@@ -36,6 +40,7 @@ interface TicketListProps {
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
+    userIds?: string[] | null;
   }) => void;
   onImmediateSearch?: (searchTerm: string) => void;
   filters: {
@@ -43,6 +48,7 @@ interface TicketListProps {
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
+    userIds?: string[] | null;
   };
   isLoading: boolean;
   hasNextPage?: boolean;
@@ -63,6 +69,7 @@ const COLUMN_WIDTHS = {
 
 export function TicketList({
   tickets,
+  totalCount,
   onViewTicket,
   onFilterChange,
   onImmediateSearch,
@@ -76,6 +83,46 @@ export function TicketList({
 
   // Add local state for the search input
   const [searchInput, setSearchInput] = useState(filters.search || "");
+
+  // Fetch users for multi-select
+  const [userOptions, setUserOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const getUsersService = useGetUsersService();
+
+  // Load users on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoadingUsers(true);
+      try {
+        const { status, data } = await getUsersService(undefined, {
+          page: 1,
+          limit: 50,
+        });
+        if (status === HTTP_CODES_ENUM.OK) {
+          const options = data.data.map((user) => ({
+            value: user.id.toString(),
+            label: `${user.firstName} ${user.lastName} (${user.email})`,
+          }));
+          setUserOptions(options);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
+    fetchUsers();
+  }, [getUsersService]);
+
+  // Handle user filter change
+  const handleUserFilterChange = (selectedUserIds: string[]) => {
+    onFilterChange({
+      ...filters,
+      userIds: selectedUserIds.length > 0 ? selectedUserIds : null,
+    });
+  };
 
   // Update searchInput when filters.search changes externally
   useEffect(() => {
@@ -126,6 +173,7 @@ export function TicketList({
       status: null,
       priority: null,
       search: null,
+      userIds: null,
     });
   };
 
@@ -145,6 +193,8 @@ export function TicketList({
   const renderStatusBadge = (status: TicketStatus) => {
     const colorMap: Record<TicketStatus, string> = {
       [TicketStatus.OPENED]: "blue",
+      [TicketStatus.IN_PROGRESS]: "yellow",
+      [TicketStatus.RESOLVED]: "green",
       [TicketStatus.CLOSED]: "gray",
     };
     return (
@@ -230,6 +280,23 @@ export function TicketList({
               </div>
             </Input.Wrapper>
           </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <MultiSelect
+              label={t("tickets:tickets.filters.userFilter")}
+              placeholder={
+                isLoadingUsers
+                  ? "Loading users..."
+                  : t("tickets:tickets.filters.selectUsers")
+              }
+              data={userOptions}
+              value={filters.userIds || []}
+              onChange={handleUserFilterChange}
+              searchable
+              clearable
+              disabled={isLoadingUsers}
+              data-testid="ticket-filter-users"
+            />
+          </Grid.Col>
         </Grid>
       </Paper>
 
@@ -287,7 +354,12 @@ export function TicketList({
       {!isLoading && (
         <Text size="sm" c="dimmed" mb="md">
           {tickets.length > 0
-            ? t("tickets:tickets.resultsCount", { count: tickets.length })
+            ? totalCount && totalCount > tickets.length
+              ? t("tickets:tickets.showingResultsCount", {
+                  showing: tickets.length,
+                  total: totalCount,
+                })
+              : t("tickets:tickets.resultsCount", { count: tickets.length })
             : t("tickets:tickets.noResults")}
         </Text>
       )}
@@ -435,12 +507,36 @@ export function TicketList({
         </Input.Wrapper>
       </Paper>
 
+      {/* User Filter - Mobile */}
+      <Paper withBorder p="md" mb="md">
+        <MultiSelect
+          label={t("tickets:tickets.filters.userFilter")}
+          placeholder={
+            isLoadingUsers
+              ? "Loading users..."
+              : t("tickets:tickets.filters.selectUsers")
+          }
+          data={userOptions}
+          value={filters.userIds || []}
+          onChange={handleUserFilterChange}
+          searchable
+          clearable
+          disabled={isLoadingUsers}
+          data-testid="ticket-filter-users-mobile"
+        />
+      </Paper>
+
       <TicketFiltersMobile filters={filters} onFilterChange={onFilterChange} />
       {/* Results count */}
       {!isLoading && (
         <Text size="sm" c="dimmed" mb="md">
           {tickets.length > 0
-            ? t("tickets:tickets.resultsCount", { count: tickets.length })
+            ? totalCount && totalCount > tickets.length
+              ? t("tickets:tickets.showingResultsCount", {
+                  showing: tickets.length,
+                  total: totalCount,
+                })
+              : t("tickets:tickets.resultsCount", { count: tickets.length })
             : t("tickets:tickets.noResults")}
         </Text>
       )}

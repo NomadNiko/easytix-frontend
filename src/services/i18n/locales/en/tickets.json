@@ -120,6 +120,7 @@
     "notFound": "Ticket not found",
     "empty": "No tickets found",
     "resultsCount": "{{count}} tickets found",
+    "showingResultsCount": "Showing {{showing}} of {{total}} tickets",
     "noResults": "No tickets found",
     "timeline": "Timeline",
     "noHistory": "No history items found",
@@ -157,6 +158,8 @@
     },
     "statuses": {
       "opened": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved",
       "closed": "Closed"
     },
     "priorities": {
@@ -172,14 +175,20 @@
       "reassign": "Reassign",
       "selectUser": "Select user",
       "closeTicket": "Close Ticket",
+      "resolveTicket": "Resolve Ticket",
       "closeTicketModal": "Close Ticket",
+      "resolveTicketModal": "Resolve Ticket",
       "closeTicketDescription": "Please provide closing notes (optional) before closing this ticket. These notes will help document the resolution.",
+      "resolveTicketDescription": "Please provide resolution notes (optional) before resolving this ticket. These notes will help document the resolution.",
       "reopenTicket": "Reopen Ticket",
       "editTicket": "Edit Ticket",
       "addComment": "Add Comment",
       "download": "Download",
       "addAttachment": "Add Attachment",
-      "deleteAttachment": "Delete Attachment"
+      "deleteAttachment": "Delete Attachment",
+      "changeQueue": "Change Queue",
+      "reassignQueue": "Reassign Queue",
+      "reassignQueueDescription": "Select a new queue and category for this ticket. This will move the ticket to a different queue."
     },
     "filters": {
       "title": "Filters",
@@ -187,11 +196,16 @@
       "status": "Status",
       "priority": "Priority",
       "search": "Search",
+      "userFilter": "Filter by Users",
+      "selectUsers": "Select users to filter by",
       "anyQueue": "Any Queue",
       "anyStatus": "Any Status",
       "anyPriority": "Any Priority",
-      "searchPlaceholder": "Search by title or description",
-      "clearFilters": "Clear Filters"
+      "searchPlaceholder": "Search by title, description, or comments",
+      "clearFilters": "Clear Filters",
+      "selectQueue": "Select a queue",
+      "selectCategory": "Select a category",
+      "selectQueueFirst": "Please select a queue first"
     },
     "validation": {
       "queueIdRequired": "Queue is required",

@@ -9,6 +9,8 @@ import { FileEntity } from "../types/file-entity"; // Instead of file.dto
 // Type definitions - Export these enums
 export enum TicketStatus {
   OPENED = "Opened",
+  IN_PROGRESS = "In Progress",
+  RESOLVED = "Resolved",
   CLOSED = "Closed",
 }
 
@@ -40,6 +42,7 @@ export type Ticket = {
 export type TicketsPaginatedResponse = {
   data: Ticket[];
   hasNextPage: boolean;
+  total?: number;
 };
 
 export type TicketStatistics = {
@@ -68,6 +71,7 @@ export type TicketsQueryParams = {
   assignedToId?: string;
   createdById?: string;
   search?: string;
+  userIds?: string[];
 };
 
 export type TicketCreateRequest = {
@@ -80,6 +84,7 @@ export type TicketCreateRequest = {
 };
 
 export type TicketUpdateRequest = {
+  queueId?: string;
   categoryId?: string;
   title?: string;
   details?: string;
@@ -96,6 +101,7 @@ export type TicketAssignRequest = {
 
 export type TicketStatusUpdateRequest = {
   status: TicketStatus;
+  closingNotes?: string;
 };
 
 // Format query params for tickets list endpoint
@@ -112,6 +118,8 @@ const formatTicketsQueryParams = (params: TicketsQueryParams) => {
   if (params.createdById)
     searchParams.append("createdById", params.createdById);
   if (params.search) searchParams.append("search", params.search);
+  if (params.userIds && params.userIds.length > 0)
+    searchParams.append("userIds", params.userIds.join(","));
   return searchParams.toString();
 };
 

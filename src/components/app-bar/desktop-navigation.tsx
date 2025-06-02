@@ -1,7 +1,7 @@
 "use client";
 import { useTranslation } from "@/services/i18n/client";
-import { Group } from "@mantine/core";
-import { Button } from "@mantine/core";
+import { Group, Menu, Button } from "@mantine/core";
+import { IconChevronDown } from "@tabler/icons-react";
 import Link from "@/components/link";
 import { getNavigationConfig, NavigationItem } from "@/config/navigation";
 import useAuth from "@/services/auth/use-auth";
@@ -34,24 +34,64 @@ const DesktopNavigation = ({ onCloseMenu }: DesktopNavigationProps) => {
     return true;
   };
 
+  const renderNavItem = (item: NavigationItem) => {
+    if (item.mobileOnly || !shouldShowItem(item)) return null;
+
+    // If item has children, render as dropdown
+    if (item.children && item.children.length > 0) {
+      const visibleChildren = item.children.filter((child) =>
+        shouldShowItem(child)
+      );
+      if (visibleChildren.length === 0) return null;
+
+      return (
+        <Menu key={item.path} position="bottom-start">
+          <Menu.Target>
+            <Button
+              variant="subtle"
+              size="compact-sm"
+              rightSection={<IconChevronDown size={16} />}
+              data-testid={`nav-dropdown-${item.label.replace(/[^a-zA-Z0-9]/g, "-")}`}
+            >
+              {t(item.label)}
+            </Button>
+          </Menu.Target>
+          <Menu.Dropdown>
+            {visibleChildren.map((child) => (
+              <Menu.Item
+                key={child.path}
+                component={Link}
+                href={child.path}
+                onClick={onCloseMenu}
+                data-testid={`nav-${child.path.replace(/\//g, "-").substring(1)}`}
+              >
+                {t(child.label)}
+              </Menu.Item>
+            ))}
+          </Menu.Dropdown>
+        </Menu>
+      );
+    }
+
+    // Regular navigation item
+    return (
+      <Button
+        key={item.path}
+        onClick={onCloseMenu}
+        variant="subtle"
+        component={Link}
+        href={item.path}
+        size="compact-sm"
+        data-testid={`nav-${item.path.replace(/\//g, "-").substring(1) || "home"}`}
+      >
+        {t(item.label)}
+      </Button>
+    );
+  };
+
   return (
     <Group gap="sm" visibleFrom="sm">
-      {navItems.map((item) => {
-        if (item.mobileOnly || !shouldShowItem(item)) return null;
-        return (
-          <Button
-            key={item.path}
-            onClick={onCloseMenu}
-            variant="subtle"
-            component={Link}
-            href={item.path}
-            size="compact-sm"
-            data-testid={`nav-${item.path.replace(/\//g, "-").substring(1) || "home"}`}
-          >
-            {t(item.label)}
-          </Button>
-        );
-      })}
+      {navItems.map(renderNavItem)}
     </Group>
   );
 };

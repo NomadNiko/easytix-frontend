@@ -24,6 +24,7 @@ import {
   IconCheck,
   IconX,
   IconDeviceFloppy,
+  IconArrowsExchange,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
@@ -39,6 +40,7 @@ import TicketDocumentsSection from "./documents/TicketDocumentsSection";
 import { useGetQueueService } from "@/app/[language]/tickets/queries/queue-queries";
 import { useUpdateTicketMutation } from "@/app/[language]/tickets/queries/ticket-queries";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
+import { ReassignQueueModal } from "./ReassignQueueModal";
 
 interface TicketDetailsProps {
   ticket: Ticket;
@@ -46,6 +48,7 @@ interface TicketDetailsProps {
   onAddComment: (comment: string) => void;
   onAssign: (userId: string) => void;
   onStatusChange: (status: TicketStatus, closingNotes?: string) => void;
+  onReassignQueue?: (queueId: string, categoryId: string) => void;
   users: { id: string; name: string }[];
   categories: { id: string; name: string }[];
   isLoading: boolean;
@@ -57,6 +60,7 @@ export function TicketDetails({
   onAddComment,
   onAssign,
   onStatusChange,
+  onReassignQueue,
   users,
   categories,
   isLoading,
@@ -74,6 +78,9 @@ export function TicketDetails({
   // Closing modal states
   const [showClosingModal, setShowClosingModal] = useState(false);
   const [closingNotes, setClosingNotes] = useState("");
+
+  // Reassign queue modal states
+  const [showReassignModal, setShowReassignModal] = useState(false);
 
   // Field values
   const [selectedUser, setSelectedUser] = useState<string | null>(
@@ -245,6 +252,8 @@ export function TicketDetails({
   const renderStatusBadge = (status: TicketStatus) => {
     const colorMap: Record<TicketStatus, string> = {
       [TicketStatus.OPENED]: "blue",
+      [TicketStatus.IN_PROGRESS]: "yellow",
+      [TicketStatus.RESOLVED]: "green",
       [TicketStatus.CLOSED]: "gray",
     };
     return (
@@ -264,18 +273,24 @@ export function TicketDetails({
   ];
 
   const toggleStatus = () => {
-    if (ticket.status === TicketStatus.OPENED) {
-      // Show modal for closing notes when closing
+    if (
+      ticket.status === TicketStatus.OPENED ||
+      ticket.status === TicketStatus.IN_PROGRESS
+    ) {
+      // Show modal for resolving notes when resolving
       setShowClosingModal(true);
-    } else {
-      // Directly reopen without modal
+    } else if (
+      ticket.status === TicketStatus.RESOLVED ||
+      ticket.status === TicketStatus.CLOSED
+    ) {
+      // Reopen ticket
       onStatusChange(TicketStatus.OPENED);
     }
   };
 
   const handleCloseTicket = () => {
-    // Pass closing notes along with status change
-    onStatusChange(TicketStatus.CLOSED, closingNotes || undefined);
+    // Pass resolving notes along with status change to RESOLVED
+    onStatusChange(TicketStatus.RESOLVED, closingNotes || undefined);
     setShowClosingModal(false);
     setClosingNotes("");
   };
@@ -283,6 +298,18 @@ export function TicketDetails({
   const handleCancelClose = () => {
     setShowClosingModal(false);
     setClosingNotes("");
+  };
+
+  // Reassign queue handlers
+  const handleReassignQueue = (queueId: string, categoryId: string) => {
+    if (onReassignQueue) {
+      onReassignQueue(queueId, categoryId);
+      setShowReassignModal(false);
+    }
+  };
+
+  const handleReassignCancel = () => {
+    setShowReassignModal(false);
   };
 
   if (isLoading) {
@@ -328,6 +355,16 @@ export function TicketDetails({
           )}
           <Group>
             <Button
+              variant="light"
+              color="blue"
+              onClick={() => setShowReassignModal(true)}
+              leftSection={<IconArrowsExchange size={16} />}
+              size="compact-sm"
+              data-testid="change-queue-button"
+            >
+              {t("tickets:tickets.actions.changeQueue")}
+            </Button>
+            <Button
               variant={
                 ticket.status === TicketStatus.OPENED ? "outline" : "filled"
               }
@@ -342,8 +379,9 @@ export function TicketDetails({
               }
               size="compact-sm"
             >
-              {ticket.status === TicketStatus.OPENED
-                ? t("tickets:tickets.actions.closeTicket")
+              {ticket.status === TicketStatus.OPENED ||
+              ticket.status === TicketStatus.IN_PROGRESS
+                ? t("tickets:tickets.actions.resolveTicket")
                 : t("tickets:tickets.actions.reopenTicket")}
             </Button>
           </Group>
@@ -429,6 +467,16 @@ export function TicketDetails({
             </Text>
             {renderStatusBadge(ticket.status)}
           </Box>
+          {ticket.closingNotes && (
+            <Box>
+              <Text fw={500} size="sm" mb="xs">
+                {t("tickets:tickets.fields.closingNotes")}
+              </Text>
+              <Paper p="xs" bg="gray.0" style={{ borderRadius: "4px" }}>
+                <Text size="sm">{ticket.closingNotes}</Text>
+              </Paper>
+            </Box>
+          )}
           <Box>
             <Text fw={500} size="sm" mb="xs">
               {t("tickets:tickets.fields.assignedTo")}
@@ -549,11 +597,11 @@ export function TicketDetails({
         <CommentBox onSubmit={onAddComment} />
       </Paper>
 
-      {/* Closing Notes Modal */}
+      {/* Resolution Notes Modal */}
       <Modal
         opened={showClosingModal}
         onClose={handleCancelClose}
-        title={t("tickets:tickets.actions.closeTicketModal")}
+        title={t("tickets:tickets.actions.resolveTicketModal")}
         centered
         maxWidth="sm"
         actions={[
@@ -565,14 +613,14 @@ export function TicketDetails({
           >
             {t("common:actions.cancel")}
           </Button>,
-          <Button key="close" color="red" onClick={handleCloseTicket}>
-            {t("tickets:tickets.actions.closeTicket")}
+          <Button key="resolve" color="green" onClick={handleCloseTicket}>
+            {t("tickets:tickets.actions.resolveTicket")}
           </Button>,
         ]}
       >
         <Stack>
           <Text size="sm" c="dimmed">
-            {t("tickets:tickets.actions.closeTicketDescription")}
+            {t("tickets:tickets.actions.resolveTicketDescription")}
           </Text>
           <Textarea
             label={t("tickets:tickets.fields.closingNotes")}
@@ -585,6 +633,16 @@ export function TicketDetails({
           />
         </Stack>
       </Modal>
+
+      {/* Reassign Queue Modal */}
+      <ReassignQueueModal
+        opened={showReassignModal}
+        onClose={handleReassignCancel}
+        onConfirm={handleReassignQueue}
+        currentQueueId={ticket.queueId}
+        currentCategoryId={ticket.categoryId}
+        isSubmitting={false}
+      />
     </Stack>
   );
 }

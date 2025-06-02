@@ -8,6 +8,7 @@ import {
   useTicketQuery,
   useAssignTicketMutation,
   useUpdateTicketStatusMutation,
+  useUpdateTicketMutation,
   TicketStatus,
 } from "@/app/[language]/tickets/queries/ticket-queries";
 import {
@@ -44,6 +45,7 @@ function TicketPage() {
     useHistoryItemsByTicketQuery(id);
   const assignTicketMutation = useAssignTicketMutation();
   const updateStatusMutation = useUpdateTicketStatusMutation();
+  const updateTicketMutation = useUpdateTicketMutation();
   const createCommentMutation = useCreateCommentMutation();
   const getUsersService = useGetUsersService();
   const getCategoriesService = useGetCategoriesByQueueService();
@@ -106,6 +108,13 @@ function TicketPage() {
     createCommentMutation.mutate({ ticketId: id, details: comment });
   };
 
+  const handleReassignQueue = (queueId: string, categoryId: string) => {
+    updateTicketMutation.mutate({
+      id,
+      data: { queueId, categoryId },
+    });
+  };
+
   if (isTicketLoading) {
     return (
       <Container size="xl">
@@ -136,6 +145,7 @@ function TicketPage() {
         onAddComment={handleAddComment}
         onAssign={handleAssignTicket}
         onStatusChange={handleStatusChange}
+        onReassignQueue={handleReassignQueue}
         users={users}
         categories={categories}
         isLoading={isTicketLoading || isHistoryLoading}
