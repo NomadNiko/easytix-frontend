@@ -1,0 +1,30 @@
+{
+  "page": {
+    "title": "Board View"
+  },
+  "loading": {
+    "tickets": "Loading tickets..."
+  },
+  "selectQueue": "Select Queue",
+  "selectQueuePlaceholder": "Choose a queue to view",
+  "columns": {
+    "opened": "Opened",
+    "inProgress": "In Progress",
+    "resolved": "Resolved"
+  },
+  "modals": {
+    "assignUser": {
+      "title": "Assign Ticket",
+      "description": "Select a user to assign this ticket to.",
+      "selectUser": "Select User",
+      "userPlaceholder": "Choose a user..."
+    },
+    "closingNotes": {
+      "title": "Resolve Ticket",
+      "description": "Please provide resolution notes for this ticket:",
+      "label": "Resolution Notes",
+      "placeholder": "Enter resolution details...",
+      "confirm": "Resolve Ticket"
+    }
+  }
+}
