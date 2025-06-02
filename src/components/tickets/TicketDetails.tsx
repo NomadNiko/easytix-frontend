@@ -25,6 +25,7 @@ import {
   IconX,
   IconDeviceFloppy,
   IconArrowsExchange,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
@@ -288,9 +289,20 @@ export function TicketDetails({
     }
   };
 
+  const handleCloseResolvedTicket = () => {
+    // Close a resolved ticket
+    setShowClosingModal(true);
+  };
+
   const handleCloseTicket = () => {
-    // Pass resolving notes along with status change to RESOLVED
-    onStatusChange(TicketStatus.RESOLVED, closingNotes || undefined);
+    // Determine the target status based on current status
+    let targetStatus = TicketStatus.RESOLVED;
+    if (ticket.status === TicketStatus.RESOLVED) {
+      targetStatus = TicketStatus.CLOSED;
+    }
+    
+    // Pass closing notes along with status change
+    onStatusChange(targetStatus, closingNotes || undefined);
     setShowClosingModal(false);
     setClosingNotes("");
   };
@@ -364,26 +376,44 @@ export function TicketDetails({
             >
               {t("tickets:tickets.actions.changeQueue")}
             </Button>
-            <Button
-              variant={
-                ticket.status === TicketStatus.OPENED ? "outline" : "filled"
-              }
-              color={ticket.status === TicketStatus.OPENED ? "red" : "blue"}
-              onClick={toggleStatus}
-              leftSection={
-                ticket.status === TicketStatus.OPENED ? (
-                  <IconX size={16} />
-                ) : (
-                  <IconCheck size={16} />
-                )
-              }
-              size="compact-sm"
-            >
-              {ticket.status === TicketStatus.OPENED ||
-              ticket.status === TicketStatus.IN_PROGRESS
-                ? t("tickets:tickets.actions.resolveTicket")
-                : t("tickets:tickets.actions.reopenTicket")}
-            </Button>
+            {/* Resolve/Reopen Button */}
+            {(ticket.status === TicketStatus.OPENED ||
+              ticket.status === TicketStatus.IN_PROGRESS ||
+              ticket.status === TicketStatus.CLOSED) && (
+              <Button
+                variant={
+                  ticket.status === TicketStatus.OPENED ? "outline" : "filled"
+                }
+                color={ticket.status === TicketStatus.OPENED ? "green" : "blue"}
+                onClick={toggleStatus}
+                leftSection={
+                  ticket.status === TicketStatus.CLOSED ? (
+                    <IconRefresh size={16} />
+                  ) : (
+                    <IconCheck size={16} />
+                  )
+                }
+                size="compact-sm"
+              >
+                {ticket.status === TicketStatus.OPENED ||
+                ticket.status === TicketStatus.IN_PROGRESS
+                  ? t("tickets:tickets.actions.resolveTicket")
+                  : t("tickets:tickets.actions.reopenTicket")}
+              </Button>
+            )}
+            
+            {/* Close Button - only show for resolved tickets */}
+            {ticket.status === TicketStatus.RESOLVED && (
+              <Button
+                variant="filled"
+                color="red"
+                onClick={handleCloseResolvedTicket}
+                leftSection={<IconX size={16} />}
+                size="compact-sm"
+              >
+                {t("tickets:tickets.actions.closeTicket")}
+              </Button>
+            )}
           </Group>
         </Group>
         <Group mb="md">
@@ -597,11 +627,15 @@ export function TicketDetails({
         <CommentBox onSubmit={onAddComment} />
       </Paper>
 
-      {/* Resolution Notes Modal */}
+      {/* Resolution/Closing Notes Modal */}
       <Modal
         opened={showClosingModal}
         onClose={handleCancelClose}
-        title={t("tickets:tickets.actions.resolveTicketModal")}
+        title={
+          ticket.status === TicketStatus.RESOLVED
+            ? t("tickets:tickets.actions.closeTicketModal")
+            : t("tickets:tickets.actions.resolveTicketModal")
+        }
         centered
         maxWidth="sm"
         actions={[
@@ -613,14 +647,22 @@ export function TicketDetails({
           >
             {t("common:actions.cancel")}
           </Button>,
-          <Button key="resolve" color="green" onClick={handleCloseTicket}>
-            {t("tickets:tickets.actions.resolveTicket")}
+          <Button 
+            key="confirm" 
+            color={ticket.status === TicketStatus.RESOLVED ? "red" : "green"} 
+            onClick={handleCloseTicket}
+          >
+            {ticket.status === TicketStatus.RESOLVED
+              ? t("tickets:tickets.actions.closeTicket")
+              : t("tickets:tickets.actions.resolveTicket")}
           </Button>,
         ]}
       >
         <Stack>
           <Text size="sm" c="dimmed">
-            {t("tickets:tickets.actions.resolveTicketDescription")}
+            {ticket.status === TicketStatus.RESOLVED
+              ? t("tickets:tickets.actions.closeTicketDescription")
+              : t("tickets:tickets.actions.resolveTicketDescription")}
           </Text>
           <Textarea
             label={t("tickets:tickets.fields.closingNotes")}

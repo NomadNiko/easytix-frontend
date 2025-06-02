@@ -13,9 +13,25 @@ import {
   Badge,
   Grid,
   ActionIcon,
+  Collapse,
+  Paper,
+  useMantineTheme,
+  Box,
+  Divider,
 } from "@mantine/core";
 import { useTranslation } from "@/services/i18n/client";
-import { IconPlus, IconEye, IconCalendar, IconUser } from "@tabler/icons-react";
+import { 
+  IconPlus, 
+  IconEye, 
+  IconCalendar, 
+  IconUser, 
+  IconChevronDown, 
+  IconChevronRight,
+  IconTicket,
+  IconCircleCheck,
+  IconProgress,
+  IconLock
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/services/auth/use-auth";
 import {
@@ -35,7 +51,14 @@ function MyTicketsPage() {
   const router = useRouter();
   const language = useLanguage();
   const { user } = useAuth();
+  const theme = useMantineTheme();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  // Collapse states for each status section
+  const [openedExpanded, setOpenedExpanded] = useState(true);
+  const [inProgressExpanded, setInProgressExpanded] = useState(true);
+  const [resolvedExpanded, setResolvedExpanded] = useState(true);
+  const [closedExpanded, setClosedExpanded] = useState(false);
 
   const createTicketMutation = useCreateTicketMutation();
 
@@ -112,18 +135,42 @@ function MyTicketsPage() {
   };
 
   const renderTicketCard = (ticket: Ticket) => (
-    <Card key={ticket.id} shadow="sm" padding="lg" radius="md" withBorder>
+    <Card 
+      key={ticket.id} 
+      shadow="xs" 
+      padding="md" 
+      radius="md" 
+      withBorder 
+      mb="sm"
+      style={{ 
+        cursor: 'pointer',
+        transition: theme.other.transitions.base,
+      }}
+      onClick={() => handleViewTicket(ticket.id)}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = theme.shadows.md;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = theme.shadows.xs;
+      }}
+    >
       <Stack gap="sm">
         <Group justify="apart" align="flex-start">
-          <div>
+          <div style={{ flex: 1 }}>
             <Group gap="xs" mb="xs">
               <Text size="xs" c="dimmed">
                 #{ticket.id.substring(ticket.id.length - 6)}
               </Text>
-              {renderStatusBadge(ticket.status)}
               {renderPriorityBadge(ticket.priority)}
+              {ticket.category && (
+                <Badge size="xs" color="gray" variant="light">
+                  {ticket.category.name}
+                </Badge>
+              )}
             </Group>
-            <Title order={4} lineClamp={2} mb="xs">
+            <Title order={5} lineClamp={2} mb="xs">
               {ticket.title}
             </Title>
           </div>
@@ -131,28 +178,31 @@ function MyTicketsPage() {
             size="lg"
             variant="light"
             color="blue"
-            onClick={() => handleViewTicket(ticket.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewTicket(ticket.id);
+            }}
           >
             <IconEye size={18} />
           </ActionIcon>
         </Group>
 
-        <Text size="sm" c="dimmed" lineClamp={3}>
+        <Text size="sm" c="dimmed" lineClamp={2}>
           {ticket.details}
         </Text>
 
-        <Group gap="md" mt="sm">
-          <Group gap="xs">
-            <IconCalendar size={14} />
+        <Group gap="lg" mt="xs">
+          <Group gap={theme.other.spacing[4]}>
+            <IconCalendar size={theme.other.iconSizes.sm} stroke={1.5} />
             <Text size="xs" c="dimmed">
               {formatDate(new Date(ticket.createdAt))}
             </Text>
           </Group>
           {ticket.assignedToId && (
-            <Group gap="xs">
-              <IconUser size={14} />
+            <Group gap={theme.other.spacing[4]}>
+              <IconUser size={theme.other.iconSizes.sm} stroke={1.5} />
               <Text size="xs" c="dimmed">
-                {t("tickets:tickets.fields.assignedTo")}: Assigned
+                {t("tickets:tickets.fields.assignedTo")}
               </Text>
             </Group>
           )}
@@ -161,17 +211,71 @@ function MyTicketsPage() {
     </Card>
   );
 
-  // Separate tickets by status (from actual data)
-  const openTickets = tickets.filter(
+  // Separate tickets by status
+  const openedTickets = tickets.filter(
     (ticket) => ticket.status === TicketStatus.OPENED
+  );
+  const inProgressTickets = tickets.filter(
+    (ticket) => ticket.status === TicketStatus.IN_PROGRESS
+  );
+  const resolvedTickets = tickets.filter(
+    (ticket) => ticket.status === TicketStatus.RESOLVED
   );
   const closedTickets = tickets.filter(
     (ticket) => ticket.status === TicketStatus.CLOSED
   );
 
-  // Use statistics for accurate counts (fallback to filtered counts if stats unavailable)
-  const openCount = statistics?.open ?? openTickets.length;
-  const closedCount = statistics?.closed ?? closedTickets.length;
+  // Status section component
+  const StatusSection = ({ 
+    title, 
+    tickets, 
+    expanded, 
+    onToggle, 
+    color, 
+    icon 
+  }: { 
+    title: string;
+    tickets: Ticket[];
+    expanded: boolean;
+    onToggle: () => void;
+    color: string;
+    icon: React.ReactNode;
+  }) => {
+    if (tickets.length === 0) return null;
+
+    return (
+      <Paper withBorder radius="md" p="md" mb="lg">
+        <Group 
+          justify="apart" 
+          mb={expanded ? "md" : undefined}
+          style={{ cursor: 'pointer' }}
+          onClick={onToggle}
+        >
+          <Group>
+            <ActionIcon variant="transparent" size="sm">
+              {expanded ? <IconChevronDown size={20} /> : <IconChevronRight size={20} />}
+            </ActionIcon>
+            <Group gap="xs">
+              {icon}
+              <Title order={4} c={color}>
+                {title}
+              </Title>
+              <Badge color={color} variant="light" size="lg">
+                {tickets.length}
+              </Badge>
+            </Group>
+          </Group>
+        </Group>
+        
+        <Collapse in={expanded}>
+          <Divider mb="md" />
+          <Stack gap="xs">
+            {tickets.map(renderTicketCard)}
+          </Stack>
+        </Collapse>
+      </Paper>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -182,6 +286,9 @@ function MyTicketsPage() {
       </Container>
     );
   }
+
+  const totalTickets = tickets.length;
+  const activeTickets = openedTickets.length + inProgressTickets.length + resolvedTickets.length;
 
   return (
     <Container size="lg">
@@ -203,51 +310,109 @@ function MyTicketsPage() {
 
       {/* Summary Cards */}
       <Grid mb="xl">
-        <Grid.Col span={{ base: 12, sm: 6 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
           <Card withBorder padding="lg" radius="md">
-            <Text size="sm" c="dimmed">
-              {t("tickets:myTickets.openTickets")}
-            </Text>
-            <Text size="xl" fw={700} c="blue">
-              {openCount}
-            </Text>
+            <Group justify="apart">
+              <div>
+                <Text size="sm" c="dimmed">
+                  Total Tickets
+                </Text>
+                <Text size="xl" fw={700}>
+                  {totalTickets}
+                </Text>
+              </div>
+              <IconTicket size={32} color={theme.colors.blue[6]} />
+            </Group>
           </Card>
         </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6 }}>
+        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
           <Card withBorder padding="lg" radius="md">
-            <Text size="sm" c="dimmed">
-              {t("tickets:myTickets.closedTickets")}
-            </Text>
-            <Text size="xl" fw={700} c="gray">
-              {closedCount}
-            </Text>
+            <Group justify="apart">
+              <div>
+                <Text size="sm" c="dimmed">
+                  Active
+                </Text>
+                <Text size="xl" fw={700} c="blue">
+                  {activeTickets}
+                </Text>
+              </div>
+              <IconProgress size={32} color={theme.colors.blue[6]} />
+            </Group>
+          </Card>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+          <Card withBorder padding="lg" radius="md">
+            <Group justify="apart">
+              <div>
+                <Text size="sm" c="dimmed">
+                  Resolved
+                </Text>
+                <Text size="xl" fw={700} c="green">
+                  {resolvedTickets.length}
+                </Text>
+              </div>
+              <IconCircleCheck size={32} color={theme.colors.green[6]} />
+            </Group>
+          </Card>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
+          <Card withBorder padding="lg" radius="md">
+            <Group justify="apart">
+              <div>
+                <Text size="sm" c="dimmed">
+                  Closed
+                </Text>
+                <Text size="xl" fw={700} c="gray">
+                  {closedTickets.length}
+                </Text>
+              </div>
+              <IconLock size={32} color={theme.colors.gray[6]} />
+            </Group>
           </Card>
         </Grid.Col>
       </Grid>
 
-      {/* Open Tickets Section */}
-      {openTickets.length > 0 && (
-        <Stack gap="md" mb="xl">
-          <Title order={3} c="blue">
-            {t("tickets:myTickets.openTickets")}
-          </Title>
-          <Stack gap="md">{openTickets.map(renderTicketCard)}</Stack>
-        </Stack>
-      )}
+      {/* Status Sections */}
+      <StatusSection
+        title={t("tickets:tickets.statuses.opened")}
+        tickets={openedTickets}
+        expanded={openedExpanded}
+        onToggle={() => setOpenedExpanded(!openedExpanded)}
+        color="blue"
+        icon={<IconTicket size={20} color={theme.colors.blue[6]} />}
+      />
 
-      {/* Closed Tickets Section */}
-      {closedTickets.length > 0 && (
-        <Stack gap="md">
-          <Title order={3} c="gray">
-            {t("tickets:myTickets.closedTickets")}
-          </Title>
-          <Stack gap="md">{closedTickets.map(renderTicketCard)}</Stack>
-        </Stack>
-      )}
+      <StatusSection
+        title={t("tickets:tickets.statuses.inProgress")}
+        tickets={inProgressTickets}
+        expanded={inProgressExpanded}
+        onToggle={() => setInProgressExpanded(!inProgressExpanded)}
+        color="yellow"
+        icon={<IconProgress size={20} color={theme.colors.yellow[6]} />}
+      />
+
+      <StatusSection
+        title={t("tickets:tickets.statuses.resolved")}
+        tickets={resolvedTickets}
+        expanded={resolvedExpanded}
+        onToggle={() => setResolvedExpanded(!resolvedExpanded)}
+        color="green"
+        icon={<IconCircleCheck size={20} color={theme.colors.green[6]} />}
+      />
+
+      <StatusSection
+        title={t("tickets:tickets.statuses.closed")}
+        tickets={closedTickets}
+        expanded={closedExpanded}
+        onToggle={() => setClosedExpanded(!closedExpanded)}
+        color="gray"
+        icon={<IconLock size={20} color={theme.colors.gray[6]} />}
+      />
 
       {/* Empty State */}
       {tickets && tickets.length === 0 && (
         <Card withBorder p="xl" radius="md" ta="center">
+          <IconTicket size={48} color={theme.colors.gray[4]} style={{ marginBottom: theme.spacing.md }} />
           <Text fw={500} mb="sm">
             {t("tickets:myTickets.empty")}
           </Text>
