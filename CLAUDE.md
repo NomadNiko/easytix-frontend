@@ -64,6 +64,62 @@
 - **COMPLETED**: Frontend changes deployed and tested
 - All improvements are now live at https://etdev.nomadsoft.us
 
+## New Views - Timeline and Board (January 2025)
+
+### Timeline View
+
+- **URL**: https://etdev.nomadsoft.us/en/timeline
+- **Features**:
+  - Calendar/timeline visualization with date columns
+  - Queue tabs for filtering
+  - Ticket blocks showing duration from open to close date
+  - Color coding by status (red=open, green=closed)
+  - Click on tickets to view/edit details
+  - Drag-and-drop functionality (abandoned space-efficient layout)
+  - Admin and Service Desk only
+
+### Board View
+
+- **URL**: https://etdev.nomadsoft.us/en/board
+- **Features**:
+  - Kanban-style board with three columns:
+    - Unassigned (open tickets without assignee)
+    - Open Assigned (open tickets with assignee)
+    - Recently Resolved (closed in last 7 days)
+  - Drag-and-drop between columns
+  - Dragging to Assigned column shows user assignment modal
+  - Dragging to Resolved column shows closing notes modal
+  - Queue selector for filtering
+  - Admin and Service Desk only
+
+### Closing Notes Enhancement
+
+- Added closing notes field to ticket close workflow
+- Closing notes are saved to ticket history with timestamp
+- Closing notes are displayed in ticket details view
+- Backend updated to accept closing notes in status update endpoint
+
+### Key Implementation Files
+
+**Timeline View**:
+
+- `/var/www/easytix-frontend/src/app/[language]/timeline/` - Route pages
+- `/var/www/easytix-frontend/src/components/timeline/` - Timeline components
+- Uses @dnd-kit/core for drag-and-drop
+
+**Board View**:
+
+- `/var/www/easytix-frontend/src/app/[language]/board/` - Route pages
+- `/var/www/easytix-frontend/src/components/board/` - Board components
+- Dynamic imports for API services to avoid hook call issues
+- Proper API parameter structure for assign and status endpoints
+
+**Backend Updates**:
+
+- `/var/www/easytix-backend/src/tickets/tickets.controller.ts` - Added closingNotes to updateStatus
+- `/var/www/easytix-backend/src/tickets/tickets.service.ts` - Includes closing notes in history
+- `/var/www/easytix-backend/src/tickets/domain/ticket.ts` - Added closingNotes field
+
 ## Latest Enhancement - Improved Ticket Search and Analytics (December 2024)
 
 ### Enhanced Backend API Endpoints
@@ -272,6 +328,86 @@ export enum RoleEnum {
 
 - **UserTicketsModal**: `/var/www/easytix-frontend/src/components/users/UserTicketsModal.tsx`
 - **Tickets API**: `/var/www/easytix-frontend/src/services/api/services/tickets.ts`
+
+## Board View Implementation Fix & Status System Update (January 2025)
+
+### Board View Fix
+
+The Board view at `/en/board` was fixed with the following changes:
+
+1. **Fixed imports in BoardView.tsx**:
+
+   - Changed from dynamic imports to proper static imports for API services
+   - Added all necessary hooks at component level: `useAssignTicketService`, `useUpdateTicketStatusService`, `useUpdateTicketService`
+
+2. **Refactored data fetching**:
+
+   - Created reusable `fetchTickets` function with `useCallback`
+   - Ensured proper dependency arrays for effects
+
+3. **Fixed event handlers**:
+   - `handleAssignUser`: Now uses properly imported service
+   - `handleCloseTicket`: Now uses properly imported service
+   - `handleDragEnd`: Fixed unassign functionality using `updateTicketService` with `assignedToId: null`
+
+### New Ticket Status System
+
+Added two new ticket statuses to improve workflow tracking:
+
+1. **In-Progress** - Automatically set when a ticket is assigned to a user
+2. **Resolved** - Used instead of directly closing tickets, allows for review before final closure
+
+#### Status Flow:
+
+- **Opened** → **In-Progress** (when assigned)
+- **In-Progress** → **Resolved** (when work is complete)
+- **Resolved** → **Closed** (after review/verification)
+- Any status → **Opened** (when reopening)
+
+#### Board View Changes:
+
+The Board now shows three columns:
+
+- **Opened**: Unassigned tickets waiting for assignment
+- **In Progress**: Tickets currently being worked on
+- **Resolved**: Tickets that have been resolved (not closed)
+
+#### Backend Changes:
+
+- Updated `TicketStatus` enum in `/var/www/easytix-backend/src/tickets/domain/ticket.ts`
+- Modified `assign` method to automatically set status to IN_PROGRESS
+- Updated `updateStatus` method to handle all four statuses
+- Updated history tracking and notifications for new statuses
+
+#### Frontend Changes:
+
+- Updated `TicketStatus` enum in `/var/www/easytix-frontend/src/services/api/services/tickets.ts`
+- Updated all status badge rendering functions to include new status colors:
+  - Opened: blue
+  - In Progress: yellow
+  - Resolved: green
+  - Closed: gray
+- Updated Board view to use new column structure
+- Updated TicketDetails to show "Resolve" instead of "Close" for active tickets
+- Updated translations for new statuses
+
+### Files Modified
+
+**Backend:**
+
+- `/var/www/easytix-backend/src/tickets/domain/ticket.ts` - Added new statuses
+- `/var/www/easytix-backend/src/tickets/tickets.service.ts` - Updated assign and status logic
+
+**Frontend:**
+
+- `/var/www/easytix-frontend/src/services/api/services/tickets.ts` - Added new statuses
+- `/var/www/easytix-frontend/src/components/board/BoardView.tsx` - Fixed and refactored for new statuses
+- `/var/www/easytix-frontend/src/components/tickets/TicketList.tsx` - Updated status badges
+- `/var/www/easytix-frontend/src/components/tickets/TicketDetails.tsx` - Updated status logic
+- `/var/www/easytix-frontend/src/components/tickets/TicketListMobile.tsx` - Updated status badges
+- `/var/www/easytix-frontend/src/app/[language]/my-tickets/page-content.tsx` - Updated status badges
+- `/var/www/easytix-frontend/src/services/i18n/locales/en/board.json` - Updated translations
+- `/var/www/easytix-frontend/src/services/i18n/locales/en/tickets.json` - Added new status translations
 
 ## Final Steps After Any Development Work
 
