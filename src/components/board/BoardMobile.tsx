@@ -22,6 +22,7 @@ import {
   IconArrowsExchange,
   IconDots,
   IconPlayerPlay,
+  IconX,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { AssignUserModal } from "./AssignUserModal";
@@ -273,8 +274,26 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
       );
     }
 
-    // More actions menu
-    if (ticket.assignedToId || ticket.status !== "Resolved") {
+    if (ticket.status === "Resolved") {
+      actions.push(
+        <Button
+          key="close"
+          leftSection={<IconX size={16} />}
+          variant="light"
+          color="red"
+          size="xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleResolveTicket(ticket); // This will close the ticket
+          }}
+        >
+          Close
+        </Button>
+      );
+    }
+
+    // More actions menu - always show for additional actions
+    if (ticket.status !== "Closed") {
       actions.push(
         <Menu key="more" position="bottom-end">
           <Menu.Target>

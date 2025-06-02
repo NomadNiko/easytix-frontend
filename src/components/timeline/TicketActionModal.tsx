@@ -27,6 +27,7 @@ import {
   IconStatusChange,
   IconUserPlus,
   IconFile,
+  IconCheck,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { useRouter } from "next/navigation";
@@ -146,9 +147,13 @@ export function TicketActionModal({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "OPENED":
-        return ticket.assignedToId ? "blue" : "red";
-      case "CLOSED":
+      case "Opened":
+        return "blue";
+      case "In Progress":
+        return "yellow";
+      case "Resolved":
+        return "green";
+      case "Closed":
         return "gray";
       default:
         return "gray";
@@ -259,11 +264,7 @@ export function TicketActionModal({
                   variant="filled"
                   size="sm"
                 >
-                  {ticket.status === "Opened"
-                    ? ticket.assignedToId
-                      ? t("timeline:status.assigned")
-                      : t("timeline:status.unassigned")
-                    : t("timeline:status.closed")}
+                  {ticket.status}
                 </Badge>
 
                 <Badge
@@ -358,23 +359,42 @@ export function TicketActionModal({
               </Button>
             </Group>
 
-            <Button
-              leftSection={
-                ticket.status === "Closed" ? (
-                  <IconLockOpen size={16} />
-                ) : (
-                  <IconLock size={16} />
-                )
-              }
-              variant="light"
-              color={ticket.status === "Closed" ? "green" : "red"}
-              onClick={handleStatusChange}
-              fullWidth
-            >
-              {ticket.status === "Closed"
-                ? t("timeline:actions.reopenTicket")
-                : t("timeline:actions.closeTicket")}
-            </Button>
+            {/* Status action buttons based on current status */}
+            {(ticket.status === "Opened" || ticket.status === "In Progress") && (
+              <Button
+                leftSection={<IconCheck size={16} />}
+                variant="light"
+                color="green"
+                onClick={handleStatusChange}
+                fullWidth
+              >
+                {t("timeline:actions.resolveTicket")}
+              </Button>
+            )}
+            
+            {ticket.status === "Resolved" && (
+              <Button
+                leftSection={<IconLock size={16} />}
+                variant="light"
+                color="red"
+                onClick={handleStatusChange}
+                fullWidth
+              >
+                {t("timeline:actions.closeTicket")}
+              </Button>
+            )}
+            
+            {(ticket.status === "Resolved" || ticket.status === "Closed") && (
+              <Button
+                leftSection={<IconLockOpen size={16} />}
+                variant="light"
+                color="blue"
+                onClick={handleStatusChange}
+                fullWidth
+              >
+                {t("timeline:actions.reopenTicket")}
+              </Button>
+            )}
           </Stack>
 
           {/* Ticket History */}

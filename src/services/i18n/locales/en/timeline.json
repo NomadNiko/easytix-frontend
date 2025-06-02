@@ -38,6 +38,7 @@
     "assign": "Assign",
     "reassign": "Reassign",
     "changeQueue": "Change Queue",
+    "resolveTicket": "Resolve Ticket",
     "closeTicket": "Close Ticket",
     "reopenTicket": "Reopen Ticket"
   },

@@ -53,7 +53,6 @@ export function ClosingNotesModal({
           value={closingNotes}
           onChange={(event) => setClosingNotes(event.currentTarget.value)}
           rows={4}
-          required
           data-autofocus
         />
 
@@ -61,7 +60,7 @@ export function ClosingNotesModal({
           <Button variant="light" onClick={handleCancel}>
             {t("common:actions.cancel")}
           </Button>
-          <Button onClick={handleConfirm} disabled={!closingNotes.trim()}>
+          <Button onClick={handleConfirm}>
             {t("board:modals.closingNotes.confirm")}
           </Button>
         </Group>
