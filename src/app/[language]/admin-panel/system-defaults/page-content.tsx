@@ -75,10 +75,32 @@ export default function SystemDefaultsPageContent() {
       ? queuesResponse.data.find((q) => q.customId === selectedQueueId)
       : null;
 
+  // Get the default queue object for loading its categories
+  const defaultQueueCustomId =
+    currentDefaultQueue &&
+    "data" in currentDefaultQueue &&
+    currentDefaultQueue.data &&
+    "queueId" in currentDefaultQueue.data
+      ? currentDefaultQueue.data.queueId
+      : null;
+  const defaultQueue =
+    queuesResponse &&
+    "data" in queuesResponse &&
+    Array.isArray(queuesResponse.data)
+      ? queuesResponse.data.find((q) => q.customId === defaultQueueCustomId)
+      : null;
+
   const { data: categoriesResponse, isLoading: loadingCategories } = useQuery({
     queryKey: ["categories", selectedQueue?.id],
     queryFn: () => getCategoriesByQueue({ queueId: selectedQueue!.id }),
     enabled: !!selectedQueue?.id,
+  });
+
+  // Load categories for the default queue to show proper category name
+  const { data: defaultCategoriesResponse } = useQuery({
+    queryKey: ["default-categories", defaultQueue?.id],
+    queryFn: () => getCategoriesByQueue({ queueId: defaultQueue!.id }),
+    enabled: !!defaultQueue?.id,
   });
 
   // Mutations
@@ -183,7 +205,36 @@ export default function SystemDefaultsPageContent() {
     ) {
       return "Not configured";
     }
-    // We need to find the category by ID across all queues
+
+    // Try to find the category name from the default queue's categories first
+    if (
+      defaultCategoriesResponse &&
+      "data" in defaultCategoriesResponse &&
+      Array.isArray(defaultCategoriesResponse.data)
+    ) {
+      const category = defaultCategoriesResponse.data.find(
+        (cat) => cat.customId === categoryData.categoryId
+      );
+      if (category) {
+        return category.name;
+      }
+    }
+
+    // Fallback to currently selected categories if available
+    if (
+      categoriesResponse &&
+      "data" in categoriesResponse &&
+      Array.isArray(categoriesResponse.data)
+    ) {
+      const category = categoriesResponse.data.find(
+        (cat) => cat.customId === categoryData.categoryId
+      );
+      if (category) {
+        return category.name;
+      }
+    }
+
+    // Fallback to showing the ID if we can't find the name
     return `Category ID: ${categoryData.categoryId}`;
   };
 
