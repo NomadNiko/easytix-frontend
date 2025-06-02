@@ -130,9 +130,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
             <IconGripVertical
               size={theme.other.iconSizes.md}
               style={{
-                color: isDark
-                  ? theme.colors.gray[4]
-                  : theme.colors.gray[5],
+                color: isDark ? theme.colors.gray[4] : theme.colors.gray[5],
               }}
             />
           </Box>
@@ -166,11 +164,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
           <Group gap="xs">
             <IconUser
               size={theme.other.iconSizes.sm}
-              color={
-                isDark
-                  ? theme.colors.gray[4]
-                  : theme.colors.gray[6]
-              }
+              color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">
               {creatorName || "Loading..."}
@@ -179,11 +173,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
           <Group gap="xs">
             <IconCalendar
               size={theme.other.iconSizes.sm}
-              color={
-                isDark
-                  ? theme.colors.gray[4]
-                  : theme.colors.gray[6]
-              }
+              color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">
               {formatDate(new Date(ticket.createdAt))}

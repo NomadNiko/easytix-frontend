@@ -1,6 +1,13 @@
 // src/components/tickets/FilePicker.tsx
 import React, { useState } from "react";
-import { Button, Text, Group, Box, Paper, useMantineTheme } from "@mantine/core";
+import {
+  Button,
+  Text,
+  Group,
+  Box,
+  Paper,
+  useMantineTheme,
+} from "@mantine/core";
 import { IconUpload, IconFile, IconX } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { useFileGeneralUploadService } from "@/services/api/services/files-general";
@@ -96,7 +103,9 @@ export function FilePicker({
               disabled={disabled}
               size="sm"
             >
-              {isLoading ? t("common:loading") : t("formInputs.filePicker.selectFile")}
+              {isLoading
+                ? t("common:loading")
+                : t("formInputs.filePicker.selectFile")}
               <input
                 type="file"
                 style={{ display: "none" }}

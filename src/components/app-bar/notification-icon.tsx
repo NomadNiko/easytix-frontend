@@ -99,7 +99,11 @@ const NotificationIcon = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 minWidth:
-                  unreadCount > 99 ? theme.other.spacing[24] : unreadCount > 9 ? theme.other.spacing[20] : theme.other.spacing[16],
+                  unreadCount > 99
+                    ? theme.other.spacing[24]
+                    : unreadCount > 9
+                      ? theme.other.spacing[20]
+                      : theme.other.spacing[16],
                 height: theme.other.spacing[20],
                 lineHeight: 1,
                 paddingTop: theme.other.spacing[2],

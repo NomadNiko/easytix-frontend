@@ -37,6 +37,12 @@ import { useGetHistoryItemsByTicketService } from "@/services/api/services/histo
 import { useGetUserService } from "@/services/api/services/users";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { User } from "@/services/api/types/user";
+import {
+  useUpdateTicketStatusService,
+  TicketStatus,
+} from "@/services/api/services/tickets";
+import { Modal as ClosingModal } from "@/components/mantine/feedback/Modal";
+import { Textarea } from "@mantine/core";
 
 interface Ticket {
   id: string;
@@ -76,12 +82,15 @@ export function TicketActionModal({
   const router = useRouter();
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const [showClosingModal, setShowClosingModal] = useState(false);
+  const [closingNotes, setClosingNotes] = useState("");
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [users, setUsers] = useState<Record<string, User>>({});
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const getHistoryItemsByTicketService = useGetHistoryItemsByTicketService();
   const getUserService = useGetUserService();
+  const updateTicketStatusService = useUpdateTicketStatusService();
 
   // Fetch ticket history when modal opens
   useEffect(() => {
@@ -192,10 +201,46 @@ export function TicketActionModal({
     setShowReassignModal(true);
   };
 
-  const handleStatusChange = () => {
-    // Navigate to ticket page for status change
-    router.push(`/tickets/${ticket.id}?action=status`);
-    onClose();
+  const handleResolveTicket = () => {
+    setShowClosingModal(true);
+  };
+
+  const handleCloseTicket = () => {
+    setShowClosingModal(true);
+  };
+
+  const handleReopenTicket = async () => {
+    try {
+      await updateTicketStatusService(
+        { status: TicketStatus.OPENED },
+        { id: ticket.id }
+      );
+      router.push(`/tickets/${ticket.id}`);
+      onClose();
+    } catch (error) {
+      console.error("Error reopening ticket:", error);
+    }
+  };
+
+  const handleConfirmStatusChange = async () => {
+    try {
+      let targetStatus = TicketStatus.RESOLVED;
+      if (ticket.status === "Resolved") {
+        targetStatus = TicketStatus.CLOSED;
+      }
+
+      await updateTicketStatusService(
+        { status: targetStatus, closingNotes: closingNotes || undefined },
+        { id: ticket.id }
+      );
+
+      setShowClosingModal(false);
+      setClosingNotes("");
+      router.push(`/tickets/${ticket.id}`);
+      onClose();
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+    }
   };
 
   const handleCommentSubmitted = () => {
@@ -360,36 +405,37 @@ export function TicketActionModal({
             </Group>
 
             {/* Status action buttons based on current status */}
-            {(ticket.status === "Opened" || ticket.status === "In Progress") && (
+            {(ticket.status === "Opened" ||
+              ticket.status === "In Progress") && (
               <Button
                 leftSection={<IconCheck size={16} />}
                 variant="light"
                 color="green"
-                onClick={handleStatusChange}
+                onClick={handleResolveTicket}
                 fullWidth
               >
                 {t("timeline:actions.resolveTicket")}
               </Button>
             )}
-            
+
             {ticket.status === "Resolved" && (
               <Button
                 leftSection={<IconLock size={16} />}
                 variant="light"
                 color="red"
-                onClick={handleStatusChange}
+                onClick={handleCloseTicket}
                 fullWidth
               >
                 {t("timeline:actions.closeTicket")}
               </Button>
             )}
-            
+
             {(ticket.status === "Resolved" || ticket.status === "Closed") && (
               <Button
                 leftSection={<IconLockOpen size={16} />}
                 variant="light"
                 color="blue"
-                onClick={handleStatusChange}
+                onClick={handleReopenTicket}
                 fullWidth
               >
                 {t("timeline:actions.reopenTicket")}
@@ -472,6 +518,61 @@ export function TicketActionModal({
         currentQueueId={ticket.queueId}
         currentCategoryId={ticket.categoryId}
       />
+
+      {/* Closing/Resolution Modal */}
+      <ClosingModal
+        opened={showClosingModal}
+        onClose={() => {
+          setShowClosingModal(false);
+          setClosingNotes("");
+        }}
+        title={
+          ticket.status === "Resolved"
+            ? t("timeline:modal.closeTicket")
+            : t("timeline:modal.resolveTicket")
+        }
+        centered
+        maxWidth="md"
+        actions={[
+          <Button
+            key="cancel"
+            variant="light"
+            color="gray"
+            onClick={() => {
+              setShowClosingModal(false);
+              setClosingNotes("");
+            }}
+          >
+            {t("common:actions.cancel")}
+          </Button>,
+          <Button
+            key="confirm"
+            color={ticket.status === "Resolved" ? "red" : "green"}
+            onClick={handleConfirmStatusChange}
+          >
+            {ticket.status === "Resolved"
+              ? t("timeline:actions.closeTicket")
+              : t("timeline:actions.resolveTicket")}
+          </Button>,
+        ]}
+      >
+        <Stack>
+          <Text size="sm" c="dimmed">
+            {ticket.status === "Resolved"
+              ? t("timeline:modal.closeDescription")
+              : t("timeline:modal.resolveDescription")}
+          </Text>
+          <Textarea
+            label={t("timeline:modal.notesLabel")}
+            placeholder={t("timeline:modal.notesPlaceholder")}
+            value={closingNotes}
+            onChange={(event) => setClosingNotes(event.currentTarget.value)}
+            minRows={3}
+            maxRows={6}
+            autosize
+          />
+        </Stack>
+      </ClosingModal>
     </>
   );
 }

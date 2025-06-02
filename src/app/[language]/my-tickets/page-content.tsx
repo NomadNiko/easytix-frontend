@@ -16,21 +16,20 @@ import {
   Collapse,
   Paper,
   useMantineTheme,
-  Box,
   Divider,
 } from "@mantine/core";
 import { useTranslation } from "@/services/i18n/client";
-import { 
-  IconPlus, 
-  IconEye, 
-  IconCalendar, 
-  IconUser, 
-  IconChevronDown, 
+import {
+  IconPlus,
+  IconEye,
+  IconCalendar,
+  IconUser,
+  IconChevronDown,
   IconChevronRight,
   IconTicket,
   IconCircleCheck,
   IconProgress,
-  IconLock
+  IconLock,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/services/auth/use-auth";
@@ -53,7 +52,7 @@ function MyTicketsPage() {
   const { user } = useAuth();
   const theme = useMantineTheme();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  
+
   // Collapse states for each status section
   const [openedExpanded, setOpenedExpanded] = useState(true);
   const [inProgressExpanded, setInProgressExpanded] = useState(true);
@@ -68,10 +67,9 @@ function MyTicketsPage() {
   });
 
   // Get accurate statistics for user's tickets
-  const { data: statistics, isLoading: statsLoading } =
-    useTicketStatisticsQuery({
-      createdById: user?.id?.toString(),
-    });
+  const { isLoading: statsLoading } = useTicketStatisticsQuery({
+    createdById: user?.id?.toString(),
+  });
 
   const isLoading = ticketsLoading || statsLoading;
 
@@ -118,41 +116,25 @@ function MyTicketsPage() {
     );
   };
 
-  const renderStatusBadge = (status: TicketStatus) => {
-    const colorMap: Record<TicketStatus, string> = {
-      [TicketStatus.OPENED]: "blue",
-      [TicketStatus.IN_PROGRESS]: "yellow",
-      [TicketStatus.RESOLVED]: "green",
-      [TicketStatus.CLOSED]: "gray",
-    };
-
-    const statusKey = status.toLowerCase().replace(" ", "");
-    return (
-      <Badge color={colorMap[status]} size="sm" variant="filled">
-        {t(`tickets:tickets.statuses.${statusKey}`)}
-      </Badge>
-    );
-  };
-
   const renderTicketCard = (ticket: Ticket) => (
-    <Card 
-      key={ticket.id} 
-      shadow="xs" 
-      padding="md" 
-      radius="md" 
-      withBorder 
+    <Card
+      key={ticket.id}
+      shadow="xs"
+      padding="md"
+      radius="md"
+      withBorder
       mb="sm"
-      style={{ 
-        cursor: 'pointer',
+      style={{
+        cursor: "pointer",
         transition: theme.other.transitions.base,
       }}
       onClick={() => handleViewTicket(ticket.id)}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.transform = "translateY(-2px)";
         e.currentTarget.style.boxShadow = theme.shadows.md;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow = theme.shadows.xs;
       }}
     >
@@ -226,14 +208,14 @@ function MyTicketsPage() {
   );
 
   // Status section component
-  const StatusSection = ({ 
-    title, 
-    tickets, 
-    expanded, 
-    onToggle, 
-    color, 
-    icon 
-  }: { 
+  const StatusSection = ({
+    title,
+    tickets,
+    expanded,
+    onToggle,
+    color,
+    icon,
+  }: {
     title: string;
     tickets: Ticket[];
     expanded: boolean;
@@ -245,15 +227,19 @@ function MyTicketsPage() {
 
     return (
       <Paper withBorder radius="md" p="md" mb="lg">
-        <Group 
-          justify="apart" 
+        <Group
+          justify="apart"
           mb={expanded ? "md" : undefined}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
           onClick={onToggle}
         >
           <Group>
             <ActionIcon variant="transparent" size="sm">
-              {expanded ? <IconChevronDown size={20} /> : <IconChevronRight size={20} />}
+              {expanded ? (
+                <IconChevronDown size={20} />
+              ) : (
+                <IconChevronRight size={20} />
+              )}
             </ActionIcon>
             <Group gap="xs">
               {icon}
@@ -266,12 +252,10 @@ function MyTicketsPage() {
             </Group>
           </Group>
         </Group>
-        
+
         <Collapse in={expanded}>
           <Divider mb="md" />
-          <Stack gap="xs">
-            {tickets.map(renderTicketCard)}
-          </Stack>
+          <Stack gap="xs">{tickets.map(renderTicketCard)}</Stack>
         </Collapse>
       </Paper>
     );
@@ -288,7 +272,8 @@ function MyTicketsPage() {
   }
 
   const totalTickets = tickets.length;
-  const activeTickets = openedTickets.length + inProgressTickets.length + resolvedTickets.length;
+  const activeTickets =
+    openedTickets.length + inProgressTickets.length + resolvedTickets.length;
 
   return (
     <Container size="lg">
@@ -412,7 +397,11 @@ function MyTicketsPage() {
       {/* Empty State */}
       {tickets && tickets.length === 0 && (
         <Card withBorder p="xl" radius="md" ta="center">
-          <IconTicket size={48} color={theme.colors.gray[4]} style={{ marginBottom: theme.spacing.md }} />
+          <IconTicket
+            size={48}
+            color={theme.colors.gray[4]}
+            style={{ marginBottom: theme.spacing.md }}
+          />
           <Text fw={500} mb="sm">
             {t("tickets:myTickets.empty")}
           </Text>

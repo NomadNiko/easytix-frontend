@@ -1,6 +1,12 @@
 // src/components/app-bar/index.tsx
 "use client";
-import { AppShell, Burger, Group, Container, useMantineTheme } from "@mantine/core";
+import {
+  AppShell,
+  Burger,
+  Group,
+  Container,
+  useMantineTheme,
+} from "@mantine/core";
 import { useState } from "react";
 import { SwitchThemeButton } from "@/components/theme/SwitchThemeButton";
 import Logo from "./logo";

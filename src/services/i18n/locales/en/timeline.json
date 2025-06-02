@@ -30,7 +30,13 @@
   "modal": {
     "title": "Manage Ticket",
     "actions": "Quick Actions",
-    "addComment": "Add Comment"
+    "addComment": "Add Comment",
+    "resolveTicket": "Resolve Ticket",
+    "closeTicket": "Close Ticket",
+    "resolveDescription": "Please provide resolution notes (optional) before resolving this ticket.",
+    "closeDescription": "Please provide closing notes (optional) before closing this ticket.",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Enter notes (optional)..."
   },
   "actions": {
     "viewTicket": "View Details",

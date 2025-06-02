@@ -168,11 +168,7 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
           <Group gap="xs" wrap="nowrap">
             <IconUser
               size={theme.other.iconSizes.xs}
-              color={
-                isDark
-                  ? theme.colors.gray[4]
-                  : theme.colors.gray[6]
-              }
+              color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed" lineClamp={1}>
               {creatorName || "Loading..."}
@@ -181,11 +177,7 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
           <Group gap="xs" wrap="nowrap">
             <IconCalendar
               size={theme.other.iconSizes.xs}
-              color={
-                isDark
-                  ? theme.colors.gray[4]
-                  : theme.colors.gray[6]
-              }
+              color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">
               {formatDate(new Date(ticket.createdAt))}

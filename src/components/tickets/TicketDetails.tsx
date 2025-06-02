@@ -300,7 +300,7 @@ export function TicketDetails({
     if (ticket.status === TicketStatus.RESOLVED) {
       targetStatus = TicketStatus.CLOSED;
     }
-    
+
     // Pass closing notes along with status change
     onStatusChange(targetStatus, closingNotes || undefined);
     setShowClosingModal(false);
@@ -399,7 +399,7 @@ export function TicketDetails({
                 </Button>
               </>
             )}
-            
+
             {ticket.status === TicketStatus.IN_PROGRESS && (
               <Button
                 variant="filled"
@@ -411,7 +411,7 @@ export function TicketDetails({
                 {t("tickets:tickets.actions.resolveTicket")}
               </Button>
             )}
-            
+
             {ticket.status === TicketStatus.RESOLVED && (
               <>
                 <Button
@@ -434,7 +434,7 @@ export function TicketDetails({
                 </Button>
               </>
             )}
-            
+
             {ticket.status === TicketStatus.CLOSED && (
               <Button
                 variant="filled"
@@ -679,9 +679,9 @@ export function TicketDetails({
           >
             {t("common:actions.cancel")}
           </Button>,
-          <Button 
-            key="confirm" 
-            color={ticket.status === TicketStatus.RESOLVED ? "red" : "green"} 
+          <Button
+            key="confirm"
+            color={ticket.status === TicketStatus.RESOLVED ? "red" : "green"}
             onClick={handleCloseTicket}
           >
             {ticket.status === TicketStatus.RESOLVED

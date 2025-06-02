@@ -1,5 +1,10 @@
 // src/components/users/UserTableRow.tsx
-import { Avatar, Box, useMantineColorScheme, useMantineTheme } from "@mantine/core";
+import {
+  Avatar,
+  Box,
+  useMantineColorScheme,
+  useMantineTheme,
+} from "@mantine/core";
 import { User } from "@/services/api/types/user";
 import { useTranslation } from "@/services/i18n/client";
 import UserActions from "./UserActions";
@@ -21,7 +26,9 @@ function UserTableRow({ user }: UserTableRowProps) {
 
   return (
     <>
-      <td style={{ width: theme.other.tableWidths.checkbox, textAlign: "left" }}>
+      <td
+        style={{ width: theme.other.tableWidths.checkbox, textAlign: "left" }}
+      >
         <Box p="xs">
           <Avatar
             alt={user?.firstName + " " + user?.lastName}
@@ -37,14 +44,18 @@ function UserTableRow({ user }: UserTableRowProps) {
       <td style={{ width: theme.other.tableWidths.name, textAlign: "left" }}>
         {user?.firstName} {user?.lastName}
       </td>
-      <td style={{ width: theme.other.tableWidths.email, textAlign: "left" }}>{user?.email}</td>
+      <td style={{ width: theme.other.tableWidths.email, textAlign: "left" }}>
+        {user?.email}
+      </td>
       <td style={{ width: theme.other.tableWidths.status, textAlign: "left" }}>
         {user?.phoneNumber || "-"}
       </td>
       <td style={{ width: theme.other.tableWidths.avatar, textAlign: "left" }}>
         {tRoles(`role.${user?.role?.id}`)}
       </td>
-      <td style={{ width: theme.other.tableWidths.actions, textAlign: "right" }}>
+      <td
+        style={{ width: theme.other.tableWidths.actions, textAlign: "right" }}
+      >
         {user && <UserActions user={user} />}
       </td>
     </>

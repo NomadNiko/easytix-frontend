@@ -1,4 +1,9 @@
-import { MantineProvider, createTheme, ColorSchemeScript, rem } from "@mantine/core";
+import {
+  MantineProvider,
+  createTheme,
+  ColorSchemeScript,
+  rem,
+} from "@mantine/core";
 import { oxanium } from "@/config/fonts";
 import "@mantine/core/styles.css";
 
@@ -41,29 +46,29 @@ const theme = createTheme({
     xl: rem(32),
   },
   shadows: {
-    xs: '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
-    sm: '0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
-    md: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    lg: '0 8px 16px rgba(0, 0, 0, 0.15)',
-    xl: '0 12px 24px rgba(0, 0, 0, 0.2)',
+    xs: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+    sm: "0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
+    md: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    lg: "0 8px 16px rgba(0, 0, 0, 0.15)",
+    xl: "0 12px 24px rgba(0, 0, 0, 0.2)",
   },
   other: {
     // Custom spacing values
     spacing: {
-      '2': rem(2),
-      '4': rem(4),
-      '6': rem(6),
-      '8': rem(8),
-      '10': rem(10),
-      '12': rem(12),
-      '16': rem(16),
-      '20': rem(20),
-      '24': rem(24),
-      '32': rem(32),
-      '40': rem(40),
-      '48': rem(48),
-      '56': rem(56),
-      '64': rem(64),
+      "2": rem(2),
+      "4": rem(4),
+      "6": rem(6),
+      "8": rem(8),
+      "10": rem(10),
+      "12": rem(12),
+      "16": rem(16),
+      "20": rem(20),
+      "24": rem(24),
+      "32": rem(32),
+      "40": rem(40),
+      "48": rem(48),
+      "56": rem(56),
+      "64": rem(64),
     },
     // Icon sizes
     iconSizes: {
@@ -87,16 +92,16 @@ const theme = createTheme({
     },
     // Transitions
     transitions: {
-      fast: '0.1s ease',
-      base: '0.2s ease',
-      slow: '0.3s ease',
-      verySlow: '0.5s ease',
+      fast: "0.1s ease",
+      base: "0.2s ease",
+      slow: "0.3s ease",
+      verySlow: "0.5s ease",
     },
     // Border styles
     borders: {
-      default: '1px solid var(--mantine-color-gray-3)',
-      light: '1px solid var(--mantine-color-gray-2)',
-      dark: '1px solid var(--mantine-color-gray-4)',
+      default: "1px solid var(--mantine-color-gray-3)",
+      light: "1px solid var(--mantine-color-gray-2)",
+      dark: "1px solid var(--mantine-color-gray-4)",
     },
     // Opacity values
     opacity: {
@@ -107,10 +112,10 @@ const theme = createTheme({
     },
     // Custom colors
     customColors: {
-      overlayDark: 'rgba(0, 0, 0, 0.5)',
-      overlayMedium: 'rgba(0, 0, 0, 0.3)',
-      overlayLight: 'rgba(0, 0, 0, 0.15)',
-      border: '#ddd',
+      overlayDark: "rgba(0, 0, 0, 0.5)",
+      overlayMedium: "rgba(0, 0, 0, 0.3)",
+      overlayLight: "rgba(0, 0, 0, 0.15)",
+      border: "#ddd",
     },
     // Table widths
     tableWidths: {
@@ -124,8 +129,8 @@ const theme = createTheme({
     // Component heights
     heights: {
       ticket: rem(74),
-      full: '100%',
-      screen: '100vh',
+      full: "100%",
+      screen: "100vh",
     },
     // Priority indicator
     priorityIndicator: {

@@ -187,8 +187,14 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
     if (!selectedTicket) return;
 
     try {
+      // Determine target status based on current status
+      let targetStatus = TicketStatus.RESOLVED;
+      if (selectedTicket.status === "Resolved") {
+        targetStatus = TicketStatus.CLOSED;
+      }
+
       const { status } = await updateTicketStatusService(
-        { status: TicketStatus.RESOLVED, closingNotes },
+        { status: targetStatus, closingNotes },
         { id: selectedTicket.id }
       );
 
@@ -198,7 +204,7 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
         setSelectedTicket(null);
       }
     } catch (error) {
-      console.error("Error resolving ticket:", error);
+      console.error("Error updating ticket status:", error);
     }
   };
 
@@ -284,7 +290,8 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
           size="xs"
           onClick={(e) => {
             e.stopPropagation();
-            handleResolveTicket(ticket); // This will close the ticket
+            setSelectedTicket(ticket);
+            setClosingModalOpen(true);
           }}
         >
           Close
