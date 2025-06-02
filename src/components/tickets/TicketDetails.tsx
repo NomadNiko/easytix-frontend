@@ -26,6 +26,7 @@ import {
   IconDeviceFloppy,
   IconArrowsExchange,
   IconRefresh,
+  IconProgress,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
@@ -273,25 +274,24 @@ export function TicketDetails({
     { value: TicketPriority.LOW, label: t("tickets:tickets.priorities.low") },
   ];
 
-  const toggleStatus = () => {
-    if (
-      ticket.status === TicketStatus.OPENED ||
-      ticket.status === TicketStatus.IN_PROGRESS
-    ) {
-      // Show modal for resolving notes when resolving
-      setShowClosingModal(true);
-    } else if (
-      ticket.status === TicketStatus.RESOLVED ||
-      ticket.status === TicketStatus.CLOSED
-    ) {
-      // Reopen ticket
-      onStatusChange(TicketStatus.OPENED);
-    }
+  const handleProgressTicket = () => {
+    // Move from OPENED to IN_PROGRESS
+    onStatusChange(TicketStatus.IN_PROGRESS);
+  };
+
+  const handleResolveTicket = () => {
+    // Show modal for resolving notes when resolving
+    setShowClosingModal(true);
   };
 
   const handleCloseResolvedTicket = () => {
     // Close a resolved ticket
     setShowClosingModal(true);
+  };
+
+  const handleReopenTicket = () => {
+    // Reopen ticket to OPENED status
+    onStatusChange(TicketStatus.OPENED);
   };
 
   const handleCloseTicket = () => {
@@ -376,42 +376,74 @@ export function TicketDetails({
             >
               {t("tickets:tickets.actions.changeQueue")}
             </Button>
-            {/* Resolve/Reopen Button */}
-            {(ticket.status === TicketStatus.OPENED ||
-              ticket.status === TicketStatus.IN_PROGRESS ||
-              ticket.status === TicketStatus.CLOSED) && (
+            {/* Status Action Buttons based on current status */}
+            {ticket.status === TicketStatus.OPENED && (
+              <>
+                <Button
+                  variant="outline"
+                  color="blue"
+                  onClick={handleProgressTicket}
+                  leftSection={<IconProgress size={16} />}
+                  size="compact-sm"
+                >
+                  {t("tickets:tickets.actions.startProgress")}
+                </Button>
+                <Button
+                  variant="outline"
+                  color="green"
+                  onClick={handleResolveTicket}
+                  leftSection={<IconCheck size={16} />}
+                  size="compact-sm"
+                >
+                  {t("tickets:tickets.actions.resolveTicket")}
+                </Button>
+              </>
+            )}
+            
+            {ticket.status === TicketStatus.IN_PROGRESS && (
               <Button
-                variant={
-                  ticket.status === TicketStatus.OPENED ? "outline" : "filled"
-                }
-                color={ticket.status === TicketStatus.OPENED ? "green" : "blue"}
-                onClick={toggleStatus}
-                leftSection={
-                  ticket.status === TicketStatus.CLOSED ? (
-                    <IconRefresh size={16} />
-                  ) : (
-                    <IconCheck size={16} />
-                  )
-                }
+                variant="filled"
+                color="green"
+                onClick={handleResolveTicket}
+                leftSection={<IconCheck size={16} />}
                 size="compact-sm"
               >
-                {ticket.status === TicketStatus.OPENED ||
-                ticket.status === TicketStatus.IN_PROGRESS
-                  ? t("tickets:tickets.actions.resolveTicket")
-                  : t("tickets:tickets.actions.reopenTicket")}
+                {t("tickets:tickets.actions.resolveTicket")}
               </Button>
             )}
             
-            {/* Close Button - only show for resolved tickets */}
             {ticket.status === TicketStatus.RESOLVED && (
+              <>
+                <Button
+                  variant="outline"
+                  color="blue"
+                  onClick={handleReopenTicket}
+                  leftSection={<IconRefresh size={16} />}
+                  size="compact-sm"
+                >
+                  {t("tickets:tickets.actions.reopenTicket")}
+                </Button>
+                <Button
+                  variant="filled"
+                  color="red"
+                  onClick={handleCloseResolvedTicket}
+                  leftSection={<IconX size={16} />}
+                  size="compact-sm"
+                >
+                  {t("tickets:tickets.actions.closeTicket")}
+                </Button>
+              </>
+            )}
+            
+            {ticket.status === TicketStatus.CLOSED && (
               <Button
                 variant="filled"
-                color="red"
-                onClick={handleCloseResolvedTicket}
-                leftSection={<IconX size={16} />}
+                color="blue"
+                onClick={handleReopenTicket}
+                leftSection={<IconRefresh size={16} />}
                 size="compact-sm"
               >
-                {t("tickets:tickets.actions.closeTicket")}
+                {t("tickets:tickets.actions.reopenTicket")}
               </Button>
             )}
           </Group>

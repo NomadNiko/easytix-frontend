@@ -188,7 +188,8 @@
       "deleteAttachment": "Delete Attachment",
       "changeQueue": "Change Queue",
       "reassignQueue": "Reassign Queue",
-      "reassignQueueDescription": "Select a new queue and category for this ticket. This will move the ticket to a different queue."
+      "reassignQueueDescription": "Select a new queue and category for this ticket. This will move the ticket to a different queue.",
+      "startProgress": "Start Progress"
     },
     "filters": {
       "title": "Filters",
