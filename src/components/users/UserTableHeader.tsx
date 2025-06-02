@@ -27,9 +27,9 @@ function UserTableHeader({
       <tr>
         {/* Avatar column - fixed width, centered */}
         <th style={{ width: 50, textAlign: "center" }}></th>
-        {/* Name column - fixed width, left-aligned */}
+        {/* Name column - larger width, left-aligned */}
         <TableSortCell<User>
-          width={200}
+          width={280}
           orderBy={orderBy}
           order={order}
           column="firstName"
@@ -67,8 +67,8 @@ function UserTableHeader({
         >
           {tUsers("admin-panel-users:table.column5")}
         </TableSortCell>
-        {/* Actions column - fixed width, centered */}
-        <th style={{ width: 450, textAlign: "right" }}></th>
+        {/* Actions column - compact width for icons, centered */}
+        <th style={{ width: 180, textAlign: "right" }}></th>
       </tr>
       {/* Loading indicator row */}
       {isFetchingNextPage && (

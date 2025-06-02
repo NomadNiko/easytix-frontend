@@ -6,7 +6,7 @@ import { useDeleteUsersService } from "@/services/api/services/users";
 import { usersQueryKeys } from "@/app/[language]/admin-panel/users/queries/queries";
 import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/services/i18n/client";
-import { Button, Group, Text } from "@mantine/core";
+import { Button, Group, Text, ActionIcon, Tooltip } from "@mantine/core";
 import {
   IconTrash,
   IconEdit,
@@ -79,21 +79,8 @@ function UserActions({ user }: UserActionsProps) {
     textOverflow: "ellipsis",
   };
 
-  // Desktop view styling - reduced dimensions as requested
-  const desktopButtonStyle = {
-    width: "88px",
-    height: "24px",
-    padding: "0 6px",
-    overflow: "hidden",
-    whiteSpace: "nowrap" as const,
-    textOverflow: "ellipsis",
-  };
-
-  // Use appropriate styling based on device type
-  const buttonStyle = isMobile ? mobileButtonStyle : desktopButtonStyle;
-
-  // Font size adjustment specifically for desktop
-  const textSize = isMobile ? "xs" : "xs"; // Smaller text size for desktop
+  // Font size adjustment for mobile
+  const textSize = "xs";
 
   // Mobile view with all actions as buttons
   if (isMobile) {
@@ -105,7 +92,7 @@ function UserActions({ user }: UserActionsProps) {
             variant="light"
             component={Link}
             href={`/admin-panel/users/edit/${user.id}`}
-            style={buttonStyle}
+            style={mobileButtonStyle}
           >
             <Group gap={4} align="center" wrap="nowrap">
               <IconEdit size={14} />
@@ -119,7 +106,7 @@ function UserActions({ user }: UserActionsProps) {
             variant="light"
             component={Link}
             href={`/admin-panel/users/edit-password/${user.id}`}
-            style={buttonStyle}
+            style={mobileButtonStyle}
           >
             <Group gap={4} align="center" wrap="nowrap">
               <IconLock size={14} />
@@ -133,7 +120,7 @@ function UserActions({ user }: UserActionsProps) {
             variant="light"
             color="blue"
             onClick={() => setTicketsModalOpened(true)}
-            style={buttonStyle}
+            style={mobileButtonStyle}
           >
             <Group gap={4} align="center" wrap="nowrap">
               <IconTicket size={14} />
@@ -147,7 +134,7 @@ function UserActions({ user }: UserActionsProps) {
             variant="light"
             color="teal"
             onClick={() => setQueuesModalOpened(true)}
-            style={buttonStyle}
+            style={mobileButtonStyle}
           >
             <Group gap={4} align="center" wrap="nowrap">
               <IconUsers size={14} />
@@ -162,7 +149,7 @@ function UserActions({ user }: UserActionsProps) {
               variant="light"
               color="red"
               onClick={handleDelete}
-              style={buttonStyle}
+              style={mobileButtonStyle}
             >
               <Group gap={4} align="center" wrap="nowrap">
                 <IconTrash size={14} />
@@ -187,110 +174,60 @@ function UserActions({ user }: UserActionsProps) {
     );
   }
 
-  // Desktop view - with more compact buttons
+  // Desktop view - icon-only buttons
   return (
     <>
       <Group gap="xs">
-        <Button
-          size="xs"
-          component={Link}
-          href={`/admin-panel/users/edit/${user.id}`}
-          style={buttonStyle}
-          styles={{
-            inner: {
-              fontSize: "12px", // Smaller font size for desktop
-              height: "100%",
-            },
-          }}
-        >
-          <Group gap={4} align="center" wrap="nowrap">
-            <IconEdit size={12} />
-            <Text size="xs" truncate>
-              {tUsers("admin-panel-users:actions.edit")}
-            </Text>
-          </Group>
-        </Button>
-        <Button
-          size="xs"
-          variant="light"
-          component={Link}
-          href={`/admin-panel/users/edit-password/${user.id}`}
-          style={buttonStyle}
-          styles={{
-            inner: {
-              fontSize: "12px", // Smaller font size for desktop
-              height: "100%",
-            },
-          }}
-        >
-          <Group gap={4} align="center" wrap="nowrap">
-            <IconLock size={12} />
-            <Text size="xs" truncate>
-              {tUsers("admin-panel-users:actions.changePassword")}
-            </Text>
-          </Group>
-        </Button>
-        <Button
-          size="xs"
-          variant="light"
-          color="blue"
-          onClick={() => setTicketsModalOpened(true)}
-          style={buttonStyle}
-          styles={{
-            inner: {
-              fontSize: "12px",
-              height: "100%",
-            },
-          }}
-        >
-          <Group gap={4} align="center" wrap="nowrap">
-            <IconTicket size={12} />
-            <Text size="xs" truncate>
-              {tUsers("admin-panel-users:actions.viewTickets")}
-            </Text>
-          </Group>
-        </Button>
-        <Button
-          size="xs"
-          variant="light"
-          color="teal"
-          onClick={() => setQueuesModalOpened(true)}
-          style={buttonStyle}
-          styles={{
-            inner: {
-              fontSize: "12px",
-              height: "100%",
-            },
-          }}
-        >
-          <Group gap={4} align="center" wrap="nowrap">
-            <IconUsers size={12} />
-            <Text size="xs" truncate>
-              {tUsers("admin-panel-users:actions.manageQueues")}
-            </Text>
-          </Group>
-        </Button>
-        {canDelete && (
-          <Button
-            size="xs"
-            variant="light"
-            color="red"
-            onClick={handleDelete}
-            style={buttonStyle}
-            styles={{
-              inner: {
-                fontSize: "12px", // Smaller font size for desktop
-                height: "100%",
-              },
-            }}
+        <Tooltip label={tUsers("admin-panel-users:actions.edit")}>
+          <ActionIcon
+            size="lg"
+            component={Link}
+            href={`/admin-panel/users/edit/${user.id}`}
           >
-            <Group gap={4} align="center" wrap="nowrap">
-              <IconTrash size={12} />
-              <Text size="xs" truncate>
-                {tUsers("admin-panel-users:actions.delete")}
-              </Text>
-            </Group>
-          </Button>
+            <IconEdit size={16} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label={tUsers("admin-panel-users:actions.changePassword")}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            component={Link}
+            href={`/admin-panel/users/edit-password/${user.id}`}
+          >
+            <IconLock size={16} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label={tUsers("admin-panel-users:actions.viewTickets")}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            color="blue"
+            onClick={() => setTicketsModalOpened(true)}
+          >
+            <IconTicket size={16} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label={tUsers("admin-panel-users:actions.manageQueues")}>
+          <ActionIcon
+            size="lg"
+            variant="light"
+            color="teal"
+            onClick={() => setQueuesModalOpened(true)}
+          >
+            <IconUsers size={16} />
+          </ActionIcon>
+        </Tooltip>
+        {canDelete && (
+          <Tooltip label={tUsers("admin-panel-users:actions.delete")}>
+            <ActionIcon
+              size="lg"
+              variant="light"
+              color="red"
+              onClick={handleDelete}
+            >
+              <IconTrash size={16} />
+            </ActionIcon>
+          </Tooltip>
         )}
       </Group>
       <UserTicketsModal
