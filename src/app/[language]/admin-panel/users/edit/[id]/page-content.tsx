@@ -12,7 +12,8 @@ import {
   useGetUserService,
   usePatchUserService,
 } from "@/services/api/services/users";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import useLanguage from "@/services/i18n/use-language";
 import { Role, RoleEnum } from "@/services/api/types/role";
 import { FormActions } from "@/components/form/profile-edit/form-actions";
 import { useSnackbar } from "@/components/mantine/feedback/notification-service";
@@ -59,6 +60,8 @@ const useValidationEditSchema = () => {
 function FormEditUser() {
   const params = useParams<{ id: string }>();
   const userId = params.id;
+  const router = useRouter();
+  const language = useLanguage();
   const fetchGetUser = useGetUserService();
   const fetchPatchUser = usePatchUserService();
   const { t } = useTranslation("admin-panel-users-edit");
@@ -109,10 +112,11 @@ function FormEditUser() {
       }
 
       if (status === HTTP_CODES_ENUM.OK) {
-        reset(formData);
         enqueueSnackbar(t("admin-panel-users-edit:alerts.user.success"), {
           variant: "success",
         });
+        // Navigate back to users admin page
+        router.push(`/${language}/admin-panel/users`);
       }
     } finally {
       setLoading(false);
