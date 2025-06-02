@@ -1,0 +1,47 @@
+{
+  "page": {
+    "title": "Timeline View"
+  },
+  "loading": {
+    "queues": "Loading queues...",
+    "tickets": "Loading tickets..."
+  },
+  "empty": {
+    "noQueues": "No queues available",
+    "noTickets": "No tickets found for this queue"
+  },
+  "status": {
+    "opened": "Open",
+    "assigned": "Assigned",
+    "unassigned": "Unassigned",
+    "closed": "Closed",
+    "resolved": "Resolved",
+    "inProgress": "In Progress"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "label": "Priority"
+  },
+  "tooltip": {
+    "clickToManage": "Click to manage this ticket"
+  },
+  "modal": {
+    "title": "Manage Ticket",
+    "actions": "Quick Actions",
+    "addComment": "Add Comment"
+  },
+  "actions": {
+    "viewTicket": "View Details",
+    "addComment": "Add Comment",
+    "assign": "Assign",
+    "reassign": "Reassign",
+    "changeQueue": "Change Queue",
+    "closeTicket": "Close Ticket",
+    "reopenTicket": "Reopen Ticket"
+  },
+  "created": "Created",
+  "closed": "Closed",
+  "category": "Category"
+}
