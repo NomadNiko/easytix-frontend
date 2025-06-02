@@ -148,8 +148,8 @@ function FilePicker(props: FilePickerProps) {
         flexDirection: "column",
         alignItems: "center",
         padding: theme.spacing.md,
-        border: "1px dashed #ddd",
-        borderRadius: "8px",
+        border: `1px dashed ${theme.other.customColors.border}`,
+        borderRadius: theme.radius.sm,
         cursor: "pointer",
         position: "relative",
       }}
@@ -162,8 +162,8 @@ function FilePicker(props: FilePickerProps) {
             left: 0,
             bottom: 0,
             right: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1,
+            backgroundColor: theme.other.customColors.overlayDark,
+            zIndex: theme.other.zIndex.base + 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -190,15 +190,15 @@ function FilePicker(props: FilePickerProps) {
         >
           <Group justify="apart" align="center">
             <Group>
-              <IconFile size={40} />
+              <IconFile size={theme.other.spacing[40]} />
               <Text size="md">{fileName || "File"}</Text>
             </Group>
             <Group>
               <ActionIcon component="a" href={props.value.path} target="_blank">
-                <IconDownload size={18} />
+                <IconDownload size={theme.other.iconSizes.lg} />
               </ActionIcon>
               <ActionIcon color="red" onClick={removeFileHandle}>
-                <IconX size={18} />
+                <IconX size={theme.other.iconSizes.lg} />
               </ActionIcon>
             </Group>
           </Group>
@@ -239,7 +239,7 @@ function FilePicker(props: FilePickerProps) {
           </Text>
           <Tooltip label="All file types are accepted including ZIP, RAR, DOC, PDF, etc.">
             <ActionIcon variant="transparent" size="xs">
-              <IconInfoCircle size={16} />
+              <IconInfoCircle size={theme.other.iconSizes.md} />
             </ActionIcon>
           </Tooltip>
         </Group>

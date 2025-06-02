@@ -82,7 +82,7 @@ const NotificationItem = ({
           : isDark
             ? theme.colors.blue[9] // Dark mode unread background
             : theme.colors.blue[0], // Light mode unread background
-        transition: "background-color 0.2s",
+        transition: `background-color ${theme.other.transitions.base}`,
         border: notification.isRead
           ? undefined
           : isDark
@@ -116,7 +116,7 @@ const NotificationItem = ({
             onClick={handleDelete}
             loading={deleteNotificationMutation.isPending}
           >
-            <IconTrash size={16} />
+            <IconTrash size={theme.other.iconSizes.md} />
           </ActionIcon>
         )}
       </Group>

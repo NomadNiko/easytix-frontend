@@ -7,6 +7,7 @@ import {
   Badge,
   Box,
   useMantineColorScheme,
+  useMantineTheme,
   Avatar, // Import Avatar directly from Mantine
 } from "@mantine/core";
 import { User } from "@/services/api/types/user";
@@ -20,6 +21,7 @@ interface UserCardProps {
 export function UserCard({ user }: UserCardProps) {
   const { t: tRoles } = useTranslation("admin-panel-roles");
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
 
   // Use the correct colorScheme from hook
   const shadowColor =
@@ -37,7 +39,7 @@ export function UserCard({ user }: UserCardProps) {
             size="lg"
             radius="xl"
             style={{
-              margin: "2px",
+              margin: theme.other.spacing[2],
               boxShadow: `0 0 10px ${shadowColor}`,
             }}
           />

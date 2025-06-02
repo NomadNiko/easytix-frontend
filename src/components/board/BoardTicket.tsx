@@ -9,6 +9,7 @@ import {
   Stack,
   Box,
   useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -43,6 +44,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
   const [creatorName, setCreatorName] = useState<string>("");
   const getUserService = useGetUserService();
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
   const isDark = colorScheme === "dark";
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -71,7 +73,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
 
   const style = {
     transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.3 : 1,
+    opacity: isDragging ? theme.other.opacity.subtle : 1,
     cursor: isDragging ? "grabbing" : "pointer",
   } as React.CSSProperties;
 
@@ -112,25 +114,25 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
             {...listeners}
             style={{
               cursor: "grab",
-              padding: "4px",
-              borderRadius: "4px",
-              transition: "background-color 0.2s ease",
+              padding: theme.other.spacing[4],
+              borderRadius: theme.radius.xs,
+              transition: `background-color ${theme.other.transitions.base}`,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = isDark
-                ? "var(--mantine-color-dark-5)"
-                : "var(--mantine-color-gray-1)";
+                ? theme.colors.dark[5]
+                : theme.colors.gray[1];
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
             }}
           >
             <IconGripVertical
-              size={16}
+              size={theme.other.iconSizes.md}
               style={{
                 color: isDark
-                  ? "var(--mantine-color-gray-4)"
-                  : "var(--mantine-color-gray-5)",
+                  ? theme.colors.gray[4]
+                  : theme.colors.gray[5],
               }}
             />
           </Box>
@@ -163,11 +165,11 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
         <Stack gap={4}>
           <Group gap="xs">
             <IconUser
-              size={12}
+              size={theme.other.iconSizes.sm}
               color={
                 isDark
-                  ? "var(--mantine-color-gray-4)"
-                  : "var(--mantine-color-gray-6)"
+                  ? theme.colors.gray[4]
+                  : theme.colors.gray[6]
               }
             />
             <Text size="xs" c="dimmed">
@@ -176,11 +178,11 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
           </Group>
           <Group gap="xs">
             <IconCalendar
-              size={12}
+              size={theme.other.iconSizes.sm}
               color={
                 isDark
-                  ? "var(--mantine-color-gray-4)"
-                  : "var(--mantine-color-gray-6)"
+                  ? theme.colors.gray[4]
+                  : theme.colors.gray[6]
               }
             />
             <Text size="xs" c="dimmed">
@@ -193,10 +195,10 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
           <Box
             p="xs"
             style={{
-              borderRadius: "4px",
+              borderRadius: theme.radius.xs,
               backgroundColor: isDark
-                ? "var(--mantine-color-dark-6)"
-                : "var(--mantine-color-gray-0)",
+                ? theme.colors.dark[6]
+                : theme.colors.gray[0],
             }}
           >
             <Text size="xs" c="dimmed" lineClamp={2}>

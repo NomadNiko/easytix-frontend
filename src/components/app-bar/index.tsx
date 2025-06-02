@@ -1,6 +1,6 @@
 // src/components/app-bar/index.tsx
 "use client";
-import { AppShell, Burger, Group, Container } from "@mantine/core";
+import { AppShell, Burger, Group, Container, useMantineTheme } from "@mantine/core";
 import { useState } from "react";
 import { SwitchThemeButton } from "@/components/theme/SwitchThemeButton";
 import Logo from "./logo";
@@ -11,6 +11,7 @@ import NotificationIcon from "./notification-icon";
 
 const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
   const [opened, setOpened] = useState(false);
+  const theme = useMantineTheme();
 
   return (
     <AppShell
@@ -72,8 +73,8 @@ const ResponsiveAppBar = ({ children }: { children: React.ReactNode }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.3)",
-            zIndex: 5, // Lower than default Mantine navbar z-index
+            background: theme.other.customColors.overlayMedium,
+            zIndex: theme.other.zIndex.dropdown,
             cursor: "pointer",
           }}
           onClick={() => setOpened(false)}

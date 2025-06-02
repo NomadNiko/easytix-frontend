@@ -1,7 +1,7 @@
 // src/components/app-bar/notification-icon.tsx
 // src/components/app-bar/notification-icon.tsx
 import { useState, useEffect } from "react";
-import { ActionIcon, Indicator, Menu } from "@mantine/core";
+import { ActionIcon, Indicator, Menu, useMantineTheme } from "@mantine/core";
 import { IconBell } from "@tabler/icons-react";
 import { useUnreadNotificationsCountQuery } from "@/app/[language]/profile/queries/notifications-queries";
 import NotificationDropdown from "@/components/notifications/notification-dropdown";
@@ -20,6 +20,7 @@ const NotificationIcon = () => {
   const { user, isLoaded } = useAuth();
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
+  const theme = useMantineTheme();
 
   // Only enable the polling when the user is authenticated
   const { data: unreadCount = 0, isLoading } = useUnreadNotificationsCountQuery(
@@ -90,18 +91,18 @@ const NotificationIcon = () => {
               indicator: {
                 padding:
                   unreadCount > 9
-                    ? "0 6px"
-                    : "0 4px" /* Dynamic padding based on digits */,
-                fontSize: "12px",
+                    ? `0 ${theme.other.spacing[6]}`
+                    : `0 ${theme.other.spacing[4]}`,
+                fontSize: theme.fontSizes.xs,
                 fontWeight: "bold",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 minWidth:
-                  unreadCount > 99 ? "24px" : unreadCount > 9 ? "20px" : "16px",
-                height: "20px" /* Fixed height */,
+                  unreadCount > 99 ? theme.other.spacing[24] : unreadCount > 9 ? theme.other.spacing[20] : theme.other.spacing[16],
+                height: theme.other.spacing[20],
                 lineHeight: 1,
-                paddingTop: "2px" /* Slight shift downward */,
+                paddingTop: theme.other.spacing[2],
               },
             }}
           >
@@ -112,7 +113,7 @@ const NotificationIcon = () => {
               aria-label="Notifications"
               size="lg"
             >
-              <IconBell size={24} />
+              <IconBell size={theme.other.iconSizes.xl} />
             </ActionIcon>
           </Indicator>
         </Menu.Target>

@@ -1,8 +1,7 @@
 // src/components/users/UserTableRow.tsx
-import { Avatar } from "@mantine/core"; // Import Avatar directly from Mantine
+import { Avatar, Box, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 import { User } from "@/services/api/types/user";
 import { useTranslation } from "@/services/i18n/client";
-import { Box, useMantineColorScheme } from "@mantine/core";
 import UserActions from "./UserActions";
 
 interface UserTableRowProps {
@@ -12,6 +11,7 @@ interface UserTableRowProps {
 function UserTableRow({ user }: UserTableRowProps) {
   const { t: tRoles } = useTranslation("admin-panel-roles");
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
 
   // Use the correct colorScheme from hook
   const shadowColor =
@@ -21,30 +21,30 @@ function UserTableRow({ user }: UserTableRowProps) {
 
   return (
     <>
-      <td style={{ width: 60, textAlign: "left" }}>
+      <td style={{ width: theme.other.tableWidths.checkbox, textAlign: "left" }}>
         <Box p="xs">
           <Avatar
             alt={user?.firstName + " " + user?.lastName}
             src={user?.photo?.path}
             size="md"
             style={{
-              margin: "2px",
+              margin: theme.other.spacing[2],
               boxShadow: `0 0 10px ${shadowColor}`,
             }}
           />
         </Box>
       </td>
-      <td style={{ width: 200, textAlign: "left" }}>
+      <td style={{ width: theme.other.tableWidths.name, textAlign: "left" }}>
         {user?.firstName} {user?.lastName}
       </td>
-      <td style={{ width: 180, textAlign: "left" }}>{user?.email}</td>
-      <td style={{ width: 120, textAlign: "left" }}>
+      <td style={{ width: theme.other.tableWidths.email, textAlign: "left" }}>{user?.email}</td>
+      <td style={{ width: theme.other.tableWidths.status, textAlign: "left" }}>
         {user?.phoneNumber || "-"}
       </td>
-      <td style={{ width: 100, textAlign: "left" }}>
+      <td style={{ width: theme.other.tableWidths.avatar, textAlign: "left" }}>
         {tRoles(`role.${user?.role?.id}`)}
       </td>
-      <td style={{ width: 450, textAlign: "right" }}>
+      <td style={{ width: theme.other.tableWidths.actions, textAlign: "right" }}>
         {user && <UserActions user={user} />}
       </td>
     </>

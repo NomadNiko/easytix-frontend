@@ -10,6 +10,7 @@ import {
   SimpleGrid,
   Select,
   useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import {
   DndContext,
@@ -70,6 +71,7 @@ interface Queue {
 export function BoardView() {
   const { t } = useTranslation("board");
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
   const isDark = colorScheme === "dark";
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [queues, setQueues] = useState<Queue[]>([]);
@@ -334,8 +336,8 @@ export function BoardView() {
                 cols={3}
                 spacing="lg"
                 style={{
-                  opacity: isRefreshing ? 0.7 : 1,
-                  transition: "opacity 0.2s ease",
+                  opacity: isRefreshing ? theme.other.opacity.hover : 1,
+                  transition: `opacity ${theme.other.transitions.base}`,
                 }}
               >
                 <BoardColumn
@@ -366,7 +368,7 @@ export function BoardView() {
               <DragOverlay
                 style={{
                   cursor: "grabbing",
-                  zIndex: 9999,
+                  zIndex: theme.other.zIndex.dragging,
                 }}
               >
                 {activeId ? (
@@ -375,10 +377,10 @@ export function BoardView() {
                     shadow="lg"
                     style={{
                       backgroundColor: isDark
-                        ? "var(--mantine-color-dark-7)"
-                        : "var(--mantine-color-gray-0)",
-                      borderColor: "var(--mantine-color-blue-6)",
-                      borderWidth: "2px",
+                        ? theme.colors.dark[7]
+                        : theme.colors.gray[0],
+                      borderColor: theme.colors.blue[6],
+                      borderWidth: theme.other.spacing[2],
                       transform: "rotate(2deg)",
                       opacity: 0.95,
                     }}

@@ -1,6 +1,6 @@
 // src/components/tickets/FilePicker.tsx
 import React, { useState } from "react";
-import { Button, Text, Group, Box, Paper } from "@mantine/core";
+import { Button, Text, Group, Box, Paper, useMantineTheme } from "@mantine/core";
 import { IconUpload, IconFile, IconX } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { useFileGeneralUploadService } from "@/services/api/services/files-general";
@@ -26,6 +26,7 @@ export function FilePicker({
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileUploadService = useFileGeneralUploadService();
+  const theme = useMantineTheme();
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -68,7 +69,7 @@ export function FilePicker({
         {value ? (
           <Group justify="apart">
             <Group>
-              <IconFile size={24} />
+              <IconFile size={theme.other.iconSizes.xl} />
               <Text size="sm">
                 {value.path.split("/").pop() ||
                   t("formInputs.filePicker.uploadedFile")}
@@ -79,7 +80,7 @@ export function FilePicker({
               color="red"
               size="xs"
               onClick={handleRemoveFile}
-              leftSection={<IconX size={16} />}
+              leftSection={<IconX size={theme.other.iconSizes.md} />}
               disabled={disabled}
             >
               {t("formInputs.filePicker.remove")}
@@ -90,12 +91,12 @@ export function FilePicker({
             <Button
               component="label"
               variant="outline"
-              leftSection={<IconUpload size={16} />}
+              leftSection={<IconUpload size={theme.other.iconSizes.md} />}
               loading={isLoading}
               disabled={disabled}
               size="sm"
             >
-              {isLoading ? t("loading") : t("formInputs.filePicker.selectFile")}
+              {isLoading ? t("common:loading") : t("formInputs.filePicker.selectFile")}
               <input
                 type="file"
                 style={{ display: "none" }}

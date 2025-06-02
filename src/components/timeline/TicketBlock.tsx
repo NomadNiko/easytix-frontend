@@ -9,6 +9,7 @@ import {
   Stack,
   Paper,
   useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconUser, IconCalendar } from "@tabler/icons-react";
 import { formatDate } from "@/utils/format-date";
@@ -39,6 +40,7 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
   const [creatorName, setCreatorName] = useState<string>("");
   const getUserService = useGetUserService();
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
   const isDark = colorScheme === "dark";
 
   // Fetch creator name
@@ -103,17 +105,17 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
       onClick={handleClick}
       style={{
         cursor: "pointer",
-        height: "100%",
-        transition: "all 0.2s ease",
-        minHeight: "74px",
+        height: theme.other.heights.full,
+        transition: theme.other.transitions.base,
+        minHeight: theme.other.heights.ticket,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-1px)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+        e.currentTarget.style.boxShadow = theme.shadows.md;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "var(--mantine-shadow-sm)";
+        e.currentTarget.style.boxShadow = theme.shadows.sm;
       }}
     >
       <Stack gap="xs" h="100%">
@@ -124,9 +126,9 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
           {ticket.priority === "HIGH" && (
             <Box
               style={{
-                width: "8px",
-                height: "8px",
-                backgroundColor: "var(--mantine-color-red-6)",
+                width: theme.other.priorityIndicator.size,
+                height: theme.other.priorityIndicator.size,
+                backgroundColor: theme.colors.red[6],
                 borderRadius: "50%",
               }}
             />
@@ -165,11 +167,11 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
         <Stack gap={2} mt="auto">
           <Group gap="xs" wrap="nowrap">
             <IconUser
-              size={10}
+              size={theme.other.iconSizes.xs}
               color={
                 isDark
-                  ? "var(--mantine-color-gray-4)"
-                  : "var(--mantine-color-gray-6)"
+                  ? theme.colors.gray[4]
+                  : theme.colors.gray[6]
               }
             />
             <Text size="xs" c="dimmed" lineClamp={1}>
@@ -178,11 +180,11 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
           </Group>
           <Group gap="xs" wrap="nowrap">
             <IconCalendar
-              size={10}
+              size={theme.other.iconSizes.xs}
               color={
                 isDark
-                  ? "var(--mantine-color-gray-4)"
-                  : "var(--mantine-color-gray-6)"
+                  ? theme.colors.gray[4]
+                  : theme.colors.gray[6]
               }
             />
             <Text size="xs" c="dimmed">

@@ -117,5 +117,6 @@
   "uploadFileInstructions": "Drop files here or click to browse",
   "uploadingFile": "Uploading file...",
   "errorOccurred": "An error occurred",
-  "loadMore": "Load More"
+  "loadMore": "Load More",
+  "unknown": "Unknown"
 }
