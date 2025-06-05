@@ -84,22 +84,15 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
     try {
       const { status, data } = await getTicketsService(undefined, {
         page: 1,
-        limit: 1000,
+        limit: 200, // Reduced from 1000 to improve performance
         queueId,
       });
 
       if (status === HTTP_CODES_ENUM.OK) {
         const ticketsArray = Array.isArray(data) ? data : data.data || [];
 
-        // Filter tickets for board view
-        const filteredTickets = ticketsArray.filter(
-          (ticket: Ticket) =>
-            ticket.status === "Opened" ||
-            ticket.status === "In Progress" ||
-            ticket.status === "Resolved"
-        );
-
-        setTickets(filteredTickets);
+        // Include all tickets without filtering
+        setTickets(ticketsArray);
       }
     } catch (error) {
       console.error("Error fetching tickets:", error);
@@ -120,6 +113,7 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
     opened: tickets.filter((t) => t.status === "Opened"),
     inProgress: tickets.filter((t) => t.status === "In Progress"),
     resolved: tickets.filter((t) => t.status === "Resolved"),
+    closed: tickets.filter((t) => t.status === "Closed"),
   };
 
   // Handle ticket actions
@@ -217,6 +211,8 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
         return "yellow";
       case "resolved":
         return "green";
+      case "closed":
+        return "gray";
       default:
         return "gray";
     }
@@ -382,7 +378,7 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
             }
             variant="light"
           >
-            {ticket.priority}
+            {t(`tickets:tickets.priorities.${ticket.priority}`)}
           </Badge>
           {ticket.category && (
             <Badge size="xs" color="gray" variant="light">
@@ -455,6 +451,16 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
           >
             Resolved
           </Tabs.Tab>
+          <Tabs.Tab
+            value="closed"
+            rightSection={
+              <Badge size="sm" color={getStatusColor("closed")} variant="light">
+                {ticketsByStatus.closed.length}
+              </Badge>
+            }
+          >
+            Closed
+          </Tabs.Tab>
         </Tabs.List>
 
         <Box pos="relative">
@@ -496,6 +502,20 @@ export function BoardMobile({ queueId, onTicketClick }: BoardMobileProps) {
                 ) : (
                   <Center py="xl">
                     <Text c="dimmed">No resolved tickets</Text>
+                  </Center>
+                )}
+              </Stack>
+            </ScrollArea>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="closed" pt="md">
+            <ScrollArea style={{ height: "calc(100vh - 250px)" }}>
+              <Stack gap="sm" p="md">
+                {ticketsByStatus.closed.length > 0 ? (
+                  ticketsByStatus.closed.map(renderTicketCard)
+                ) : (
+                  <Center py="xl">
+                    <Text c="dimmed">No closed tickets</Text>
                   </Center>
                 )}
               </Stack>

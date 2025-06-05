@@ -36,7 +36,7 @@ export function TicketListMobile({
     };
     return (
       <Badge color={colorMap[priority]} size="sm">
-        {priority}
+        {t(`tickets:tickets.priorities.${priority}`)}
       </Badge>
     );
   };
@@ -50,7 +50,7 @@ export function TicketListMobile({
     };
     return (
       <Badge color={colorMap[status]} size="sm">
-        {status}
+        {t(`tickets:tickets.statuses.${status}`)}
       </Badge>
     );
   };

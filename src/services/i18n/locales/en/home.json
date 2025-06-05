@@ -9,8 +9,14 @@
     "goTo": "Go to",
     "createTicket": "Create Ticket",
     "createTicketDesc": "Submit a new support ticket",
-    "viewTickets": "View Tickets",
-    "viewTicketsDesc": "See all your tickets and their status",
+    "myTickets": "My Tickets",
+    "myTicketsDesc": "View and manage your personal tickets",
+    "ticketSearch": "Ticket Search",
+    "ticketSearchDesc": "Search and filter all system tickets",
+    "board": "Board View",
+    "boardDesc": "Kanban-style ticket management board",
+    "timeline": "Timeline View",
+    "timelineDesc": "Calendar-based ticket visualization",
     "notifications": "Notifications",
     "notificationsDesc": "Check your latest notifications",
     "profile": "Profile Settings",
@@ -19,5 +25,50 @@
     "manageQueuesDesc": "Configure queues and assignments",
     "adminNotifications": "Admin Notifications",
     "adminNotificationsDesc": "Send system-wide notifications"
+  },
+  "guest": {
+    "subtitle": "Professional Support Ticket Management by Nomadsoft",
+    "description": "EasyTix is a comprehensive ticket management system designed for organizations of all sizes. Submit support requests, track their progress, and manage your customer service efficiently with our powerful platform.",
+    "submitTicket": "Submit a Ticket",
+    "signIn": "Sign In to Dashboard",
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Only $1 per month per user with a $100 monthly cap",
+      "perUser": "$1",
+      "perUserDesc": "Per user per month",
+      "maxCap": "$100",
+      "maxCapDesc": "Maximum monthly cost",
+      "maxUsers": "300",
+      "maxUsersDesc": "Users included at max price",
+      "customUpgrade": "Need more than 300 users? Contact us for custom enterprise pricing.",
+      "noAgentFees": "Pay only for your team members, not per support agent"
+    },
+    "features": {
+      "title": "Why Choose EasyTix?",
+      "easy": "Easy to Use",
+      "easyDesc": "Intuitive interface with simple ticket submission - no training required for your team or customers",
+      "tracking": "Real-time Tracking",
+      "trackingDesc": "Instant notifications and status updates keep everyone informed throughout the resolution process",
+      "support": "Professional Support",
+      "supportDesc": "Dedicated customer success team and comprehensive documentation to ensure your success",
+      "kanban": "Kanban Board View",
+      "kanbanDesc": "Visual ticket management with drag-and-drop functionality for efficient workflow organization",
+      "timeline": "Timeline Management",
+      "timelineDesc": "Calendar-based ticket visualization to track deadlines and manage workload distribution",
+      "roles": "Role-Based Access",
+      "rolesDesc": "Granular permissions system with admin, service desk, and user roles for secure operations"
+    },
+    "company": {
+      "title": "About Nomadsoft",
+      "description": "EasyTix is proudly developed by Nomadsoft, a leading provider of business automation solutions. We specialize in creating intuitive software that streamlines operations and enhances productivity.",
+      "website": "Visit Nomadsoft.us",
+      "websiteUrl": "https://nomadsoft.us/",
+      "mobile": "Mobile-First Design",
+      "mobileDesc": "Fully responsive interface optimized for all devices and screen sizes",
+      "i18n": "Global Internationalization",
+      "i18nDesc": "Built-in multi-language support for worldwide deployment",
+      "support": "Dedicated Customer Success",
+      "supportDesc": "Expert guidance and comprehensive documentation for your team"
+    }
   }
 }

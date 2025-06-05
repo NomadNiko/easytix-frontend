@@ -5,3 +5,26 @@ html {
 body {
   font-family: var(--font-oxanium), system-ui, sans-serif;
 }
+
+/* Fix for properly sized chevron icons in Mantine DateInput calendar */
+.mantine-DatePicker-calendarHeaderControl {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.mantine-DatePicker-calendarHeaderControl svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.mantine-DatePicker-calendarHeader button {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.mantine-DatePicker-calendarHeader button svg {
+  width: 16px !important;
+  height: 16px !important;
+}

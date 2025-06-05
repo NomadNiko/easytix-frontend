@@ -117,7 +117,7 @@ const NotificationIcon = () => {
               aria-label="Notifications"
               size="lg"
             >
-              <IconBell size={theme.other.iconSizes.xl} />
+              <IconBell size={theme.other.iconSizesPixels.xl} />
             </ActionIcon>
           </Indicator>
         </Menu.Target>

@@ -6,6 +6,7 @@ import { createQueryKeys } from "@/services/react-query/query-key-factory";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
 import {
+  useGetCategoriesService,
   useGetCategoriesByQueueService,
   useGetCategoryService,
   useCreateCategoryService,
@@ -19,6 +20,17 @@ export const categoryQueryKeys = createQueryKeys(["categories"], {
   list: () => ({
     key: [],
     sub: {
+      by: ({
+        page,
+        limit,
+        search,
+      }: {
+        page?: number;
+        limit?: number;
+        search?: string;
+      }) => ({
+        key: [page, limit, search],
+      }),
       byQueue: ({ queueId }: { queueId: string }) => ({
         key: [queueId],
       }),
@@ -33,6 +45,30 @@ export const categoryQueryKeys = createQueryKeys(["categories"], {
     },
   }),
 });
+
+export const useCategoriesQuery = (
+  page = 1,
+  limit = 100,
+  search?: string,
+  enabled = true
+) => {
+  const getCategoriesService = useGetCategoriesService();
+  return useQuery({
+    queryKey: categoryQueryKeys.list().sub.by({ page, limit, search }).key,
+    queryFn: async ({ signal }) => {
+      const { status, data } = await getCategoriesService(
+        undefined,
+        { page, limit, search },
+        { signal }
+      );
+      if (status === HTTP_CODES_ENUM.OK) {
+        return data;
+      }
+      return [];
+    },
+    enabled,
+  });
+};
 
 export const useCategoriesByQueueQuery = (queueId: string, enabled = true) => {
   const getCategoriesService = useGetCategoriesByQueueService();

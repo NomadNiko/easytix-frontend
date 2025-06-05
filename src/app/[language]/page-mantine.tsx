@@ -3,7 +3,6 @@ import { useTranslation } from "@/services/i18n/client";
 import {
   Container,
   Anchor,
-  Flex,
   Box,
   Stack,
   Title,
@@ -17,7 +16,6 @@ import {
   Loader,
   Center,
 } from "@mantine/core";
-import { Trans } from "react-i18next/TransWithoutContext";
 import {
   IconTicket,
   IconUsers,
@@ -26,6 +24,16 @@ import {
   IconClipboardList,
   IconExternalLink,
   IconPlus,
+  IconSearch,
+  IconCalendarTime,
+  IconColumns3,
+  IconFileText,
+  IconShield,
+  IconCurrencyDollar,
+  IconBuilding,
+  IconDeviceMobile,
+  IconWorld,
+  IconHeadset,
 } from "@tabler/icons-react";
 import useAuth from "@/services/auth/use-auth";
 import Link from "@/components/link";
@@ -35,7 +43,8 @@ function UserDashboard() {
   const { t } = useTranslation("home");
   const { user } = useAuth();
 
-  const isAdmin = user?.role?.id === RoleEnum.ADMIN;
+  const isAdmin = Number(user?.role?.id) === RoleEnum.ADMIN;
+  const isServiceDesk = Number(user?.role?.id) === RoleEnum.SERVICE_DESK;
 
   const quickActions = [
     {
@@ -46,10 +55,10 @@ function UserDashboard() {
       color: "blue",
     },
     {
-      title: t("dashboard.viewTickets"),
-      description: t("dashboard.viewTicketsDesc"),
-      icon: <IconTicket size={24} />,
-      href: "/tickets",
+      title: t("dashboard.myTickets"),
+      description: t("dashboard.myTicketsDesc"),
+      icon: <IconFileText size={24} />,
+      href: "/my-tickets",
       color: "green",
     },
     {
@@ -65,6 +74,30 @@ function UserDashboard() {
       icon: <IconSettings size={24} />,
       href: "/profile",
       color: "gray",
+    },
+  ];
+
+  const serviceDeskActions = [
+    {
+      title: t("dashboard.ticketSearch"),
+      description: t("dashboard.ticketSearchDesc"),
+      icon: <IconSearch size={24} />,
+      href: "/tickets",
+      color: "cyan",
+    },
+    {
+      title: t("dashboard.board"),
+      description: t("dashboard.boardDesc"),
+      icon: <IconColumns3 size={24} />,
+      href: "/board",
+      color: "teal",
+    },
+    {
+      title: t("dashboard.timeline"),
+      description: t("dashboard.timelineDesc"),
+      icon: <IconCalendarTime size={24} />,
+      href: "/timeline",
+      color: "violet",
     },
   ];
 
@@ -93,8 +126,10 @@ function UserDashboard() {
   ];
 
   const allActions = isAdmin
-    ? [...quickActions, ...adminActions]
-    : quickActions;
+    ? [...quickActions, ...serviceDeskActions, ...adminActions]
+    : isServiceDesk
+      ? [...quickActions, ...serviceDeskActions]
+      : quickActions;
 
   return (
     <Container size="lg">
@@ -181,20 +216,335 @@ function GuestLanding() {
   const { t } = useTranslation("home");
 
   return (
-    <Container size="md">
-      <Flex direction="column" h="90vh" justify="space-between" pt="md">
-        <Stack gap="md">
-          <Title order={3} data-testid="home-title" mb="md">
+    <Container size="xl" py="xl">
+      <Stack gap="xl">
+        {/* Hero Section */}
+        <Box ta="center" py="xl">
+          <Title
+            order={1}
+            data-testid="home-title"
+            mb="md"
+            c="blue"
+            size="3rem"
+          >
             {t("title")}
           </Title>
-          <Text>
-            <Trans i18nKey={`description`} t={t} />
+          <Title order={2} mb="lg" c="dimmed" fw={400} size="1.5rem">
+            {t("guest.subtitle")}
+          </Title>
+          <Text size="lg" maw={800} mx="auto" mb="xl" c="dimmed">
+            {t("guest.description")}
           </Text>
-        </Stack>
-        <Box ta="center" pb="md">
-          <Anchor href="/privacy-policy">Privacy Policy</Anchor>
+
+          <Group justify="center" gap="md" mb="xl">
+            <Button
+              component={Link}
+              href="/submit-ticket"
+              size="xl"
+              leftSection={<IconPlus size={24} />}
+              variant="filled"
+              color="blue"
+              radius="md"
+            >
+              {t("guest.submitTicket")}
+            </Button>
+            <Button
+              component={Link}
+              href="/sign-in"
+              size="xl"
+              variant="light"
+              color="blue"
+              radius="md"
+            >
+              {t("guest.signIn")}
+            </Button>
+          </Group>
         </Box>
-      </Flex>
+
+        {/* Features Section */}
+        <Box py="xl">
+          <Container size="lg">
+            <Title order={2} ta="center" mb="xl">
+              {t("guest.features.title")}
+            </Title>
+            <Grid>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconTicket size={40} color="var(--mantine-color-blue-6)" />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.easy")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.easyDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconBell size={40} color="var(--mantine-color-green-6)" />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.tracking")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.trackingDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconUsers size={40} color="var(--mantine-color-orange-6)" />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.support")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.supportDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconColumns3
+                    size={40}
+                    color="var(--mantine-color-purple-6)"
+                  />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.kanban")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.kanbanDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconCalendarTime
+                    size={40}
+                    color="var(--mantine-color-cyan-6)"
+                  />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.timeline")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.timelineDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+                <Card padding="lg" radius="md" withBorder ta="center" h="100%">
+                  <IconShield size={40} color="var(--mantine-color-red-6)" />
+                  <Text fw={500} mt="md" mb="sm">
+                    {t("guest.features.roles")}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {t("guest.features.rolesDesc")}
+                  </Text>
+                </Card>
+              </Grid.Col>
+            </Grid>
+          </Container>
+        </Box>
+
+        {/* Pricing Section */}
+        <Box py="xl" style={{ backgroundColor: "var(--mantine-color-gray-0)" }}>
+          <Container size="lg">
+            <Stack gap="xl" ta="center">
+              <Box>
+                <Title order={2} mb="sm">
+                  {t("guest.pricing.title")}
+                </Title>
+                <Text size="lg" c="dimmed" mb="xl">
+                  {t("guest.pricing.subtitle")}
+                </Text>
+              </Box>
+
+              <Grid>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="xl"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconCurrencyDollar
+                      size={48}
+                      color="var(--mantine-color-blue-6)"
+                    />
+                    <Title order={1} c="blue" mt="md" mb="xs">
+                      {t("guest.pricing.perUser")}
+                    </Title>
+                    <Text fw={500} mb="sm">
+                      {t("guest.pricing.perUserDesc")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      Simple per-user pricing
+                    </Text>
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="xl"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconShield
+                      size={48}
+                      color="var(--mantine-color-green-6)"
+                    />
+                    <Title order={1} c="green" mt="md" mb="xs">
+                      {t("guest.pricing.maxCap")}
+                    </Title>
+                    <Text fw={500} mb="sm">
+                      {t("guest.pricing.maxCapDesc")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      No surprise billing
+                    </Text>
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="xl"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconBuilding
+                      size={48}
+                      color="var(--mantine-color-orange-6)"
+                    />
+                    <Title order={1} c="orange" mt="md" mb="xs">
+                      {t("guest.pricing.maxUsers")}
+                    </Title>
+                    <Text fw={500} mb="sm">
+                      {t("guest.pricing.maxUsersDesc")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      Perfect for growing teams
+                    </Text>
+                  </Card>
+                </Grid.Col>
+              </Grid>
+
+              <Box>
+                <Text size="lg" fw={500} mb="sm">
+                  {t("guest.pricing.noAgentFees")}
+                </Text>
+                <Text size="sm" c="dimmed">
+                  {t("guest.pricing.customUpgrade")}
+                </Text>
+              </Box>
+            </Stack>
+          </Container>
+        </Box>
+
+        {/* Company Section */}
+        <Box py="xl" style={{ backgroundColor: "var(--mantine-color-blue-0)" }}>
+          <Container size="lg">
+            <Stack gap="xl" ta="center">
+              <Box>
+                <Title order={2} mb="lg">
+                  {t("guest.company.title")}
+                </Title>
+                <Text size="lg" maw={800} mx="auto" mb="md">
+                  {t("guest.company.description")}
+                </Text>
+                <Anchor
+                  href={t("guest.company.websiteUrl")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "12px 24px",
+                    backgroundColor: "var(--mantine-color-blue-1)",
+                    color: "var(--mantine-color-blue-7)",
+                    borderRadius: "var(--mantine-radius-md)",
+                    textDecoration: "none",
+                    fontWeight: 500,
+                    fontSize: "var(--mantine-font-size-lg)",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <IconExternalLink size={20} />
+                  {t("guest.company.website")}
+                </Anchor>
+              </Box>
+
+              <Grid>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="lg"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconDeviceMobile
+                      size={40}
+                      color="var(--mantine-color-blue-6)"
+                    />
+                    <Text fw={500} mt="md" mb="sm">
+                      {t("guest.company.mobile")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      {t("guest.company.mobileDesc")}
+                    </Text>
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="lg"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconWorld size={40} color="var(--mantine-color-green-6)" />
+                    <Text fw={500} mt="md" mb="sm">
+                      {t("guest.company.i18n")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      {t("guest.company.i18nDesc")}
+                    </Text>
+                  </Card>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Card
+                    padding="lg"
+                    radius="md"
+                    withBorder
+                    ta="center"
+                    h="100%"
+                  >
+                    <IconHeadset
+                      size={40}
+                      color="var(--mantine-color-orange-6)"
+                    />
+                    <Text fw={500} mt="md" mb="sm">
+                      {t("guest.company.support")}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      {t("guest.company.supportDesc")}
+                    </Text>
+                  </Card>
+                </Grid.Col>
+              </Grid>
+            </Stack>
+          </Container>
+        </Box>
+
+        {/* Footer */}
+        <Box ta="center" py="md">
+          <Anchor href="/privacy-policy" size="sm" c="dimmed">
+            Privacy Policy
+          </Anchor>
+        </Box>
+      </Stack>
     </Container>
   );
 }

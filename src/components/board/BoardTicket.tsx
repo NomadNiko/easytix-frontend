@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Paper,
   Text,
@@ -13,10 +13,9 @@ import {
 } from "@mantine/core";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useTranslation } from "@/services/i18n/client";
 import { IconGripVertical, IconUser, IconCalendar } from "@tabler/icons-react";
 import { formatDate } from "@/utils/format-date";
-import { useGetUserService } from "@/services/api/services/users";
-import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
 interface Ticket {
   id: string;
@@ -33,6 +32,18 @@ interface Ticket {
   details: string;
   category?: { id: string; name: string };
   queue?: { id: string; name: string };
+  createdBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  assignedTo?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 interface BoardTicketProps {
@@ -41,8 +52,7 @@ interface BoardTicketProps {
 }
 
 export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
-  const [creatorName, setCreatorName] = useState<string>("");
-  const getUserService = useGetUserService();
+  const { t } = useTranslation("tickets");
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const isDark = colorScheme === "dark";
@@ -51,25 +61,11 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
       id: ticket.id,
     });
 
-  // Fetch creator name
-  useEffect(() => {
-    const fetchCreator = async () => {
-      if (ticket.createdById) {
-        try {
-          const response = await getUserService({ id: ticket.createdById });
-          if (response.status === HTTP_CODES_ENUM.OK && response.data) {
-            const firstName = response.data.firstName || "";
-            const lastName = response.data.lastName || "";
-            const fullName = `${firstName} ${lastName}`.trim();
-            setCreatorName(fullName || response.data.email);
-          }
-        } catch (error) {
-          console.error("Error fetching creator:", error);
-        }
-      }
-    };
-    fetchCreator();
-  }, [ticket.createdById, getUserService]);
+  // Get creator name from included user data
+  const creatorName = ticket.createdBy
+    ? `${ticket.createdBy.firstName} ${ticket.createdBy.lastName}`.trim() ||
+      ticket.createdBy.email
+    : "Unknown User";
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -128,7 +124,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
             }}
           >
             <IconGripVertical
-              size={theme.other.iconSizes.md}
+              size={theme.other.iconSizesPixels.md}
               style={{
                 color: isDark ? theme.colors.gray[4] : theme.colors.gray[5],
               }}
@@ -149,7 +145,7 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
             color={getPriorityColor(ticket.priority)}
             variant="light"
           >
-            {ticket.priority}
+            {t(`tickets:tickets.priorities.${ticket.priority}`)}
           </Badge>
 
           {ticket.category && (
@@ -163,16 +159,16 @@ export function BoardTicket({ ticket, onClick }: BoardTicketProps) {
         <Stack gap={4}>
           <Group gap="xs">
             <IconUser
-              size={theme.other.iconSizes.sm}
+              size={theme.other.iconSizesPixels.sm}
               color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">
-              {creatorName || "Loading..."}
+              {creatorName}
             </Text>
           </Group>
           <Group gap="xs">
             <IconCalendar
-              size={theme.other.iconSizes.sm}
+              size={theme.other.iconSizesPixels.sm}
               color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">

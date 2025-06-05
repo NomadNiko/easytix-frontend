@@ -76,7 +76,7 @@ export function FilePicker({
         {value ? (
           <Group justify="apart">
             <Group>
-              <IconFile size={theme.other.iconSizes.xl} />
+              <IconFile size={theme.other.iconSizesPixels.xl} />
               <Text size="sm">
                 {value.path.split("/").pop() ||
                   t("formInputs.filePicker.uploadedFile")}
@@ -87,7 +87,7 @@ export function FilePicker({
               color="red"
               size="xs"
               onClick={handleRemoveFile}
-              leftSection={<IconX size={theme.other.iconSizes.md} />}
+              leftSection={<IconX size={theme.other.iconSizesPixels.md} />}
               disabled={disabled}
             >
               {t("formInputs.filePicker.remove")}
@@ -98,7 +98,7 @@ export function FilePicker({
             <Button
               component="label"
               variant="outline"
-              leftSection={<IconUpload size={theme.other.iconSizes.md} />}
+              leftSection={<IconUpload size={theme.other.iconSizesPixels.md} />}
               loading={isLoading}
               disabled={disabled}
               size="sm"

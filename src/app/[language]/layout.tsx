@@ -15,6 +15,7 @@ import { MantineProviders } from "@/components/theme/mantine-provider";
 import { NotificationsProvider } from "@/components/mantine/feedback/notification-provider";
 import { oxanium } from "@/config/fonts";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
 import "../globals.css";
 import "@/services/i18n/config";

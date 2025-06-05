@@ -119,6 +119,7 @@
     "ticketDetails": "Ticket Details",
     "notFound": "Ticket not found",
     "empty": "No tickets found",
+    "noTickets": "No tickets found",
     "resultsCount": "{{count}} tickets found",
     "showingResultsCount": "Showing {{showing}} of {{total}} tickets",
     "noResults": "No tickets found",
@@ -150,6 +151,17 @@
       "category": "Category",
       "closingNotes": "Closing Notes"
     },
+    "table": {
+      "id": "ID",
+      "title": "Title",
+      "queue": "Queue",
+      "category": "Category",
+      "status": "Status",
+      "priority": "Priority",
+      "created": "Created",
+      "unknownQueue": "Unknown Queue",
+      "unknownCategory": "Unknown Category"
+    },
     "placeholders": {
       "title": "Enter ticket title",
       "details": "Enter ticket details",
@@ -160,12 +172,19 @@
       "opened": "Open",
       "inProgress": "In Progress",
       "resolved": "Resolved",
-      "closed": "Closed"
+      "closed": "Closed",
+      "Opened": "Open",
+      "In Progress": "In Progress",
+      "Resolved": "Resolved",
+      "Closed": "Closed"
     },
     "priorities": {
       "high": "High",
       "medium": "Medium",
-      "low": "Low"
+      "low": "Low",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low"
     },
     "actions": {
       "create": "Create Ticket",
@@ -194,12 +213,26 @@
     "filters": {
       "title": "Filters",
       "queue": "Queue",
+      "queues": "Queues",
+      "category": "Category",
+      "categories": "Categories",
       "status": "Status",
       "priority": "Priority",
       "search": "Search",
       "userFilter": "Filter by Users",
       "selectUsers": "Select users to filter by",
+      "selectQueues": "Select queues",
+      "selectCategories": "Select categories",
+      "selectStatuses": "Select statuses",
+      "selectPriorities": "Select priorities",
+      "createdAfter": "Created After",
+      "createdBefore": "Created Before",
+      "selectDate": "Select date",
+      "unassigned": "Unassigned Only",
+      "hasDocuments": "Has Attachments",
+      "hasComments": "Has Comments",
       "anyQueue": "Any Queue",
+      "anyCategory": "Any Category",
       "anyStatus": "Any Status",
       "anyPriority": "Any Priority",
       "searchPlaceholder": "Search by title, description, or comments",
@@ -207,6 +240,14 @@
       "selectQueue": "Select a queue",
       "selectCategory": "Select a category",
       "selectQueueFirst": "Please select a queue first"
+    },
+    "search": {
+      "placeholder": "Search tickets by title, description, or comments...",
+      "search": "Search",
+      "showing": "Showing",
+      "resultsFor": "results for",
+      "allTickets": "tickets",
+      "clearAll": "Clear All"
     },
     "validation": {
       "queueIdRequired": "Queue is required",
@@ -320,7 +361,10 @@
   "priority": {
     "high": "High",
     "medium": "Medium",
-    "low": "Low"
+    "low": "Low",
+    "High": "High",
+    "Medium": "Medium",
+    "Low": "Low"
   },
   "actions": {
     "submitTicket": "Submit Ticket",

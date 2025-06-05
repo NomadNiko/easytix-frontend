@@ -14,6 +14,9 @@ import {
   Timeline,
   Loader,
   Center,
+  Button,
+  Textarea,
+  Select,
 } from "@mantine/core";
 import {
   IconUser,
@@ -24,13 +27,30 @@ import {
   IconStatusChange,
   IconUserPlus,
   IconFile,
+  IconUserX,
+  IconSend,
+  IconCheck,
+  IconX,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { formatDate } from "@/utils/format-date";
-import { TicketStatus, TicketPriority } from "@/services/api/services/tickets";
-import { useGetHistoryItemsByTicketService } from "@/services/api/services/history-items";
+import {
+  TicketStatus,
+  TicketPriority,
+  useUpdateTicketStatusService,
+  useAssignTicketService,
+  useUpdateTicketService,
+} from "@/services/api/services/tickets";
+import {
+  useGetHistoryItemsByTicketService,
+  useCreateHistoryItemService,
+  HistoryItemType,
+} from "@/services/api/services/history-items";
 import { useGetUserService } from "@/services/api/services/users";
+import { useGetQueueService } from "@/services/api/services/queues";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
+import { notifications } from "@mantine/notifications";
 
 interface Ticket {
   id: string;
@@ -53,6 +73,7 @@ interface ExpandedTicketModalProps {
   opened: boolean;
   onClose: () => void;
   ticket: Ticket | null;
+  onTicketUpdate?: () => void; // Callback to refresh board data
 }
 
 interface HistoryItem {
@@ -70,25 +91,54 @@ export function ExpandedTicketModal({
   opened,
   onClose,
   ticket,
+  onTicketUpdate,
 }: ExpandedTicketModalProps) {
-  const { t } = useTranslation("tickets");
+  const { t } = useTranslation("board");
+  const tTickets = useTranslation("tickets").t;
+  const tCommon = useTranslation("common").t;
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [users, setUsers] = useState<Record<string, User>>({});
+  const [queueUsers, setQueueUsers] = useState<User[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [creator, setCreator] = useState<User | null>(null);
+  const [currentTicket, setCurrentTicket] = useState<Ticket | null>(ticket);
 
+  // Action states
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [selectedAssignee, setSelectedAssignee] = useState<string | null>(null);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [showClosingNotes, setShowClosingNotes] = useState(false);
+  const [closingNotes, setClosingNotes] = useState("");
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
+  // Services
   const getHistoryItemsByTicketService = useGetHistoryItemsByTicketService();
+  const createHistoryItemService = useCreateHistoryItemService();
   const getUserService = useGetUserService();
+  const getQueueService = useGetQueueService();
+  const updateTicketStatusService = useUpdateTicketStatusService();
+  const assignTicketService = useAssignTicketService();
+  const updateTicketService = useUpdateTicketService();
 
+  // Update current ticket when prop changes
+  useEffect(() => {
+    setCurrentTicket(ticket);
+    setSelectedAssignee(ticket?.assignedToId || null);
+  }, [ticket]);
+
+  // Fetch history and users
   useEffect(() => {
     const fetchHistoryAndUsers = async () => {
-      if (!ticket) return;
+      if (!currentTicket) return;
 
       setIsLoadingHistory(true);
       try {
         // Fetch history items
         const historyResponse = await getHistoryItemsByTicketService({
-          ticketId: ticket.id,
+          ticketId: currentTicket.id,
         });
 
         if (historyResponse.status === HTTP_CODES_ENUM.OK) {
@@ -98,7 +148,7 @@ export function ExpandedTicketModal({
           // Get unique user IDs
           const userIds = Array.from(
             new Set<string>([
-              ticket.createdById,
+              currentTicket.createdById,
               ...historyData.map((item) => item.userId),
             ])
           );
@@ -123,8 +173,8 @@ export function ExpandedTicketModal({
           setUsers(userMap);
 
           // Set creator
-          if (ticket.createdById && userMap[ticket.createdById]) {
-            setCreator(userMap[ticket.createdById]);
+          if (currentTicket.createdById && userMap[currentTicket.createdById]) {
+            setCreator(userMap[currentTicket.createdById]);
           }
         }
       } catch (error) {
@@ -134,10 +184,227 @@ export function ExpandedTicketModal({
       }
     };
 
-    if (opened && ticket) {
+    // Fetch queue and assigned users for assignment
+    const fetchQueueAndUsers = async () => {
+      if (!currentTicket?.queueId) return;
+
+      setIsLoadingUsers(true);
+      try {
+        const queueResponse = await getQueueService({
+          id: currentTicket.queueId,
+        });
+        if (queueResponse.status === HTTP_CODES_ENUM.OK && queueResponse.data) {
+          const queue = queueResponse.data;
+
+          // Fetch users who are assigned to this queue
+          const assignedUsers = [];
+          for (const userId of queue.assignedUserIds || []) {
+            try {
+              const userResponse = await getUserService({ id: userId });
+              if (
+                userResponse.status === HTTP_CODES_ENUM.OK &&
+                userResponse.data
+              ) {
+                assignedUsers.push(userResponse.data);
+              }
+            } catch (error) {
+              console.error(`Error fetching user ${userId}:`, error);
+            }
+          }
+          setQueueUsers(assignedUsers);
+        }
+      } catch (error) {
+        console.error("Error fetching queue:", error);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
+
+    if (opened && currentTicket) {
       fetchHistoryAndUsers();
+      fetchQueueAndUsers();
     }
-  }, [opened, ticket, getHistoryItemsByTicketService, getUserService]);
+  }, [
+    opened,
+    currentTicket,
+    getHistoryItemsByTicketService,
+    getUserService,
+    getQueueService,
+  ]);
+
+  // Action handlers
+  const handleAddComment = async () => {
+    if (!currentTicket || !newComment.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const response = await createHistoryItemService({
+        ticketId: currentTicket.id,
+        type: HistoryItemType.COMMENT,
+        details: newComment.trim(),
+      });
+
+      if (response.status === HTTP_CODES_ENUM.CREATED) {
+        notifications.show({
+          title: t("modal.notifications.comment.success.title"),
+          message: t("modal.notifications.comment.success.message"),
+          color: "green",
+        });
+
+        // Refresh history
+        const historyResponse = await getHistoryItemsByTicketService({
+          ticketId: currentTicket.id,
+        });
+        if (historyResponse.status === HTTP_CODES_ENUM.OK) {
+          setHistoryItems(historyResponse.data || []);
+        }
+
+        setNewComment("");
+        setShowCommentForm(false);
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      notifications.show({
+        title: tCommon("error"),
+        message: t("modal.notifications.comment.error.message"),
+        color: "red",
+      });
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  const handleAssignTicket = async () => {
+    if (!currentTicket || !selectedAssignee) return;
+
+    setIsAssigning(true);
+    try {
+      const response = await assignTicketService(
+        { userId: selectedAssignee },
+        { id: currentTicket.id }
+      );
+
+      if (response.status === HTTP_CODES_ENUM.OK && response.data) {
+        notifications.show({
+          title: t("modal.notifications.assign.success.title"),
+          message: t("modal.notifications.assign.success.message"),
+          color: "green",
+        });
+
+        setCurrentTicket(response.data);
+        onTicketUpdate?.();
+
+        // Refresh history
+        const historyResponse = await getHistoryItemsByTicketService({
+          ticketId: currentTicket.id,
+        });
+        if (historyResponse.status === HTTP_CODES_ENUM.OK) {
+          setHistoryItems(historyResponse.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error assigning ticket:", error);
+      notifications.show({
+        title: tCommon("error"),
+        message: t("modal.notifications.assign.error.message"),
+        color: "red",
+      });
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const handleUnassignTicket = async () => {
+    if (!currentTicket) return;
+
+    setIsAssigning(true);
+    try {
+      const response = await updateTicketService(
+        { assignedToId: null },
+        { id: currentTicket.id }
+      );
+
+      if (response.status === HTTP_CODES_ENUM.OK && response.data) {
+        notifications.show({
+          title: t("modal.notifications.unassign.success.title"),
+          message: t("modal.notifications.unassign.success.message"),
+          color: "green",
+        });
+
+        setCurrentTicket(response.data);
+        setSelectedAssignee(null);
+        onTicketUpdate?.();
+
+        // Refresh history
+        const historyResponse = await getHistoryItemsByTicketService({
+          ticketId: currentTicket.id,
+        });
+        if (historyResponse.status === HTTP_CODES_ENUM.OK) {
+          setHistoryItems(historyResponse.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error unassigning ticket:", error);
+      notifications.show({
+        title: tCommon("error"),
+        message: t("modal.notifications.unassign.error.message"),
+        color: "red",
+      });
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const handleStatusChange = async (
+    newStatus: TicketStatus,
+    notes?: string
+  ) => {
+    if (!currentTicket) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      const payload: { status: TicketStatus; closingNotes?: string } = {
+        status: newStatus,
+      };
+      if (notes) {
+        payload.closingNotes = notes;
+      }
+
+      const response = await updateTicketStatusService(payload, {
+        id: currentTicket.id,
+      });
+
+      if (response.status === HTTP_CODES_ENUM.OK && response.data) {
+        notifications.show({
+          title: t("modal.notifications.status.success.title"),
+          message: t("modal.notifications.status.success.message"),
+          color: "green",
+        });
+
+        setCurrentTicket(response.data);
+        setShowClosingNotes(false);
+        setClosingNotes("");
+        onTicketUpdate?.();
+
+        // Refresh history
+        const historyResponse = await getHistoryItemsByTicketService({
+          ticketId: currentTicket.id,
+        });
+        if (historyResponse.status === HTTP_CODES_ENUM.OK) {
+          setHistoryItems(historyResponse.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      notifications.show({
+        title: tCommon("error"),
+        message: t("modal.notifications.status.error.message"),
+        color: "red",
+      });
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   const getUserName = (userId: string) => {
     if (userId === "system") return "System";
@@ -194,7 +461,7 @@ export function ExpandedTicketModal({
     }
   };
 
-  if (!ticket) return null;
+  if (!currentTicket) return null;
 
   return (
     <Modal
@@ -203,8 +470,15 @@ export function ExpandedTicketModal({
       title={
         <Group>
           <Text size="sm" c="dimmed">
-            #{ticket.id.slice(-6)}
+            #{currentTicket.id.slice(-6)}
           </Text>
+          <Badge
+            color={getStatusColor(currentTicket.status)}
+            variant="filled"
+            size="sm"
+          >
+            {tTickets(`tickets.statuses.${currentTicket.status}`)}
+          </Badge>
         </Group>
       }
       size="xl"
@@ -212,7 +486,8 @@ export function ExpandedTicketModal({
       overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
       styles={{
         content: {
-          maxHeight: "80vh",
+          height: "95vh",
+          maxHeight: "95vh",
           display: "flex",
           flexDirection: "column",
         },
@@ -221,132 +496,339 @@ export function ExpandedTicketModal({
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          padding: "0",
         },
       }}
     >
-      <Stack gap="md" style={{ flex: 1, overflow: "hidden" }}>
-        {/* Header */}
-        <Box>
-          <Title order={3} mb="md">
-            {ticket.title}
-          </Title>
+      <ScrollArea
+        style={{ flex: 1, height: "100%" }}
+        offsetScrollbars
+        scrollbarSize={6}
+        type="auto"
+      >
+        <Stack gap="md" p="md">
+          {/* Header */}
+          <Box>
+            <Title order={3} mb="md">
+              {currentTicket.title}
+            </Title>
 
-          <Group gap="xl" wrap="wrap">
-            <Group gap="xs">
-              <IconFlag size={16} />
-              <Badge
-                color={getPriorityColor(ticket.priority)}
-                variant="filled"
-                size="sm"
-              >
-                {ticket.priority}
-              </Badge>
-            </Group>
-
-            <Group gap="xs">
-              <Badge
-                color={getStatusColor(ticket.status)}
-                variant="filled"
-                size="sm"
-              >
-                {ticket.status}
-              </Badge>
-            </Group>
-
-            {ticket.category && (
-              <Group gap="xs">
-                <IconCategory size={16} />
-                <Text size="sm">{ticket.category.name}</Text>
-              </Group>
-            )}
-
-            <Group gap="xs">
-              <IconUser size={16} />
-              <Text size="sm">
-                {creator
-                  ? `${creator.firstName || ""} ${creator.lastName || ""}`.trim() ||
-                    creator.email
-                  : t("common:unknown")}
-              </Text>
-            </Group>
-
-            <Group gap="xs">
-              <IconCalendar size={16} />
-              <Text size="sm">{formatDate(new Date(ticket.createdAt))}</Text>
-            </Group>
-          </Group>
-        </Box>
-
-        <Divider />
-
-        {/* Details */}
-        <Box>
-          <Text fw={600} size="sm" mb="xs">
-            {t("tickets:tickets.fields.details")}
-          </Text>
-          <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
-            {ticket.details}
-          </Text>
-        </Box>
-
-        {ticket.closingNotes && (
-          <>
-            <Divider />
-            <Box>
-              <Text fw={600} size="sm" mb="xs">
-                {t("tickets:tickets.fields.closingNotes")}
-              </Text>
-              <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
-                {ticket.closingNotes}
-              </Text>
-            </Box>
-          </>
-        )}
-
-        <Divider />
-
-        {/* History Timeline */}
-        <Box style={{ flex: 1, minHeight: 0 }}>
-          <Text fw={600} size="sm" mb="md">
-            {t("tickets:tickets.timeline")}
-          </Text>
-
-          {isLoadingHistory ? (
-            <Center py="xl">
-              <Loader size="sm" />
-            </Center>
-          ) : (
-            <ScrollArea style={{ height: "300px" }} offsetScrollbars>
-              <Timeline
-                active={historyItems.length}
-                bulletSize={24}
-                lineWidth={2}
-              >
-                {historyItems.map((item) => (
-                  <Timeline.Item
-                    key={item.id}
-                    bullet={getHistoryIcon(item.type)}
-                    title={
-                      <Group gap="xs">
-                        <Text size="sm" fw={500}>
-                          {getUserName(item.userId)}
-                        </Text>
-                        <Text size="xs" c="dimmed">
-                          {formatDate(new Date(item.createdAt))}
-                        </Text>
-                      </Group>
-                    }
+            <Stack gap="sm">
+              <Group gap="md" wrap="wrap">
+                <Group gap="xs">
+                  <IconFlag size={16} />
+                  <Badge
+                    color={getPriorityColor(currentTicket.priority)}
+                    variant="filled"
+                    size="sm"
                   >
-                    <Text size="sm" c="dimmed">
-                      {item.details}
-                    </Text>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </ScrollArea>
+                    {tTickets(`tickets.priorities.${currentTicket.priority}`)}
+                  </Badge>
+                </Group>
+
+                {currentTicket.category && (
+                  <Group gap="xs">
+                    <IconCategory size={16} />
+                    <Text size="sm">{currentTicket.category.name}</Text>
+                  </Group>
+                )}
+              </Group>
+
+              <Stack gap="xs">
+                <Group gap="xs">
+                  <IconUser size={16} />
+                  <Text size="sm">
+                    {creator
+                      ? `${creator.firstName || ""} ${creator.lastName || ""}`.trim() ||
+                        creator.email
+                      : tCommon("unknown")}
+                  </Text>
+                </Group>
+
+                <Group gap="xs">
+                  <IconCalendar size={16} />
+                  <Text size="sm">
+                    {formatDate(new Date(currentTicket.createdAt))}
+                  </Text>
+                </Group>
+              </Stack>
+            </Stack>
+          </Box>
+
+          {/* Action Buttons */}
+          <Box>
+            <Stack gap="xs">
+              <Button
+                fullWidth
+                leftSection={<IconMessage size={16} />}
+                variant="light"
+                color="blue"
+                onClick={() => setShowCommentForm(!showCommentForm)}
+                size="sm"
+                styles={{
+                  label: { fontSize: "11px" },
+                }}
+              >
+                {t("modal.actions.addComment")}
+              </Button>
+
+              {currentTicket.assignedToId ? (
+                <Button
+                  fullWidth
+                  leftSection={<IconUserX size={16} />}
+                  variant="light"
+                  color="orange"
+                  onClick={handleUnassignTicket}
+                  loading={isAssigning}
+                  size="sm"
+                  styles={{
+                    label: { fontSize: "11px" },
+                  }}
+                >
+                  {t("modal.actions.unassign")}
+                </Button>
+              ) : (
+                <Button
+                  fullWidth
+                  leftSection={<IconUserPlus size={16} />}
+                  variant="light"
+                  color="green"
+                  onClick={handleAssignTicket}
+                  loading={isAssigning}
+                  disabled={!selectedAssignee}
+                  size="sm"
+                  styles={{
+                    label: { fontSize: "11px" },
+                  }}
+                >
+                  {t("modal.actions.assign")}
+                </Button>
+              )}
+
+              {currentTicket.status === TicketStatus.OPENED ||
+              currentTicket.status === TicketStatus.IN_PROGRESS ? (
+                <Button
+                  fullWidth
+                  leftSection={<IconCheck size={16} />}
+                  variant="light"
+                  color="green"
+                  onClick={() => setShowClosingNotes(true)}
+                  loading={isUpdatingStatus}
+                  size="sm"
+                  styles={{
+                    label: { fontSize: "11px" },
+                  }}
+                >
+                  {t("modal.actions.resolve")}
+                </Button>
+              ) : currentTicket.status === TicketStatus.RESOLVED ? (
+                <Button
+                  fullWidth
+                  leftSection={<IconX size={16} />}
+                  variant="light"
+                  color="gray"
+                  onClick={() => handleStatusChange(TicketStatus.CLOSED)}
+                  loading={isUpdatingStatus}
+                  size="sm"
+                  styles={{
+                    label: { fontSize: "11px" },
+                  }}
+                >
+                  {t("modal.actions.close")}
+                </Button>
+              ) : (
+                <Button
+                  fullWidth
+                  leftSection={<IconRefresh size={16} />}
+                  variant="light"
+                  color="blue"
+                  onClick={() => handleStatusChange(TicketStatus.OPENED)}
+                  loading={isUpdatingStatus}
+                  size="sm"
+                  styles={{
+                    label: { fontSize: "11px" },
+                  }}
+                >
+                  {t("modal.actions.reopen")}
+                </Button>
+              )}
+            </Stack>
+          </Box>
+
+          {/* Assignment Section */}
+          {!currentTicket.assignedToId && (
+            <Box>
+              <Select
+                label={t("modal.assignTo.label")}
+                placeholder={
+                  isLoadingUsers
+                    ? tCommon("loading")
+                    : t("modal.assignTo.placeholder")
+                }
+                data={queueUsers.map((user) => ({
+                  value: user.id,
+                  label:
+                    `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+                    user.email,
+                }))}
+                value={selectedAssignee}
+                onChange={setSelectedAssignee}
+                searchable
+                disabled={isLoadingUsers}
+                size="sm"
+              />
+            </Box>
           )}
-        </Box>
-      </Stack>
+
+          {/* Comment Form */}
+          {showCommentForm && (
+            <Box>
+              <Stack gap="sm">
+                <Textarea
+                  label={t("modal.comment.label")}
+                  placeholder={t("modal.comment.placeholder")}
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  minRows={3}
+                  maxRows={6}
+                  size="sm"
+                />
+                <Group justify="flex-end">
+                  <Button
+                    variant="subtle"
+                    onClick={() => {
+                      setShowCommentForm(false);
+                      setNewComment("");
+                    }}
+                    size="sm"
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                  <Button
+                    leftSection={<IconSend size={16} />}
+                    onClick={handleAddComment}
+                    loading={isSubmittingComment}
+                    disabled={!newComment.trim()}
+                    size="sm"
+                  >
+                    {t("modal.comment.send")}
+                  </Button>
+                </Group>
+              </Stack>
+            </Box>
+          )}
+
+          {/* Closing Notes Form */}
+          {showClosingNotes && (
+            <Box>
+              <Stack gap="sm">
+                <Textarea
+                  label={t("modal.closingNotes.label")}
+                  placeholder={t("modal.closingNotes.placeholder")}
+                  value={closingNotes}
+                  onChange={(e) => setClosingNotes(e.target.value)}
+                  minRows={3}
+                  maxRows={6}
+                  size="sm"
+                />
+                <Group justify="flex-end">
+                  <Button
+                    variant="subtle"
+                    onClick={() => {
+                      setShowClosingNotes(false);
+                      setClosingNotes("");
+                    }}
+                    size="sm"
+                  >
+                    {tCommon("cancel")}
+                  </Button>
+                  <Button
+                    leftSection={<IconCheck size={16} />}
+                    onClick={() =>
+                      handleStatusChange(TicketStatus.RESOLVED, closingNotes)
+                    }
+                    loading={isUpdatingStatus}
+                    color="green"
+                    size="sm"
+                  >
+                    {t("modal.actions.resolve")}
+                  </Button>
+                </Group>
+              </Stack>
+            </Box>
+          )}
+
+          <Divider />
+
+          {/* Details */}
+          <Box>
+            <Text fw={600} size="sm" mb="xs">
+              {t("modal.details.title")}
+            </Text>
+            <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+              {currentTicket.details}
+            </Text>
+          </Box>
+
+          {currentTicket.closingNotes && (
+            <>
+              <Divider />
+              <Box>
+                <Text fw={600} size="sm" mb="xs">
+                  {t("modal.closingNotes.title")}
+                </Text>
+                <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+                  {currentTicket.closingNotes}
+                </Text>
+              </Box>
+            </>
+          )}
+
+          <Divider />
+
+          {/* History Timeline */}
+          <Box>
+            <Text fw={600} size="sm" mb="md">
+              {t("modal.timeline.title")}
+            </Text>
+
+            {isLoadingHistory ? (
+              <Center py="xl">
+                <Loader size="sm" />
+              </Center>
+            ) : (
+              <Box style={{ maxHeight: "250px", overflowY: "auto" }}>
+                <Timeline
+                  active={historyItems.length}
+                  bulletSize={20}
+                  lineWidth={2}
+                >
+                  {historyItems.map((item) => (
+                    <Timeline.Item
+                      key={item.id}
+                      bullet={getHistoryIcon(item.type)}
+                      title={
+                        <Group gap="xs">
+                          <Text size="sm" fw={500}>
+                            {getUserName(item.userId)}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            {formatDate(new Date(item.createdAt))}
+                          </Text>
+                        </Group>
+                      }
+                    >
+                      <Text size="sm" c="dimmed">
+                        {item.details}
+                      </Text>
+                    </Timeline.Item>
+                  ))}
+                </Timeline>
+              </Box>
+            )}
+          </Box>
+        </Stack>
+      </ScrollArea>
     </Modal>
   );
 }

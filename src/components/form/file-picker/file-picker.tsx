@@ -190,15 +190,15 @@ function FilePicker(props: FilePickerProps) {
         >
           <Group justify="apart" align="center">
             <Group>
-              <IconFile size={theme.other.spacing[40]} />
+              <IconFile size={40} />
               <Text size="md">{fileName || "File"}</Text>
             </Group>
             <Group>
               <ActionIcon component="a" href={props.value.path} target="_blank">
-                <IconDownload size={theme.other.iconSizes.lg} />
+                <IconDownload size={theme.other.iconSizesPixels.lg} />
               </ActionIcon>
               <ActionIcon color="red" onClick={removeFileHandle}>
-                <IconX size={theme.other.iconSizes.lg} />
+                <IconX size={theme.other.iconSizesPixels.lg} />
               </ActionIcon>
             </Group>
           </Group>
@@ -239,7 +239,7 @@ function FilePicker(props: FilePickerProps) {
           </Text>
           <Tooltip label="All file types are accepted including ZIP, RAR, DOC, PDF, etc.">
             <ActionIcon variant="transparent" size="xs">
-              <IconInfoCircle size={theme.other.iconSizes.md} />
+              <IconInfoCircle size={theme.other.iconSizesPixels.md} />
             </ActionIcon>
           </Tooltip>
         </Group>

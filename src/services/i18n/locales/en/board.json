@@ -10,7 +10,76 @@
   "columns": {
     "opened": "Opened",
     "inProgress": "In Progress",
-    "resolved": "Resolved"
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "modal": {
+    "actions": {
+      "addComment": "Add Comment",
+      "assign": "Assign",
+      "unassign": "Unassign",
+      "resolve": "Resolve",
+      "close": "Close",
+      "reopen": "Reopen"
+    },
+    "assignTo": {
+      "label": "Assign To",
+      "placeholder": "Select a user"
+    },
+    "comment": {
+      "label": "Add Comment",
+      "placeholder": "Enter your comment...",
+      "send": "Send"
+    },
+    "closingNotes": {
+      "label": "Resolution Notes",
+      "placeholder": "Enter resolution details...",
+      "title": "Closing Notes"
+    },
+    "details": {
+      "title": "Details"
+    },
+    "timeline": {
+      "title": "Timeline"
+    },
+    "notifications": {
+      "comment": {
+        "success": {
+          "title": "Comment Added",
+          "message": "Your comment has been added successfully"
+        },
+        "error": {
+          "message": "Failed to add comment"
+        }
+      },
+      "assign": {
+        "success": {
+          "title": "Ticket Assigned",
+          "message": "Ticket has been assigned successfully"
+        },
+        "error": {
+          "message": "Failed to assign ticket"
+        }
+      },
+      "unassign": {
+        "success": {
+          "title": "Ticket Unassigned",
+          "message": "Ticket has been unassigned successfully"
+        },
+        "error": {
+          "message": "Failed to unassign ticket"
+        }
+      },
+      "status": {
+        "success": {
+          "title": "Status Updated",
+          "message": "Ticket status has been updated successfully"
+        },
+        "error": {
+          "message": "Failed to update ticket status"
+        }
+      }
+    }
   },
   "modals": {
     "assignUser": {

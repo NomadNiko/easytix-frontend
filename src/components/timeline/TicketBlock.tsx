@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Text,
@@ -13,8 +13,7 @@ import {
 } from "@mantine/core";
 import { IconUser, IconCalendar } from "@tabler/icons-react";
 import { formatDate } from "@/utils/format-date";
-import { useGetUserService } from "@/services/api/services/users";
-import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
+import { useTranslation } from "@/services/i18n/client";
 
 interface Ticket {
   id: string;
@@ -29,6 +28,18 @@ interface Ticket {
   createdById: string;
   category?: { id: string; name: string };
   queue?: { id: string; name: string };
+  createdBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  assignedTo?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 interface TicketBlockProps {
@@ -37,31 +48,16 @@ interface TicketBlockProps {
 }
 
 export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
-  const [creatorName, setCreatorName] = useState<string>("");
-  const getUserService = useGetUserService();
+  const { t } = useTranslation("tickets");
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const isDark = colorScheme === "dark";
 
-  // Fetch creator name
-  useEffect(() => {
-    const fetchCreator = async () => {
-      if (ticket.createdById) {
-        try {
-          const response = await getUserService({ id: ticket.createdById });
-          if (response.status === HTTP_CODES_ENUM.OK && response.data) {
-            const firstName = response.data.firstName || "";
-            const lastName = response.data.lastName || "";
-            const fullName = `${firstName} ${lastName}`.trim();
-            setCreatorName(fullName || response.data.email);
-          }
-        } catch (error) {
-          console.error("Error fetching creator:", error);
-        }
-      }
-    };
-    fetchCreator();
-  }, [ticket.createdById, getUserService]);
+  // Get creator name from included user data
+  const creatorName = ticket.createdBy
+    ? `${ticket.createdBy.firstName} ${ticket.createdBy.lastName}`.trim() ||
+      ticket.createdBy.email
+    : "Unknown User";
 
   // Use standard status color mapping like the rest of the app
   const getStatusColor = (status: string) => {
@@ -145,7 +141,7 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
             color={getStatusColor(ticket.status)}
             variant="light"
           >
-            {ticket.status}
+            {t(`tickets:tickets.statuses.${ticket.status}`)}
           </Badge>
 
           <Badge
@@ -153,7 +149,7 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
             color={getPriorityColor(ticket.priority)}
             variant="light"
           >
-            {ticket.priority}
+            {t(`tickets:tickets.priorities.${ticket.priority}`)}
           </Badge>
 
           {ticket.category && (
@@ -167,16 +163,16 @@ export function TicketBlock({ ticket, onClick }: TicketBlockProps) {
         <Stack gap={2} mt="auto">
           <Group gap="xs" wrap="nowrap">
             <IconUser
-              size={theme.other.iconSizes.xs}
+              size={theme.other.iconSizesPixels.xs}
               color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed" lineClamp={1}>
-              {creatorName || "Loading..."}
+              {creatorName}
             </Text>
           </Group>
           <Group gap="xs" wrap="nowrap">
             <IconCalendar
-              size={theme.other.iconSizes.xs}
+              size={theme.other.iconSizesPixels.xs}
               color={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
             />
             <Text size="xs" c="dimmed">

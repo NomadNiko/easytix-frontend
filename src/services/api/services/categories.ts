@@ -26,6 +26,11 @@ export type CategoryUpdateRequest = {
 };
 
 // API Services
+export const useGetCategoriesService = createGetService<
+  Category[],
+  { page?: number; limit?: number; search?: string }
+>("/v1/categories");
+
 export const useGetCategoriesByQueueService = createGetService<
   Category[],
   { queueId: string }

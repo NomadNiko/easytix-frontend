@@ -5,22 +5,23 @@ import {
   rem,
 } from "@mantine/core";
 import { oxanium } from "@/config/fonts";
+import { BRAND_COLORS, MANTINE_SEMANTIC_COLORS } from "@/config/branding";
 import "@mantine/core/styles.css";
 
 const theme = createTheme({
   primaryColor: "blue",
   colors: {
     blue: [
-      "#E6F7FF",
-      "#BAE7FF",
-      "#91D5FF",
-      "#69C0FF",
-      "#40A9FF",
-      "#1890FF",
-      "#096DD9",
-      "#0050B3",
-      "#003A8C",
-      "#002766",
+      BRAND_COLORS.primary[50],
+      BRAND_COLORS.primary[100],
+      BRAND_COLORS.primary[200],
+      BRAND_COLORS.primary[300],
+      BRAND_COLORS.primary[400],
+      BRAND_COLORS.primary[500],
+      BRAND_COLORS.primary[600],
+      BRAND_COLORS.primary[700],
+      BRAND_COLORS.primary[800],
+      BRAND_COLORS.primary[900],
     ],
   },
   fontFamily: `${oxanium.style.fontFamily}, system-ui, sans-serif`,
@@ -46,11 +47,11 @@ const theme = createTheme({
     xl: rem(32),
   },
   shadows: {
-    xs: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
-    sm: "0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)",
-    md: "0 4px 12px rgba(0, 0, 0, 0.15)",
-    lg: "0 8px 16px rgba(0, 0, 0, 0.15)",
-    xl: "0 12px 24px rgba(0, 0, 0, 0.2)",
+    xs: `0 1px 3px ${BRAND_COLORS.ui.shadowLight}, 0 1px 2px ${BRAND_COLORS.ui.shadowMedium}`,
+    sm: `0 2px 4px ${BRAND_COLORS.ui.shadowLight}, 0 1px 2px ${BRAND_COLORS.ui.shadowMedium}`,
+    md: `0 4px 12px ${BRAND_COLORS.ui.shadowDark}`,
+    lg: `0 8px 16px ${BRAND_COLORS.ui.shadowDark}`,
+    xl: `0 12px 24px ${BRAND_COLORS.ui.shadowHeavy}`,
   },
   other: {
     // Custom spacing values
@@ -78,6 +79,14 @@ const theme = createTheme({
       lg: rem(18),
       xl: rem(24),
     },
+    // Icon sizes for Tabler icons (pixel values)
+    iconSizesPixels: {
+      xs: 10,
+      sm: 12,
+      md: 16,
+      lg: 18,
+      xl: 24,
+    },
     // Z-index values
     zIndex: {
       base: 0,
@@ -97,11 +106,11 @@ const theme = createTheme({
       slow: "0.3s ease",
       verySlow: "0.5s ease",
     },
-    // Border styles
+    // Border styles using brand colors
     borders: {
-      default: "1px solid var(--mantine-color-gray-3)",
-      light: "1px solid var(--mantine-color-gray-2)",
-      dark: "1px solid var(--mantine-color-gray-4)",
+      default: `1px solid ${BRAND_COLORS.ui.border}`,
+      light: `1px solid ${BRAND_COLORS.ui.borderLight}`,
+      dark: `1px solid ${BRAND_COLORS.ui.borderDark}`,
     },
     // Opacity values
     opacity: {
@@ -110,12 +119,18 @@ const theme = createTheme({
       subtle: 0.5,
       overlay: 0.5,
     },
-    // Custom colors
+    // Centralized Brand Colors
+    brandColors: BRAND_COLORS,
+
+    // Semantic Color Mappings
+    semanticColors: MANTINE_SEMANTIC_COLORS,
+
+    // Custom colors (legacy support)
     customColors: {
-      overlayDark: "rgba(0, 0, 0, 0.5)",
-      overlayMedium: "rgba(0, 0, 0, 0.3)",
-      overlayLight: "rgba(0, 0, 0, 0.15)",
-      border: "#ddd",
+      overlayDark: BRAND_COLORS.ui.overlayMedium,
+      overlayMedium: BRAND_COLORS.ui.overlayLight,
+      overlayLight: BRAND_COLORS.ui.overlaySubtle,
+      border: BRAND_COLORS.ui.border,
     },
     // Table widths
     tableWidths: {
@@ -198,5 +213,5 @@ export function InitColorSchemeScript() {
   return <ColorSchemeScript defaultColorScheme="light" />;
 }
 
-// Export theme for use in components
-export { theme };
+// Export theme and brand colors for use in components
+export { theme, BRAND_COLORS, MANTINE_SEMANTIC_COLORS };

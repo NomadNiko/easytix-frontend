@@ -123,3 +123,16 @@ export const useUpdateUserNotificationPreferencesService = createPatchService<
   NotificationPreferences,
   { id: User["id"] }
 >((params) => `/v1/users/${params.id}/notification-preferences`);
+
+// Batch operations
+export const useGetUsersBatchService = createGetService<
+  User[],
+  void,
+  { ids: string[] }
+>("/v1/users/batch", {
+  formatQueryParams: (params) => {
+    const searchParams = new URLSearchParams();
+    params.ids.forEach((id) => searchParams.append("ids", id));
+    return searchParams.toString();
+  },
+});

@@ -51,7 +51,7 @@ export const useTicketsQuery = (
   const getTicketsService = useGetTicketsService();
 
   return useQuery<TicketsPaginatedResponse>({
-    queryKey: ["tickets", "list", JSON.stringify(filters || {})],
+    queryKey: ["tickets", "list", filters],
     queryFn: async ({ signal }) => {
       const { status, data } = await getTicketsService(undefined, filters, {
         signal,
@@ -62,8 +62,10 @@ export const useTicketsQuery = (
       return { data: [], hasNextPage: false };
     },
     enabled,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // 30 seconds - reasonable freshness
     gcTime: 1000 * 60 * 5, // 5 minutes
+    retry: 1, // Reduce retries to avoid request spam
+    retryDelay: 1000, // 1 second delay between retries
   });
 };
 

@@ -1,114 +1,65 @@
 // src/app/[language]/tickets/page-content.tsx
 "use client";
 import React, { useState } from "react";
-import { Container, Title, Button, Group, Modal, Tabs } from "@mantine/core";
+import { Container, Title, Button, Group, Modal } from "@mantine/core";
 import { useTranslation } from "@/services/i18n/client";
 import { IconPlus } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/services/auth/use-auth";
 import {
   useTicketsQuery,
   useCreateTicketMutation,
-  TicketStatus,
   TicketPriority,
 } from "@/app/[language]/tickets/queries/ticket-queries";
 import { TicketsPaginatedResponse } from "@/services/api/services/tickets";
 import { Ticket } from "@/services/api/services/tickets";
 import { TicketForm } from "@/components/tickets/TicketForm";
-import { TicketList } from "@/components/tickets/TicketList";
+import { SimpleTicketList } from "@/components/tickets/SimpleTicketList";
+import { UnifiedSearchPanel } from "@/components/tickets/UnifiedSearchPanel";
 import useLanguage from "@/services/i18n/use-language";
-
-interface TicketFilters {
-  queueId: string | null;
-  status: TicketStatus | null;
-  priority: TicketPriority | null;
-  search: string | null;
-  assignedToId?: string | null;
-  createdById?: string | null;
-  userIds?: string[] | null;
-}
+import {
+  SearchCriteria,
+  toAPIFormat,
+} from "@/services/api/types/search-criteria";
 
 function TicketsPage() {
   const { t } = useTranslation("tickets");
   const router = useRouter();
   const language = useLanguage();
-  const { user } = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string | null>("all");
   const [page, setPage] = useState(1);
   const [allTickets, setAllTickets] = useState<Ticket[]>([]);
 
-  // Filters state
-  const [filters, setFilters] = useState<TicketFilters>({
-    queueId: null,
-    status: null,
-    priority: null,
-    search: null,
-    userIds: null,
+  // Search criteria state using the unified interface
+  const [searchCriteria, setSearchCriteria] = useState<SearchCriteria>({
+    page: 1,
+    limit: 20,
   });
 
-  // Debounced search to prevent excessive API calls
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string | null>(
-    null
-  );
+  // Debounced search criteria to prevent excessive API calls
+  const [debouncedSearchCriteria, setDebouncedSearchCriteria] =
+    useState<SearchCriteria>(searchCriteria);
 
-  // Debounce search term updates
+  // Debounce search criteria updates
   React.useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearchTerm(filters.search);
-    }, 500); // 500ms delay
+      setDebouncedSearchCriteria(searchCriteria);
+    }, 300); // 300ms delay for all filters
 
     return () => {
       clearTimeout(handler);
     };
-  }, [filters.search]);
+  }, [searchCriteria]);
 
   const createTicketMutation = useCreateTicketMutation();
 
-  // Determine query filters based on active tab and filters state
-  const getQueryFilters = React.useCallback(() => {
-    const queryFilters: Record<string, string | string[] | null> = {};
-
-    // Add base filters
-    if (filters.queueId) queryFilters.queueId = filters.queueId;
-    if (filters.status) queryFilters.status = filters.status;
-    if (filters.priority) queryFilters.priority = filters.priority;
-    if (debouncedSearchTerm) queryFilters.search = debouncedSearchTerm;
-    if (filters.userIds && filters.userIds.length > 0)
-      queryFilters.userIds = filters.userIds;
-
-    // Add tab-specific filters
-    if (activeTab === "assigned" && user) {
-      queryFilters.assignedToId = user.id.toString();
-    } else if (activeTab === "unassigned") {
-      queryFilters.assignedToId = "null";
-    } else if (activeTab === "created" && user) {
-      queryFilters.createdById = user.id.toString();
-    } else if (activeTab === "open") {
-      queryFilters.status = TicketStatus.OPENED;
-    } else if (activeTab === "closed") {
-      queryFilters.status = TicketStatus.CLOSED;
-    }
-
-    return queryFilters;
-  }, [
-    filters.queueId,
-    filters.status,
-    filters.priority,
-    filters.userIds,
-    debouncedSearchTerm,
-    activeTab,
-    user,
-  ]);
-
-  const queryFilters = React.useMemo(
-    () => ({
-      ...getQueryFilters(),
+  // Convert search criteria to API format with pagination
+  const queryFilters = React.useMemo(() => {
+    return {
+      ...toAPIFormat(debouncedSearchCriteria),
       page,
       limit: 20,
-    }),
-    [getQueryFilters, page]
-  );
+    };
+  }, [debouncedSearchCriteria, page]);
 
   const {
     data: ticketsResponse,
@@ -131,27 +82,19 @@ function TicketsPage() {
 
   // Update allTickets when new data arrives
   React.useEffect(() => {
-    if (ticketsData.length > 0 || page === 1) {
-      if (page === 1) {
-        setAllTickets(ticketsData);
-      } else {
-        setAllTickets((prev) => [...prev, ...ticketsData]);
-      }
+    if (page === 1) {
+      // Always replace tickets on page 1 (new filter or reset)
+      setAllTickets(ticketsData);
+    } else if (ticketsData.length > 0) {
+      // Only append if we have data for pagination
+      setAllTickets((prev) => [...prev, ...ticketsData]);
     }
   }, [ticketsData, page]);
 
-  // Reset page when filters change
+  // Reset page when debounced search criteria change (actual query change)
   React.useEffect(() => {
     setPage(1);
-    setAllTickets([]);
-  }, [
-    filters.queueId,
-    filters.status,
-    filters.priority,
-    filters.userIds,
-    debouncedSearchTerm,
-    activeTab,
-  ]);
+  }, [debouncedSearchCriteria]);
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1);
@@ -187,24 +130,18 @@ function TicketsPage() {
     router.push(`/${language}/tickets/${ticketId}`);
   };
 
-  const handleEditTicket = (ticketId: string) => {
-    router.push(`/${language}/tickets/${ticketId}/edit`);
-  };
-
-  const handleFilterChange = (newFilters: Partial<TicketFilters>) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      ...newFilters,
+  const handleSearchCriteriaChange = (newCriteria: Partial<SearchCriteria>) => {
+    setSearchCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      ...newCriteria,
     }));
   };
 
   const handleImmediateSearch = (searchTerm: string) => {
     // For immediate search (Enter key or search icon), bypass debounce
-    setDebouncedSearchTerm(searchTerm);
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      search: searchTerm,
-    }));
+    const newCriteria = { ...searchCriteria, search: searchTerm || undefined };
+    setSearchCriteria(newCriteria);
+    setDebouncedSearchCriteria(newCriteria);
   };
 
   return (
@@ -220,30 +157,18 @@ function TicketsPage() {
           {t("tickets:tickets.actions.create")}
         </Button>
       </Group>
-      <Tabs value={activeTab} onChange={setActiveTab} mb="lg">
-        <Tabs.List>
-          <Tabs.Tab value="all">{t("tickets:tickets.tabs.all")}</Tabs.Tab>
-          <Tabs.Tab value="assigned">
-            {t("tickets:tickets.tabs.assigned")}
-          </Tabs.Tab>
-          <Tabs.Tab value="unassigned">
-            {t("tickets:tickets.tabs.unassigned")}
-          </Tabs.Tab>
-          <Tabs.Tab value="created">
-            {t("tickets:tickets.tabs.created")}
-          </Tabs.Tab>
-          <Tabs.Tab value="open">{t("tickets:tickets.tabs.open")}</Tabs.Tab>
-          <Tabs.Tab value="closed">{t("tickets:tickets.tabs.closed")}</Tabs.Tab>
-        </Tabs.List>
-      </Tabs>
-      <TicketList
-        tickets={allTickets}
-        totalCount={totalCount}
-        onViewTicket={handleViewTicket}
-        onEditTicket={handleEditTicket}
-        onFilterChange={handleFilterChange}
+      {/* Unified Search Panel */}
+      <UnifiedSearchPanel
+        searchCriteria={searchCriteria}
+        onSearchCriteriaChange={handleSearchCriteriaChange}
         onImmediateSearch={handleImmediateSearch}
-        filters={filters}
+        totalCount={totalCount}
+      />
+
+      {/* Tickets List */}
+      <SimpleTicketList
+        tickets={allTickets}
+        onViewTicket={handleViewTicket}
         isLoading={isLoading && page === 1}
         hasNextPage={hasNextPage}
         onLoadMore={handleLoadMore}

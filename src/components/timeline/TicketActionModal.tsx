@@ -34,7 +34,7 @@ import { useRouter } from "next/navigation";
 import { CommentBox } from "@/components/tickets/CommentBox";
 import { ReassignQueueModal } from "@/components/tickets/ReassignQueueModal";
 import { useGetHistoryItemsByTicketService } from "@/services/api/services/history-items";
-import { useGetUserService } from "@/services/api/services/users";
+import { useGetUsersBatchService } from "@/services/api/services/users";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { User } from "@/services/api/types/user";
 import {
@@ -89,7 +89,7 @@ export function TicketActionModal({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const getHistoryItemsByTicketService = useGetHistoryItemsByTicketService();
-  const getUserService = useGetUserService();
+  const getUsersBatchService = useGetUsersBatchService();
   const updateTicketStatusService = useUpdateTicketStatusService();
 
   // Fetch ticket history when modal opens
@@ -115,24 +115,28 @@ export function TicketActionModal({
             new Set<string>(recentHistory.map((item) => item.userId))
           );
 
-          // Fetch user details
-          const userMap: Record<string, User> = {};
-          for (const userId of userIds) {
-            if (userId && userId !== "system") {
-              try {
-                const userResponse = await getUserService({ id: userId });
-                if (
-                  userResponse.status === HTTP_CODES_ENUM.OK &&
-                  userResponse.data
-                ) {
-                  userMap[userId] = userResponse.data;
-                }
-              } catch (error) {
-                console.error(`Error fetching user ${userId}:`, error);
+          // Fetch user details in batch for better performance
+          const validUserIds = userIds.filter((id) => id && id !== "system");
+          if (validUserIds.length > 0) {
+            try {
+              const usersResponse = await getUsersBatchService(undefined, {
+                ids: validUserIds,
+              });
+              if (
+                usersResponse.status === HTTP_CODES_ENUM.OK &&
+                usersResponse.data
+              ) {
+                const userMap: Record<string, User> = {};
+                usersResponse.data.forEach((user) => {
+                  userMap[user.id] = user;
+                });
+                setUsers(userMap);
               }
+            } catch (error) {
+              console.error("Error fetching users in batch:", error);
+              setUsers({});
             }
           }
-          setUsers(userMap);
         }
       } catch (error) {
         console.error("Error fetching history:", error);
@@ -142,7 +146,7 @@ export function TicketActionModal({
     };
 
     fetchHistoryAndUsers();
-  }, [opened, ticket, getHistoryItemsByTicketService, getUserService]);
+  }, [opened, ticket, getHistoryItemsByTicketService, getUsersBatchService]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -309,7 +313,7 @@ export function TicketActionModal({
                   variant="filled"
                   size="sm"
                 >
-                  {ticket.status}
+                  {t(`tickets:tickets.statuses.${ticket.status}`)}
                 </Badge>
 
                 <Badge
@@ -317,7 +321,8 @@ export function TicketActionModal({
                   variant="light"
                   size="sm"
                 >
-                  {ticket.priority} {t("timeline:priority.label")}
+                  {t(`tickets:tickets.priorities.${ticket.priority}`)}{" "}
+                  {t("timeline:priority.label")}
                 </Badge>
               </Group>
 

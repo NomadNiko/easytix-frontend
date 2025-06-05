@@ -116,7 +116,7 @@ const NotificationItem = ({
             onClick={handleDelete}
             loading={deleteNotificationMutation.isPending}
           >
-            <IconTrash size={theme.other.iconSizes.md} />
+            <IconTrash size={theme.other.iconSizesPixels.md} />
           </ActionIcon>
         )}
       </Group>

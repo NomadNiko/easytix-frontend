@@ -1,0 +1,279 @@
+{
+  "pageTitle": "Reports & Analytics",
+  "pageDescription": "Comprehensive reports and analytics for ticket management system",
+
+  "filters": {
+    "title": "Filters",
+    "dateRange": "Date Range",
+    "selectDateRange": "Select date range",
+    "queues": "Queues",
+    "selectQueues": "Select queues to filter",
+    "categories": "Categories",
+    "selectCategories": "Select categories to filter",
+    "priorities": "Priorities",
+    "selectPriorities": "Select priorities to filter",
+    "users": "Users",
+    "selectUsers": "Select users to filter",
+    "reset": "Reset Filters",
+    "apply": "Apply Filters"
+  },
+
+  "tabs": {
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "trends": "Trends",
+    "performance": "Performance",
+    "queues": "Queues",
+    "categories": "Categories",
+    "flow": "Status Flow"
+  },
+
+  "metrics": {
+    "totalTickets": "Total Tickets",
+    "totalResolved": "Total Resolved",
+    "totalOpen": "Total Open",
+    "totalInProgress": "In Progress",
+    "totalClosed": "Total Closed",
+    "averageResolutionTime": "Avg Resolution Time",
+    "medianResolutionTime": "Median Resolution Time",
+    "medianTime": "Median Time",
+    "activeUsers": "Active Users",
+    "activeAgents": "Active Agents",
+    "activeQueues": "Active Queues",
+    "resolutionRate": "Resolution Rate",
+    "tickets": "tickets",
+    "assigned": "Assigned",
+    "resolved": "Resolved",
+    "avgTime": "Avg Time",
+    "total": "Total",
+    "open": "Open",
+    "inProgress": "In Progress",
+    "closed": "Closed",
+    "created": "Created",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "avgResolutionTime": "Average Resolution Time",
+    "ticketCount": "Ticket Count",
+    "resolutionTimeHours": "Resolution Time (Hours)",
+    "volumeCreated": "Tickets Created",
+    "volumeResolved": "Tickets Resolved",
+    "volumeClosed": "Tickets Closed",
+    "fromLastPeriod": "from last period",
+    "noChange": "No change",
+    "ofTotal": "of total"
+  },
+
+  "sections": {
+    "keyMetrics": "Key Metrics",
+    "resolutionByPriority": "Resolution Time by Priority",
+    "resolutionByQueue": "Resolution Time by Queue",
+    "volumeTrends": "Volume Trends",
+    "dailyTrends": "Daily Trends",
+    "weeklyTrends": "Weekly Trends",
+    "monthlyTrends": "Monthly Trends",
+    "userPerformance": "User Performance",
+    "topPerformers": "Top Performers",
+    "detailedPerformance": "Detailed Performance Metrics",
+    "queuePerformance": "Queue Performance",
+    "categoryBreakdown": "Category Breakdown",
+    "statusFlow": "Status Flow Analysis",
+    "averageTimeInStatus": "Average Time in Status",
+    "timeInStatus": "Time in Status",
+    "statusTransitions": "Status Transitions",
+    "resolutionTimeAnalysis": "Resolution Time Analysis",
+    "workloadDistribution": "Workload Distribution",
+    "priorityDistribution": "Priority Distribution",
+    "recentActivity": "Recent Activity"
+  },
+
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+
+  "status": {
+    "opened": "Opened",
+    "in-progress": "In Progress",
+    "inProgress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+
+  "timeRanges": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last7Days": "Last 7 Days",
+    "last30Days": "Last 30 Days",
+    "last90Days": "Last 90 Days",
+    "lastYear": "Last Year",
+    "custom": "Custom Range"
+  },
+
+  "periods": {
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly"
+  },
+
+  "charts": {
+    "loading": "Loading chart data...",
+    "noData": "No data available for the selected criteria",
+    "error": "Error loading chart data",
+    "volumeOverTime": "Ticket Volume Over Time",
+    "resolutionTrends": "Resolution Time Trends",
+    "performanceComparison": "Performance Comparison",
+    "queueDistribution": "Queue Status Distribution",
+    "priorityDistribution": "Priority Distribution",
+    "statusDistribution": "Status Distribution",
+    "userWorkload": "User Workload",
+    "categoryAnalysis": "Category Analysis",
+    "peakHours": "Peak Hours Analysis",
+    "hourlyPeakAnalysis": "Hourly Activity Distribution",
+    "dailyPeakAnalysis": "Daily Activity Distribution"
+  },
+
+  "table": {
+    "agent": "Agent",
+    "user": "User",
+    "queue": "Queue",
+    "category": "Category",
+    "assigned": "Assigned",
+    "resolved": "Resolved",
+    "inProgress": "In Progress",
+    "avgResolutionTime": "Avg Resolution Time",
+    "resolutionRate": "Resolution Rate",
+    "last7Days": "Last 7 Days",
+    "from": "From",
+    "to": "To",
+    "count": "Count",
+    "avgTime": "Avg Time",
+    "ticketsAssigned": "Tickets Assigned",
+    "ticketsResolved": "Tickets Resolved",
+    "averageTime": "Average Time",
+    "totalTickets": "Total Tickets",
+    "performance": "Performance",
+    "rank": "Rank",
+    "trend": "Trend",
+    "lastUpdated": "Last Updated",
+    "actions": "Actions",
+    "viewDetails": "View Details",
+    "exportData": "Export Data"
+  },
+
+  "actions": {
+    "export": "Export Report",
+    "download": "Download",
+    "share": "Share"
+  },
+
+  "export": {
+    "title": "Export Data",
+    "description": "Export analytics data in various formats",
+    "csv": "Export as CSV",
+    "excel": "Export as Excel",
+    "pdf": "Export as PDF",
+    "image": "Export Chart as Image",
+    "processing": "Processing export...",
+    "success": "Export completed successfully",
+    "error": "Error during export",
+    "filename": "Filename",
+    "includeCharts": "Include Charts",
+    "includeData": "Include Raw Data",
+    "dateRange": "Date Range",
+    "selectedMetrics": "Selected Metrics",
+    "noData": "No data available for export"
+  },
+
+  "dashboard": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Comprehensive overview of your ticket management system",
+    "lastRefresh": "Last refreshed",
+    "autoRefresh": "Auto-refresh",
+    "refreshNow": "Refresh Now",
+    "customize": "Customize Dashboard",
+    "fullscreen": "Fullscreen Mode",
+    "print": "Print Dashboard"
+  },
+
+  "comparison": {
+    "title": "Period Comparison",
+    "compareTo": "Compare to",
+    "previousPeriod": "Previous Period",
+    "samePeriodiousYear": "Same Period Last Year",
+    "custom": "Custom Period",
+    "percentageChange": "% Change",
+    "improvement": "Improvement",
+    "decline": "Decline",
+    "noChange": "No Change"
+  },
+
+  "forecasting": {
+    "title": "Forecasting",
+    "predictedVolume": "Predicted Volume",
+    "expectedResolutionTime": "Expected Resolution Time",
+    "capacityPlanning": "Capacity Planning",
+    "trendAnalysis": "Trend Analysis",
+    "seasonalPatterns": "Seasonal Patterns",
+    "confidence": "Confidence",
+    "accuracy": "Accuracy"
+  },
+
+  "alerts": {
+    "title": "Performance Alerts",
+    "highVolume": "High ticket volume detected",
+    "slowResolution": "Resolution times are above average",
+    "queueBacklog": "Queue has significant backlog",
+    "userOverload": "User has high workload",
+    "categorySpike": "Unusual spike in category",
+    "configure": "Configure Alerts",
+    "dismiss": "Dismiss",
+    "viewDetails": "View Details"
+  },
+
+  "error": {
+    "title": "Unable to load analytics data",
+    "message": "There was an error loading the analytics data. Please try refreshing the page or contact support if the issue persists.",
+    "retry": "Retry",
+    "contactSupport": "Contact Support"
+  },
+
+  "loading": {
+    "analytics": "Loading analytics...",
+    "charts": "Loading charts...",
+    "data": "Loading data...",
+    "calculating": "Calculating metrics...",
+    "processing": "Processing request..."
+  },
+
+  "empty": {
+    "noData": "No data available",
+    "noTickets": "No tickets found for the selected criteria",
+    "noActivity": "No activity in the selected period",
+    "selectFilters": "Select filters to view analytics",
+    "createTickets": "Create some tickets to see analytics"
+  },
+
+  "help": {
+    "title": "Analytics Help",
+    "overview": "The overview tab provides key metrics and summaries",
+    "trends": "The trends tab shows volume and resolution patterns over time",
+    "performance": "The performance tab analyzes user and team productivity",
+    "queues": "The queues tab provides queue-specific analytics",
+    "filters": "Use filters to focus on specific time periods, queues, or categories",
+    "export": "Export data for external analysis or reporting",
+    "refresh": "Data is automatically refreshed every 5 minutes"
+  },
+
+  "comingSoon": "Charts and detailed visualizations coming soon. Currently showing summary data only.",
+
+  "notifications": {
+    "dataRefreshed": "Analytics data has been refreshed",
+    "exportStarted": "Export has been started",
+    "exportCompleted": "Export completed successfully",
+    "filterApplied": "Filters have been applied",
+    "error": "An error occurred while processing your request"
+  },
+
+  "more": "more"
+}

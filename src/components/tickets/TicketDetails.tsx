@@ -246,7 +246,7 @@ export function TicketDetails({
     };
     return (
       <Badge color={colorMap[priority]} size="md">
-        {priority}
+        {t(`tickets:tickets.priorities.${priority}`)}
       </Badge>
     );
   };
@@ -260,7 +260,7 @@ export function TicketDetails({
     };
     return (
       <Badge color={colorMap[status]} size="md">
-        {status}
+        {t(`tickets:tickets.statuses.${status}`)}
       </Badge>
     );
   };

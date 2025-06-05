@@ -17,7 +17,10 @@ import {
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { TicketBlock } from "./TicketBlock";
-import { useGetTicketsService } from "@/services/api/services/tickets";
+import {
+  useGetTicketsService,
+  TicketStatus,
+} from "@/services/api/services/tickets";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
 interface Ticket {
@@ -84,19 +87,19 @@ export function TimelineMobile({
       try {
         const { status, data } = await getTicketsService(undefined, {
           page: 1,
-          limit: 1000,
+          limit: 300, // Reduced limit for better performance
           queueId,
+          statuses: [
+            TicketStatus.OPENED,
+            TicketStatus.IN_PROGRESS,
+            TicketStatus.RESOLVED,
+          ], // Filter at API level
         });
 
         if (status === HTTP_CODES_ENUM.OK) {
+          // Filtering now done at API level for better performance
           const ticketsArray = Array.isArray(data) ? data : data.data || [];
-          const filteredTickets = ticketsArray.filter(
-            (ticket: Ticket) =>
-              ticket.status === "Opened" ||
-              ticket.status === "In Progress" ||
-              ticket.status === "Resolved"
-          );
-          setTickets(filteredTickets);
+          setTickets(ticketsArray);
         }
       } catch (error) {
         console.error("Error fetching tickets:", error);

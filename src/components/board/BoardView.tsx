@@ -37,12 +37,7 @@ import { ExpandedTicketModal } from "./ExpandedTicketModal";
 import { ResponsiveDisplay } from "@/components/responsive-display/ResponsiveDisplay";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 
-// Dynamic import for modal to prevent flashing
-const TicketActionModal = React.lazy(() =>
-  import("../timeline/TicketActionModal").then((module) => ({
-    default: module.TicketActionModal,
-  }))
-);
+// No longer needed - using ExpandedTicketModal directly
 
 interface Ticket {
   id: string;
@@ -85,8 +80,6 @@ export function BoardView() {
   const [draggedTicket, setDraggedTicket] = useState<Ticket | null>(null);
   const [expandedTicket, setExpandedTicket] = useState<Ticket | null>(null);
   const [expandedModalOpen, setExpandedModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const getTicketsService = useGetTicketsService();
@@ -135,7 +128,7 @@ export function BoardView() {
       try {
         const { status, data } = await getTicketsService(undefined, {
           page: 1,
-          limit: 1000,
+          limit: 200, // Reduced from 1000 to improve performance
           queueId: selectedQueueId,
         });
 
@@ -174,6 +167,10 @@ export function BoardView() {
 
   const resolvedTickets = tickets.filter(
     (ticket) => ticket.status === TicketStatus.RESOLVED
+  );
+
+  const closedTickets = tickets.filter(
+    (ticket) => ticket.status === TicketStatus.CLOSED
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -236,6 +233,21 @@ export function BoardView() {
     ) {
       // Moving to resolved - show closing notes modal
       setClosingNotesModalOpen(true);
+    } else if (over.id === "closed" && ticket.status !== TicketStatus.CLOSED) {
+      // Moving to closed - update status to CLOSED
+      try {
+        const response = await updateTicketStatusService(
+          { status: TicketStatus.CLOSED },
+          { id: ticket.id }
+        );
+
+        if (response.status === HTTP_CODES_ENUM.OK) {
+          await fetchTickets(false);
+        }
+      } catch (error) {
+        console.error("Error closing ticket:", error);
+      }
+      setDraggedTicket(null);
     }
   };
 
@@ -285,13 +297,18 @@ export function BoardView() {
   };
 
   const handleTicketClick = (ticket: Ticket) => {
-    setSelectedTicket(ticket);
-    setIsActionModalOpen(true);
+    setExpandedTicket(ticket);
+    setExpandedModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setSelectedTicket(null);
-    setIsActionModalOpen(false);
+  const handleExpandedModalClose = () => {
+    setExpandedTicket(null);
+    setExpandedModalOpen(false);
+  };
+
+  const handleTicketUpdate = () => {
+    // Refresh the board data when ticket is updated
+    fetchTickets(false);
   };
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -333,7 +350,7 @@ export function BoardView() {
               onDragStart={handleDragStart}
             >
               <SimpleGrid
-                cols={3}
+                cols={4}
                 spacing="lg"
                 style={{
                   opacity: isRefreshing ? theme.other.opacity.hover : 1,
@@ -361,6 +378,14 @@ export function BoardView() {
                   title={t("board:columns.resolved")}
                   tickets={resolvedTickets}
                   color="green"
+                  onTicketClick={handleTicketClick}
+                />
+
+                <BoardColumn
+                  id="closed"
+                  title={t("board:columns.closed")}
+                  tickets={closedTickets}
+                  color="gray"
                   onTicketClick={handleTicketClick}
                 />
               </SimpleGrid>
@@ -426,25 +451,12 @@ export function BoardView() {
         </>
       )}
 
-      {/* Timeline-style Action Modal */}
-      {selectedTicket && isActionModalOpen && (
-        <React.Suspense fallback={<div>Loading...</div>}>
-          <TicketActionModal
-            ticket={selectedTicket}
-            opened={isActionModalOpen}
-            onClose={handleCloseModal}
-          />
-        </React.Suspense>
-      )}
-
       {/* Expanded Ticket Modal */}
       <ExpandedTicketModal
         opened={expandedModalOpen}
-        onClose={() => {
-          setExpandedModalOpen(false);
-          setExpandedTicket(null);
-        }}
+        onClose={handleExpandedModalClose}
         ticket={expandedTicket}
+        onTicketUpdate={handleTicketUpdate}
       />
     </Box>
   );

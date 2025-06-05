@@ -49,6 +49,12 @@ export const createNavigationConfig = (): NavigationItem[] => [
         requiresAuth: true,
         roles: [RoleEnum.ADMIN, RoleEnum.SERVICE_DESK],
       },
+      {
+        label: "common:navigation.reports",
+        path: "/reports",
+        requiresAuth: true,
+        roles: [RoleEnum.ADMIN, RoleEnum.SERVICE_DESK],
+      },
     ],
   },
   // Admin dropdown for admin only

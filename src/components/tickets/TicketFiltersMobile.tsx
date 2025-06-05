@@ -1,23 +1,33 @@
 // src/components/tickets/TicketFiltersMobile.tsx
 import React from "react";
 import { Accordion, Box, Button, Group, Select } from "@mantine/core";
-import { IconFilter, IconX } from "@tabler/icons-react";
+import { DateInput } from "@mantine/dates";
+import { IconFilter, IconX, IconCalendar } from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import { TicketPriority, TicketStatus } from "@/services/api/services/tickets";
 import { QueueSelect } from "./queues/QueueSelect";
+import { CategorySelect } from "./categories/CategorySelect";
 
 interface TicketFiltersMobileProps {
   filters: {
     queueId?: string | null;
+    categoryId?: string | null;
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
+    userIds?: string[] | null;
+    createdAfter?: Date | null;
+    createdBefore?: Date | null;
   };
   onFilterChange: (filters: {
     queueId?: string | null;
+    categoryId?: string | null;
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
+    userIds?: string[] | null;
+    createdAfter?: Date | null;
+    createdBefore?: Date | null;
   }) => void;
 }
 
@@ -40,9 +50,13 @@ export function TicketFiltersMobile({
   const handleClearFilters = () => {
     onFilterChange({
       queueId: null,
+      categoryId: null,
       status: null,
       priority: null,
       search: null,
+      userIds: null,
+      createdAfter: null,
+      createdBefore: null,
     });
   };
 
@@ -78,6 +92,16 @@ export function TicketFiltersMobile({
             </Box>
 
             <Box mb="sm">
+              <CategorySelect
+                queueId={filters.queueId || null}
+                value={filters.categoryId || null}
+                onChange={(value) => handleFilterChange("categoryId", value)}
+                label={t("tickets:tickets.filters.category")}
+                placeholder={t("tickets:tickets.filters.anyCategory")}
+              />
+            </Box>
+
+            <Box mb="sm">
               <Select
                 label={t("tickets:tickets.filters.status")}
                 placeholder={t("tickets:tickets.filters.anyStatus")}
@@ -100,6 +124,30 @@ export function TicketFiltersMobile({
                   handleFilterChange("priority", value as TicketPriority | null)
                 }
                 clearable
+              />
+            </Box>
+
+            <Box mb="sm">
+              <DateInput
+                label={t("tickets:tickets.filters.createdAfter")}
+                placeholder={t("tickets:tickets.filters.selectDate")}
+                value={filters.createdAfter}
+                onChange={(value) => handleFilterChange("createdAfter", value)}
+                leftSection={<IconCalendar size={16} />}
+                clearable
+                size="sm"
+              />
+            </Box>
+
+            <Box mb="sm">
+              <DateInput
+                label={t("tickets:tickets.filters.createdBefore")}
+                placeholder={t("tickets:tickets.filters.selectDate")}
+                value={filters.createdBefore}
+                onChange={(value) => handleFilterChange("createdBefore", value)}
+                leftSection={<IconCalendar size={16} />}
+                clearable
+                size="sm"
               />
             </Box>
 

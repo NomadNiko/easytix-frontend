@@ -10,9 +10,9 @@ import {
   ScrollArea,
   Paper,
 } from "@mantine/core";
-import { useGetTicketsService } from "@/services/api/services/tickets";
-import { useState, useEffect } from "react";
+import { useTicketsQuery } from "@/app/[language]/tickets/queries/ticket-queries";
 import { User } from "@/services/api/types/user";
+import { useTranslation } from "@/services/i18n/client";
 import { useRouter } from "next/navigation";
 import { IconExternalLink } from "@tabler/icons-react";
 import useLanguage from "@/services/i18n/use-language";
@@ -23,56 +23,26 @@ interface UserTicketsModalProps {
   onClose: () => void;
 }
 
-interface Ticket {
-  id: string;
-  title: string;
-  status: string;
-  priority: string;
-  details: string;
-  createdAt: string;
-  queue?: {
-    name: string;
-  };
-}
-
 export function UserTicketsModal({
   user,
   opened,
   onClose,
 }: UserTicketsModalProps) {
-  // const { t } = useTranslation("admin-panel-users");
+  const { t } = useTranslation("tickets");
   const router = useRouter();
   const language = useLanguage();
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(false);
-  const getTicketsService = useGetTicketsService();
 
-  const fetchUserTickets = async () => {
-    setLoading(true);
-    try {
-      const response = await getTicketsService(undefined, {
-        page: 1,
-        limit: 100,
-        createdById: user.id,
-      });
+  // Use React Query for optimized data fetching with caching
+  const { data: ticketsResponse, isLoading: loading } = useTicketsQuery(
+    {
+      page: 1,
+      limit: 50, // Reduced limit for better performance
+      createdById: user.id,
+    },
+    opened // Only fetch when modal is opened
+  );
 
-      if (response.status === 200 && response.data) {
-        setTickets(response.data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching user tickets:", error);
-      setTickets([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (opened) {
-      fetchUserTickets();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [opened]);
+  const tickets = ticketsResponse?.data || [];
 
   const handleTicketClick = (ticketId: string) => {
     router.push(`/${language}/tickets/${ticketId}`);
@@ -143,10 +113,10 @@ export function UserTicketsModal({
 
                   <Group gap="xs" mb="xs">
                     <Badge size="sm" color={getStatusColor(ticket.status)}>
-                      {ticket.status}
+                      {t(`tickets:tickets.statuses.${ticket.status}`)}
                     </Badge>
                     <Badge size="sm" color={getPriorityColor(ticket.priority)}>
-                      {ticket.priority}
+                      {t(`tickets:tickets.priorities.${ticket.priority}`)}
                     </Badge>
                     {ticket.queue?.name && (
                       <Badge size="sm" variant="outline">

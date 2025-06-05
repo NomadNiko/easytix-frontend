@@ -14,8 +14,16 @@ import {
   Button,
   Title,
   MultiSelect,
+  Checkbox,
 } from "@mantine/core";
-import { IconSearch, IconX } from "@tabler/icons-react";
+import { DateInput } from "@mantine/dates";
+import {
+  IconSearch,
+  IconX,
+  IconCalendar,
+  IconChevronLeft,
+  IconChevronRight,
+} from "@tabler/icons-react";
 import { useTranslation } from "@/services/i18n/client";
 import {
   Ticket,
@@ -24,6 +32,7 @@ import {
 } from "@/services/api/services/tickets";
 import { formatDate } from "@/utils/format-date";
 import { QueueSelect } from "./queues/QueueSelect";
+import { CategorySelect } from "./categories/CategorySelect";
 import { ResponsiveDisplay } from "@/components/responsive-display/ResponsiveDisplay";
 import { TicketListMobile } from "./TicketListMobile";
 import { TicketFiltersMobile } from "./TicketFiltersMobile";
@@ -37,18 +46,26 @@ interface TicketListProps {
   onEditTicket: (ticketId: string) => void;
   onFilterChange: (filters: {
     queueId?: string | null;
+    categoryId?: string | null;
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
     userIds?: string[] | null;
+    createdAfter?: Date | null;
+    createdBefore?: Date | null;
+    unassigned?: boolean;
   }) => void;
   onImmediateSearch?: (searchTerm: string) => void;
   filters: {
     queueId?: string | null;
+    categoryId?: string | null;
     status?: TicketStatus | null;
     priority?: TicketPriority | null;
     search?: string | null;
     userIds?: string[] | null;
+    createdAfter?: Date | null;
+    createdBefore?: Date | null;
+    unassigned?: boolean;
   };
   isLoading: boolean;
   hasNextPage?: boolean;
@@ -170,10 +187,14 @@ export function TicketList({
   const handleClearFilters = () => {
     onFilterChange({
       queueId: null,
+      categoryId: null,
       status: null,
       priority: null,
       search: null,
       userIds: null,
+      createdAfter: null,
+      createdBefore: null,
+      unassigned: false,
     });
   };
 
@@ -185,7 +206,7 @@ export function TicketList({
     };
     return (
       <Badge color={colorMap[priority]} size="sm">
-        {priority}
+        {t(`tickets:tickets.priorities.${priority}`)}
       </Badge>
     );
   };
@@ -199,7 +220,7 @@ export function TicketList({
     };
     return (
       <Badge color={colorMap[status]} size="sm">
-        {status}
+        {t(`tickets:tickets.statuses.${status}`)}
       </Badge>
     );
   };
@@ -312,6 +333,15 @@ export function TicketList({
             />
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <CategorySelect
+              queueId={filters.queueId || null}
+              value={filters.categoryId || null}
+              onChange={(value) => handleFilterChange("categoryId", value)}
+              label={t("tickets:tickets.filters.category")}
+              placeholder={t("tickets:tickets.filters.anyCategory")}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
             <Select
               label={t("tickets:tickets.filters.status")}
               placeholder={t("tickets:tickets.filters.anyStatus")}
@@ -335,6 +365,59 @@ export function TicketList({
               }
               clearable
               data-testid="ticket-filter-priority"
+            />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <DateInput
+              label={t("tickets:tickets.filters.createdAfter")}
+              placeholder={t("tickets:tickets.filters.selectDate")}
+              value={filters.createdAfter}
+              onChange={(value) => handleFilterChange("createdAfter", value)}
+              leftSection={<IconCalendar size={16} />}
+              clearable
+              data-testid="ticket-filter-created-after"
+              size="sm"
+              previousIcon={<IconChevronLeft size={16} stroke={2} />}
+              nextIcon={<IconChevronRight size={16} stroke={2} />}
+              popoverProps={{
+                withinPortal: true,
+                zIndex: 999999,
+                classNames: {
+                  dropdown: "date-picker-popover-after",
+                },
+              }}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <DateInput
+              label={t("tickets:tickets.filters.createdBefore")}
+              placeholder={t("tickets:tickets.filters.selectDate")}
+              value={filters.createdBefore}
+              onChange={(value) => handleFilterChange("createdBefore", value)}
+              leftSection={<IconCalendar size={16} />}
+              clearable
+              data-testid="ticket-filter-created-before"
+              size="sm"
+              previousIcon={<IconChevronLeft size={16} stroke={2} />}
+              nextIcon={<IconChevronRight size={16} stroke={2} />}
+              popoverProps={{
+                withinPortal: true,
+                zIndex: 999999,
+                classNames: {
+                  dropdown: "date-picker-popover-before",
+                },
+              }}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
+            <Checkbox
+              label={t("tickets:tickets.filters.unassigned")}
+              checked={filters.unassigned || false}
+              onChange={(event) =>
+                handleFilterChange("unassigned", event.currentTarget.checked)
+              }
+              data-testid="ticket-filter-unassigned"
+              mt="xl"
             />
           </Grid.Col>
         </Grid>
@@ -523,6 +606,18 @@ export function TicketList({
           clearable
           disabled={isLoadingUsers}
           data-testid="ticket-filter-users-mobile"
+        />
+        <Checkbox
+          label={t("tickets:tickets.filters.unassigned")}
+          checked={filters.unassigned || false}
+          onChange={(event) =>
+            onFilterChange({
+              ...filters,
+              unassigned: event.currentTarget.checked,
+            })
+          }
+          data-testid="ticket-filter-unassigned-mobile"
+          mt="md"
         />
       </Paper>
 
